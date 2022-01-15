@@ -1,95 +1,195 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
+
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj.RobotState;
+import frc.robot.subsystems.DriveSystem;
+import frc.robot.subsystems.HighClimbSystem;
+import frc.robot.subsystems.IntakeSystem;
+import frc.robot.subsystems.MidClimbSystem;
+import frc.robot.subsystems.ShooterSystem;
 
-/**
- * The VM is configured to automatically run this class, and to call the functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the name of this class or
- * the package after creating this project, you must also update the build.gradle file in the
- * project.
- */
 public class Robot extends TimedRobot {
-  private Command m_autonomousCommand;
+  private Logger stateLogger = LogManager.getLogger("robot_state");
+	private Logger robotLogger = LogManager.getLogger("robot");
 
-  private RobotContainer m_robotContainer;
+	private ObjectMapper mapper = new ObjectMapper();
+
+	private Command autoCommand = null;
+
+	private RobotContainer container = null;
+
+	/**
+   * Tracks the current state of the robot
+   */
+  private RobotState robotState = null;
+
+	/**
+	 * Thread pool for handling interval based tasks that are outside of the
+	 * typical robot lifecyle. In other words, things that should not be on the
+	 * robot's main loop/thread.
+	 */
+	private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
+
+	/**
+	 * The robot's drive train subsystem.
+	 */
+	public final static DriveSystem drive = new DriveSystem();
+
+	/**
+	 * The robot's intake subsystem.
+	 */
+	public final static IntakeSystem intake = new IntakeSystem();
+
+	/**
+	 * The robot's mid rung climber subsystem.
+	 */
+	public final static MidClimbSystem midClimber = new MidClimbSystem();
 
   /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-  @Override
-  public void robotInit() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
-    m_robotContainer = new RobotContainer();
-  }
+	 * The robot's high/transversal rung climber subsystem.
+	 */
+	public final static HighClimbSystem highClimber = new HighClimbSystem();
 
-  /**
-   * This function is called every robot packet, no matter the mode. Use this for items like
-   * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>This runs after the mode specific periodic functions, but before LiveWindow and
-   * SmartDashboard integrated updating.
-   */
-  @Override
-  public void robotPeriodic() {
-    // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
-    // commands, running already-scheduled commands, removing finished or interrupted commands,
-    // and running subsystem periodic() methods.  This must be called from the robot's periodic
-    // block in order for anything in the Command-based framework to work.
-    CommandScheduler.getInstance().run();
-  }
+	/**
+	 * The robot's shooter subsystem.
+	 */
+	public final static ShooterSystem shooter = new ShooterSystem();
 
-  /** This function is called once each time the robot enters Disabled mode. */
-  @Override
-  public void disabledInit() {}
+	/**
+	 * This function is run when the robot is first started up and should be
+	 * used for any initialization code.
+	 */
+	@Override
+	public void robotInit() {
+		// Instantiate our RobotContainer.  This will perform all our button
+		// bindings, and put our autonomous chooser on the dashboard.
+		this.container = new RobotContainer();
 
-  @Override
-  public void disabledPeriodic() {}
+		// this.robotState = new RobotState()
+		//  .withPDP(new PowerDistributionPanel())
+		// 	.withDriveSystem(Robot.drive)
+		// 	.withIntakeSystem(Robot.intake);
 
-  /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
-    // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+		SlotConfiguration[] slots = Robot.drive.getPID();
 
-    // schedule the autonomous command (example)
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
-    }
-  }
+		for (int i = 0; i < slots.length; i++) {
+			this.robotLogger.info("Slot: {} - P: {} I: {} D: {} F: {}",
+				i, slots[i].kP, slots[i].kI, slots[i].kD, slots[i].kF
+			);
+		}
+	}
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
+	@Override
+	public void robotPeriodic() {
+		CommandScheduler.getInstance().run();
+	}
 
-  @Override
-  public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-  }
+	/**
+	 * This function is called once each time the robot enters Disabled mode.
+	 */
+	@Override
+	public void disabledInit() {
+	}
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
+	@Override
+	public void disabledPeriodic() {
+	}
 
-  @Override
-  public void testInit() {
-    // Cancels all running commands at the start of test mode.
-    CommandScheduler.getInstance().cancelAll();
-  }
+	/**
+	 * This autonomous runs the autonomous command selected by your
+	 * {@link RobotContainer} class.
+	 */
+	@Override
+	public void autonomousInit() {
+		Robot.drive.setPIDF(
+			DriveSystem.POSITION_P,
+			DriveSystem.POSITION_I,
+			DriveSystem.POSITION_D,
+			DriveSystem.POSITION_FEED_FORWARD
+		);
+		// Robot.drive.setPIDF(
+		// 	DriveSystem.VELOCITY_P,
+		// 	DriveSystem.VELOCITY_I,
+		// 	DriveSystem.VELOCITY_D,
+		// 	DriveSystem.VELOCITY_FEED_FORWARD
+		// );
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
+		Robot.drive.resetAngle();
+		this.robotLogger.info("reset drive system angle: {}", Robot.drive.getAngle());
+
+		Robot.drive.resetPosition();
+
+		this.autoCommand = this.container.getAutonomousCommand();
+
+		// schedule the autonomous command (example)
+		if (this.autoCommand != null) {
+			this.autoCommand.schedule();
+		}
+	}
+
+	/**
+	 * This function is called periodically during autonomous.
+	 */
+	@Override
+	public void autonomousPeriodic() {
+
+	}
+
+	@Override
+	public void teleopInit() {
+		Robot.drive.setPIDF(
+			DriveSystem.VELOCITY_P,
+			DriveSystem.VELOCITY_I,
+			DriveSystem.VELOCITY_D,
+			DriveSystem.VELOCITY_FEED_FORWARD
+		);
+
+		Robot.drive.resetAngle();
+		Robot.drive.resetPosition();
+
+		// This makes sure that the autonomous stops running when
+		// teleop starts running. If you want the autonomous to
+		// continue until interrupted by another command, remove
+		// this line or comment it out.
+		if (this.autoCommand != null) {
+			this.autoCommand.cancel();
+		}
+	}
+
+	/**
+	 * This function is called periodically during operator control.
+	 */
+	@Override
+	public void teleopPeriodic() {
+	}
+
+	@Override
+	public void testInit() {
+		// Cancels all running commands at the start of test mode.
+		CommandScheduler.getInstance().cancelAll();
+	}
+
+	/**
+	 * This function is called periodically during test mode.
+	 */
+	@Override
+	public void testPeriodic() {
+	}
+
+	@Override
+	public void startCompetition() {
+		super.startCompetition();
+	}
 }

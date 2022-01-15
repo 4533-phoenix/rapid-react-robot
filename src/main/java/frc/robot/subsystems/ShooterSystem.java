@@ -66,6 +66,13 @@ public class ShooterSystem extends SubsystemBase {
         flywheelIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
+    public void resetPosition() {
+        leftFlywheelMotor.setSelectedSensorPosition(0);
+        rightFlywheelMotor.setSelectedSensorPosition(0);
+
+        flywheelIntakeMotor.setSelectedSensorPosition(0);
+    }
+
     @Override
     public void periodic() {
 
