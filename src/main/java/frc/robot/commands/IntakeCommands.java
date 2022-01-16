@@ -11,5 +11,25 @@ import frc.robot.Robot;
 public class IntakeCommands {
     public IntakeCommands() {}
 
-    
+    public static Command intakeInCommand() {
+		return new InstantCommand(
+			() -> Robot.intake.intakeIn(),
+			Robot.intake
+		);
+	}
+
+	public static Command intakeOutCommand() {
+		return new InstantCommand(
+			() -> Robot.intake.intakeOut(),
+			Robot.intake
+		);
+	}
+
+	public static Command intakeStopCommand() {
+		return new InstantCommand(
+			() -> Robot.intake.intakeStop(),
+			Robot.intake
+		);
+	}
+
 }
