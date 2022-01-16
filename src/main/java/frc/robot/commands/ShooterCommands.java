@@ -11,5 +11,31 @@ import frc.robot.Robot;
 public class ShooterCommands {
     public ShooterCommands() {}
 
-    
+    public static Command flywheelOutCommand() {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelOut(),
+            Robot.shooter
+        );
+    }
+
+    public static Command flywheelInCommand() {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelIn(),
+            Robot.shooter
+        );
+    }
+
+    public static Command flywheelIntakeInCommand() {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelIntakeIn(), 
+            Robot.shooter
+        );
+    }
+
+    public static Command flywheelIntakeOutCommand() {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelIntakeOut(),
+            Robot.shooter
+        );
+    }
 }
