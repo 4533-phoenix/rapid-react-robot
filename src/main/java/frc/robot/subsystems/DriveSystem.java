@@ -5,8 +5,13 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMax.*;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -20,10 +25,13 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 public class DriveSystem extends SubsystemBase {
     
 	// Drive train motor controllers
-	private WPI_TalonSRX rightMaster;
-	private WPI_TalonSRX rightSlave;
-	private WPI_TalonSRX leftMaster;
-	private WPI_TalonSRX leftSlave;
+	private CANSparkMax rightMaster;
+	private CANSparkMax rightSlave;
+	private CANSparkMax leftMaster;
+	private CANSparkMax leftSlave;
+
+	private RelativeEncoder rightEncoder;
+	private RelativeEncoder leftEncoder;
 
 	// Onboard IMU.
 	private AHRS navX;
@@ -103,20 +111,18 @@ public class DriveSystem extends SubsystemBase {
 
 	public DriveSystem() {
 		// Initialize all of the drive systems motor controllers.
-		this.leftMaster = new WPI_TalonSRX(Constants.LEFT_MASTER_MOTOR);
-		this.leftSlave = new WPI_TalonSRX(Constants.LEFT_SLAVE_MOTOR);
-		this.rightMaster = new WPI_TalonSRX(Constants.RIGHT_MASTER_MOTOR);
-		this.rightSlave = new WPI_TalonSRX(Constants.RIGHT_SLAVE_MOTOR);
+		this.leftMaster = new CANSparkMax(Constants.LEFT_MASTER_MOTOR,MotorType.kBrushless);
+		this.leftSlave = new CANSparkMax(Constants.LEFT_SLAVE_MOTOR,MotorType.kBrushless);
+		this.rightMaster = new CANSparkMax(Constants.RIGHT_MASTER_MOTOR,MotorType.kBrushless);
+		this.rightSlave = new CANSparkMax(Constants.RIGHT_SLAVE_MOTOR,MotorType.kBrushless);
 
-		this.leftSlave.follow(leftMaster, FollowerType.AuxOutput1);
-		this.rightSlave.follow(rightMaster, FollowerType.AuxOutput1);
+		this.leftSlave.follow(leftMaster);
+		this.rightSlave.follow(rightMaster);
 
 		this.leftMaster.setInverted(true);
 		this.leftSlave.setInverted(true);
 
-		this.leftMaster.setSensorPhase(true);
-		this.rightMaster.setSensorPhase(true);
-
+		/* Not sure if this is needed with SparkMAX controllers (or what equivalents would be)
 		this.leftMaster.configPeakOutputForward(PEAK_OUTPUT);
 		this.leftMaster.configPeakOutputReverse(-PEAK_OUTPUT);
 		this.leftSlave.configPeakOutputForward(PEAK_OUTPUT);
@@ -139,11 +145,12 @@ public class DriveSystem extends SubsystemBase {
 
 		this.leftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, DEFAULT_TIMEOUT);
 		this.rightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, DEFAULT_TIMEOUT);
+		*/
 		
-		this.rightMaster.setNeutralMode(NeutralMode.Brake);
-		this.rightSlave.setNeutralMode(NeutralMode.Brake);
-		this.leftMaster.setNeutralMode(NeutralMode.Brake);
-		this.leftSlave.setNeutralMode(NeutralMode.Brake);
+		this.rightMaster.setIdleMode(IdleMode.kBrake);
+		this.rightSlave.setIdleMode(IdleMode.kBrake);
+		this.leftMaster.setIdleMode(IdleMode.kBrake);
+		this.leftSlave.setIdleMode(IdleMode.kBrake);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
@@ -161,6 +168,7 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
+	/* PID control is different for Sparks. To be resolved.
 	public void setPIDF(double p, double i, double d, double f) {
 		// Set PIDF for Left Master controller.
 		this.leftMaster.config_kP(0, p, 100);
@@ -186,15 +194,16 @@ public class DriveSystem extends SubsystemBase {
 
 		return slots;
 	}
+	*/
 
 	public void resetPosition() {
-		this.rightMaster.setSelectedSensorPosition(0);
-		this.leftMaster.setSelectedSensorPosition(0);
+		this.rightEncoder.setPosition(0);
+		this.leftEncoder.setPosition(0);
 	}
 
 	public boolean reachedPosition() {
-		double leftPos = this.leftMaster.getSelectedSensorPosition();
-		double rightPos = this.rightMaster.getSelectedSensorPosition();
+		double leftPos = this.leftEncoder.getPosition();
+		double rightPos = this.rightEncoder.getPosition();
 
 		System.out.println("Left: " + leftPos + " Right: " + rightPos);
 		if (targetDirection == Direction.FORWARD) {
@@ -208,8 +217,8 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public boolean reachedCurve(double targetL, double targetR) {
-		double leftPos = this.leftMaster.getSelectedSensorPosition();
-		double rightPos = this.rightMaster.getSelectedSensorPosition();
+		double leftPos = this.leftEncoder.getPosition();
+		double rightPos = this.rightEncoder.getPosition();
 
 		if (targetDirection == Direction.FORWARD) {
 			return (leftPos >= targetL) && (rightPos >= targetR);
@@ -230,8 +239,8 @@ public class DriveSystem extends SubsystemBase {
 			targetPosition = 0;
 		}
 
-		this.leftMaster.set(ControlMode.Position, targetPosition);
-		this.rightMaster.set(ControlMode.Position, targetPosition);
+		this.leftMaster.set(targetPosition);
+		this.rightMaster.set(targetPosition);
 	}
 
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
@@ -246,24 +255,26 @@ public class DriveSystem extends SubsystemBase {
 			leftDist = 0;
 			rightDist = 0;
 		}
-		this.leftMaster.set(ControlMode.Position, leftDist);
-		this.rightMaster.set(ControlMode.Position, rightDist);
+		this.leftMaster.set(leftDist);
+		this.rightMaster.set(rightDist);
 	}
 
 	public void driveCircle(double speed, double angle, Direction direction, double radius) {
 		double innerCircumference = radius * 2 * Math.PI * (angle / 360);
 		double outerCircumference = (radius + 24) * 2 * Math.PI * (angle / 360);
 
-		/*double innerVelocity = -1 * (speed * (innerCircumference / outerCircumference)) * MAX_VELOCITY * 4096 / 600.0;
-		double outerVelocity = -1 * speed * MAX_VELOCITY * 4096 / 600.0;*/
+		/*
+		double innerVelocity = -1 * (speed * (innerCircumference / outerCircumference)) * MAX_VELOCITY * 4096 / 600.0;
+		double outerVelocity = -1 * speed * MAX_VELOCITY * 4096 / 600.0;
 
-		//double outerVelocity = -1 * (speed * ((innerCircumference + outerCircumference) / innerCircumference)) * MAX_VELOCITY * 4096 / 600.0;
-		// double innerVelocity = -1 * speed * MAX_VELOCITY * 4096 / 600.0;
-		// double outerVelocity = (innerVelocity * outerCircumference) / innerCircumference;
+		double outerVelocity = -1 * (speed * ((innerCircumference + outerCircumference) / innerCircumference)) * MAX_VELOCITY * 4096 / 600.0;
+		double innerVelocity = -1 * speed * MAX_VELOCITY * 4096 / 600.0;
+		double outerVelocity = (innerVelocity * outerCircumference) / innerCircumference;
+		*/
 
 		
 		double leftDist, rightDist;
-		//double leftVelocity, rightVelocity;
+		// double leftVelocity, rightVelocity;
 		
 		if (direction == Direction.LEFT) {
 			leftDist = innerCircumference;
@@ -289,13 +300,13 @@ public class DriveSystem extends SubsystemBase {
 		
 		// System.out.println("Left Velocity: " + leftVelocity);
 		// System.out.println("Right Velocity: " + rightVelocity);
-		this.leftMaster.set(ControlMode.Position, leftDist);
-		this.rightMaster.set(ControlMode.Position, rightDist);
+		this.leftMaster.set(leftDist);
+		this.rightMaster.set(rightDist);
 	}
 
 	public boolean reachedCircle(double angle, double radius, Direction direction) {
-		double leftPos = this.leftMaster.getSelectedSensorPosition();
-		double rightPos = this.rightMaster.getSelectedSensorPosition();
+		double leftPos = this.leftEncoder.getPosition();
+		double rightPos = this.rightEncoder.getPosition();
 
 		double rightTarget, leftTarget;
 
@@ -320,15 +331,15 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public double getPosition() {
-		return this.leftMaster.getSelectedSensorPosition() / TICKS_PER_INCH;
+		return this.leftEncoder.getPosition() / TICKS_PER_INCH;
 	}
 
 	public double getLeftDistance() {
-		return this.leftMaster.getSelectedSensorPosition() / TICKS_PER_METER;
+		return this.leftEncoder.getPosition() / TICKS_PER_METER;
 	}
 
 	public double getRightDistance() {
-		return this.rightMaster.getSelectedSensorPosition() / TICKS_PER_METER;
+		return this.rightEncoder.getPosition() / TICKS_PER_METER;
 	}
 
 	public void toggleTurbo() {
@@ -366,22 +377,18 @@ public class DriveSystem extends SubsystemBase {
 			targetRight = -temp;
 		}
 
-		this.leftMaster.set(ControlMode.Velocity, targetLeft);
-		this.rightMaster.set(ControlMode.Velocity, targetRight);
+		this.leftMaster.set(targetLeft);
+		this.rightMaster.set(targetRight);
 	}
 
 	public void voltage(double left, double right) {
 		leftMaster.setVoltage(left * 12.0);
 		rightMaster.setVoltage(right * 12.0);
-		leftSlave.set(ControlMode.Follower, Constants.LEFT_MASTER_MOTOR);
-		rightSlave.set(ControlMode.Follower, Constants.RIGHT_MASTER_MOTOR);
 	}
 
 	public void percent(double left, double right) {
-		this.leftMaster.set(ControlMode.PercentOutput, left);
-		this.rightMaster.set(ControlMode.PercentOutput, right);
-		this.leftSlave.set(ControlMode.Follower, Constants.LEFT_MASTER_MOTOR);
-		this.rightSlave.set(ControlMode.Follower, Constants.RIGHT_MASTER_MOTOR);
+		this.leftMaster.set(left);
+		this.rightMaster.set(right);
 	}
 
 	public double getAngle() {
@@ -407,6 +414,7 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
+	/*
 	public DifferentialDriveWheelSpeeds getWheelSpeeds() {
 		// Convert the measured rate of velocity to meters per second.
 		//
@@ -423,6 +431,7 @@ public class DriveSystem extends SubsystemBase {
 		double right = this.rightMaster.getSelectedSensorVelocity() * METERS_PER_TICK * 1000;
 		return new DifferentialDriveWheelSpeeds(left, right);
 	}
+	*/
 
 	@Override
 	public void periodic() {
