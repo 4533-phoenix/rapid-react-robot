@@ -25,6 +25,13 @@ public class ShooterCommands {
         );
     }
 
+    public static Command flywheelStopCommand() {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelOut(),
+            Robot.shooter
+        );
+    }
+
     public static Command flywheelIntakeInCommand() {
         return new InstantCommand(
             () -> Robot.shooter.flywheelIntakeIn(), 
@@ -38,4 +45,11 @@ public class ShooterCommands {
             Robot.shooter
         );
     }
+
+    public static Command flywheelIntakeStopCommand() {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelIntakeStop(),
+            Robot.shooter
+        );
+    } 
 }
