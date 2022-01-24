@@ -41,4 +41,8 @@ public final class Constants {
 	public static final int RIGHT_STICK_AXIS = 5;
 	public static final int LEFT_TRIGGER_AXIS = 2;
 	public static final int RIGHT_TRIGGER_AXIS = 3;
+
+	// SlotIDs for PID control
+	public static final int POSITION_SLOT_ID = 0;
+	public static final int VELOCITY_SLOT_ID = 1;
 }

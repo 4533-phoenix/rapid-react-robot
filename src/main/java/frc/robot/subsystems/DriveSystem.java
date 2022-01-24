@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.*;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.kauailabs.navx.frc.AHRS;
@@ -32,6 +33,8 @@ public class DriveSystem extends SubsystemBase {
 
 	private RelativeEncoder rightEncoder;
 	private RelativeEncoder leftEncoder;
+	private SparkMaxPIDController leftPIDCont;
+	private SparkMaxPIDController rightPIDCont;
 
 	// Onboard IMU.
 	private AHRS navX;
@@ -51,22 +54,18 @@ public class DriveSystem extends SubsystemBase {
 	private static final double TICKS_PER_METER = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE_M;
 	private static final double METERS_PER_TICK = WHEEL_CIRCUMFERENCE_M / TICKS_PER_ROTATION;
 
-	// Velocity PID Gains and Feed Forward values.
-	//
-	// The following values should be used when driving the robot in "Velocity"
-	// mode.
+	// Velocity PIDF values
 	public static final double VELOCITY_P = 0.000213;
 	public static final double VELOCITY_I = 0.0;
 	public static final double VELOCITY_D = 0.0;
+	public static final double VELOCITY_I_ZONE = 0.0;
 	public static final double VELOCITY_FEED_FORWARD = 0.243;
 
-	// Position PID Gains and Feed Forward values.
-	//
-	// The following values should be used when driving the robot in "Position"
-	// mode.
+	// Position PIDF values
 	public static final double POSITION_P = 0.06;
 	public static final double POSITION_I = 0.0;
 	public static final double POSITION_D = 0.0;
+	public static final double POSITION_I_ZONE = 0.0;
 	public static final double POSITION_FEED_FORWARD = 0.0;
 
 	// Feed Forward Gains
@@ -116,44 +115,36 @@ public class DriveSystem extends SubsystemBase {
 		this.rightMaster = new CANSparkMax(Constants.RIGHT_MASTER_MOTOR,MotorType.kBrushless);
 		this.rightSlave = new CANSparkMax(Constants.RIGHT_SLAVE_MOTOR,MotorType.kBrushless);
 
+		this.leftEncoder = leftMaster.getEncoder();
+		this.rightEncoder = rightMaster.getEncoder();
+
+		this.leftPIDCont = leftMaster.getPIDController();
+		leftPIDCont.setFeedbackDevice(leftEncoder);
+
+		this.rightPIDCont = rightMaster.getPIDController();
+		rightPIDCont.setFeedbackDevice(rightEncoder);
+
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
 
 		this.leftMaster.setInverted(true);
 		this.leftSlave.setInverted(true);
-
-		/* Not sure if this is needed with SparkMAX controllers (or what equivalents would be)
-		this.leftMaster.configPeakOutputForward(PEAK_OUTPUT);
-		this.leftMaster.configPeakOutputReverse(-PEAK_OUTPUT);
-		this.leftSlave.configPeakOutputForward(PEAK_OUTPUT);
-		this.leftSlave.configPeakOutputReverse(-PEAK_OUTPUT);
-
-		this.rightMaster.configPeakOutputForward(PEAK_OUTPUT);
-		this.rightMaster.configPeakOutputReverse(-PEAK_OUTPUT);
-		this.rightSlave.configPeakOutputForward(PEAK_OUTPUT);
-		this.rightSlave.configPeakOutputReverse(-PEAK_OUTPUT);
-
-		this.leftMaster.configNominalOutputForward(0, DEFAULT_TIMEOUT);
-		this.leftMaster.configNominalOutputReverse(0, DEFAULT_TIMEOUT);
-		this.leftSlave.configNominalOutputForward(0, DEFAULT_TIMEOUT);
-		this.leftSlave.configNominalOutputReverse(0, DEFAULT_TIMEOUT);
-
-		this.rightMaster.configNominalOutputForward(0, 30);
-		this.rightMaster.configNominalOutputReverse(0, 30);
-		this.rightSlave.configNominalOutputForward(0, 30);
-		this.rightSlave.configNominalOutputReverse(0, 30);
-
-		this.leftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, DEFAULT_TIMEOUT);
-		this.rightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, DEFAULT_TIMEOUT);
-		*/
 		
-		this.rightMaster.setIdleMode(IdleMode.kBrake);
-		this.rightSlave.setIdleMode(IdleMode.kBrake);
-		this.leftMaster.setIdleMode(IdleMode.kBrake);
-		this.leftSlave.setIdleMode(IdleMode.kBrake);
+		this.rightMaster.setIdleMode(IdleMode.kCoast);
+		this.rightSlave.setIdleMode(IdleMode.kCoast);
+		this.leftMaster.setIdleMode(IdleMode.kCoast);
+		this.leftSlave.setIdleMode(IdleMode.kCoast);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
+	}
+
+	public SparkMaxPIDController getLeftPIDCont() {
+		return leftPIDCont;
+	}
+
+	public SparkMaxPIDController getRightPIDCont() {
+		return rightPIDCont;
 	}
 
 	public void setDriveMode(DriveMode mode) {
@@ -167,34 +158,6 @@ public class DriveSystem extends SubsystemBase {
 			this.driveMode = DriveMode.Normal;
 		}
 	}
-
-	/* PID control is different for Sparks. To be resolved.
-	public void setPIDF(double p, double i, double d, double f) {
-		// Set PIDF for Left Master controller.
-		this.leftMaster.config_kP(0, p, 100);
-		this.leftMaster.config_kI(0, i, 100);
-		this.leftMaster.config_kD(0, d, 100);
-		this.leftMaster.config_kF(0, f, 100);
-
-		// Set PIDF for Right Master controller.
-		this.rightMaster.config_kP(0, p, 100);
-		this.rightMaster.config_kI(0, i, 100);
-		this.rightMaster.config_kD(0, d, 100);
-		this.rightMaster.config_kF(0, f, 100);
-	}
-
-	public SlotConfiguration[] getPID() {
-		SlotConfiguration[] slots = new SlotConfiguration[]{
-			new SlotConfiguration(),
-			new SlotConfiguration()
-		};
-
-		this.leftMaster.getSlotConfigs(slots[0], 0, 30);
-		this.rightMaster.getSlotConfigs(slots[1], 0, 30);
-
-		return slots;
-	}
-	*/
 
 	public void resetPosition() {
 		this.rightEncoder.setPosition(0);
@@ -272,7 +235,6 @@ public class DriveSystem extends SubsystemBase {
 		double outerVelocity = (innerVelocity * outerCircumference) / innerCircumference;
 		*/
 
-		
 		double leftDist, rightDist;
 		// double leftVelocity, rightVelocity;
 		

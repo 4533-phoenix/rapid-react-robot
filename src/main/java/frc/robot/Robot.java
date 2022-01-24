@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.RobotState;
+import com.revrobotics.SparkMaxPIDController;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.HighClimbSystem;
 import frc.robot.subsystems.IntakeSystem;
@@ -76,19 +77,14 @@ public class Robot extends TimedRobot {
 		// Instantiate our RobotContainer.  This will perform all our button
 		// bindings, and put our autonomous chooser on the dashboard.
 		this.container = new RobotContainer();
+	}
 
-		// this.robotState = new RobotState()
-		//  .withPDP(new PowerDistributionPanel())
-		// 	.withDriveSystem(Robot.drive)
-		// 	.withIntakeSystem(Robot.intake);
-
-		// SlotConfiguration[] slots = Robot.drive.getPID();
-
-		// for (int i = 0; i < slots.length; i++) {
-		// 	this.robotLogger.info("Slot: {} - P: {} I: {} D: {} F: {}",
-		// 		i, slots[i].kP, slots[i].kI, slots[i].kD, slots[i].kF
-		// 	);
-		// }
+	public static void setPIDF(SparkMaxPIDController controller, double p, double i, double d, double iz, double ff, int slotID) {
+		controller.setP(p,slotID);
+		controller.setI(i,slotID);
+		controller.setD(d,slotID);
+		controller.setIZone(iz,slotID);
+		controller.setFF(ff,slotID);
 	}
 
 	@Override
@@ -113,18 +109,25 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		// Robot.drive.setPIDF(
-		// 	DriveSystem.POSITION_P,
-		// 	DriveSystem.POSITION_I,
-		// 	DriveSystem.POSITION_D,
-		// 	DriveSystem.POSITION_FEED_FORWARD
-		// );
-		// Robot.drive.setPIDF(
-		// 	DriveSystem.VELOCITY_P,
-		// 	DriveSystem.VELOCITY_I,
-		// 	DriveSystem.VELOCITY_D,
-		// 	DriveSystem.VELOCITY_FEED_FORWARD
-		// );
+		setPIDF(
+			drive.getLeftPIDCont(), 
+			DriveSystem.POSITION_P, 
+			DriveSystem.POSITION_D, 
+			DriveSystem.POSITION_I, 
+			DriveSystem.POSITION_I_ZONE, 
+			DriveSystem.POSITION_FEED_FORWARD,
+			Constants.POSITION_SLOT_ID
+		);
+
+		setPIDF(
+			drive.getRightPIDCont(), 
+			DriveSystem.POSITION_P, 
+			DriveSystem.POSITION_D, 
+			DriveSystem.POSITION_I, 
+			DriveSystem.POSITION_I_ZONE, 
+			DriveSystem.POSITION_FEED_FORWARD,
+			Constants.POSITION_SLOT_ID
+		);
 
 		Robot.drive.resetAngle();
 		this.robotLogger.info("reset drive system angle: {}", Robot.drive.getAngle());
@@ -149,12 +152,25 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		// Robot.drive.setPIDF(
-		// 	DriveSystem.VELOCITY_P,
-		// 	DriveSystem.VELOCITY_I,
-		// 	DriveSystem.VELOCITY_D,
-		// 	DriveSystem.VELOCITY_FEED_FORWARD
-		// );
+		setPIDF(
+			drive.getLeftPIDCont(), 
+			DriveSystem.VELOCITY_P, 
+			DriveSystem.VELOCITY_D, 
+			DriveSystem.VELOCITY_I, 
+			DriveSystem.VELOCITY_I_ZONE, 
+			DriveSystem.VELOCITY_FEED_FORWARD,
+			Constants.VELOCITY_SLOT_ID
+		);
+
+		setPIDF(
+			drive.getRightPIDCont(), 
+			DriveSystem.VELOCITY_P, 
+			DriveSystem.VELOCITY_D, 
+			DriveSystem.VELOCITY_I, 
+			DriveSystem.VELOCITY_I_ZONE, 
+			DriveSystem.VELOCITY_FEED_FORWARD,
+			Constants.VELOCITY_SLOT_ID
+		);
 
 		Robot.drive.resetAngle();
 		Robot.drive.resetPosition();
