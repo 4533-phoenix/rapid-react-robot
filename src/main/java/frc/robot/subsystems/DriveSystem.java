@@ -15,11 +15,14 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.Direction;
+import frc.robot.commands.Odometry;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -108,6 +111,10 @@ public class DriveSystem extends SubsystemBase {
 
 	private DriveMode driveMode = DriveMode.Normal;
 
+	private Odometry odometry;
+	private Pose2d robotPos;
+	private Rotation2d robotAngle;
+
 	public DriveSystem() {
 		// Initialize all of the drive systems motor controllers.
 		this.leftMaster = new CANSparkMax(Constants.LEFT_MASTER_MOTOR,MotorType.kBrushless);
@@ -137,6 +144,9 @@ public class DriveSystem extends SubsystemBase {
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
+
+		this.robotPos = new Pose2d(5, 5, new Rotation2d());
+		this.odometry = new Odometry(navX.getRotation2d(), robotPos);
 	}
 
 	public SparkMaxPIDController getLeftPIDCont() {
@@ -397,6 +407,10 @@ public class DriveSystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		
+		double leftDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
+		double rightDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
+
+		robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
+		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
 	}
 }
