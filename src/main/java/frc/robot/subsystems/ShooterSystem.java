@@ -9,8 +9,6 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.math.geometry.Transform2d;
 
@@ -35,10 +33,10 @@ public class ShooterSystem extends SubsystemBase {
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
 
     private AHRS shooterNAVX;
-    
-    private NetworkTable WARCam;
 
     PhotonCamera visionCam;
+    PhotonPipelineResult result;
+    PhotonTrackedTarget target;
 
     private double yaw;
     private double pitch;
@@ -63,15 +61,16 @@ public class ShooterSystem extends SubsystemBase {
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
-        WARCam = NetworkTableInstance.getDefault().getTable("hi");
         visionCam = new PhotonCamera("WARCam");
-
+        result = null;
+        target = null;
+        
         yaw = 0.0;
         pitch = 0.0;
         skew = 0.0;
 
-        pos = new Transform2d();
-        corners = new ArrayList<TargetCorner>();
+        pos = null;
+        corners = null ;
     }
 
     public void flywheelIn() {
@@ -134,9 +133,7 @@ public class ShooterSystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        PhotonPipelineResult result = visionCam.getLatestResult();
-
-        PhotonTrackedTarget target = null;
+        result = visionCam.getLatestResult();
 
         if (result.hasTargets()) {
             target = result.getBestTarget();
