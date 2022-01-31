@@ -212,8 +212,8 @@ public class DriveSystem extends SubsystemBase {
 			targetPosition = 0;
 		}
 
-		this.leftMaster.set(targetPosition);
-		this.rightMaster.set(targetPosition);
+		this.leftPIDCont.setReference(targetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(targetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
@@ -228,52 +228,31 @@ public class DriveSystem extends SubsystemBase {
 			leftDist = 0;
 			rightDist = 0;
 		}
-		this.leftMaster.set(leftDist);
-		this.rightMaster.set(rightDist);
+		this.leftPIDCont.setReference(leftDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(rightDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public void driveCircle(double speed, double angle, Direction direction, double radius) {
 		double innerCircumference = radius * 2 * Math.PI * (angle / 360);
 		double outerCircumference = (radius + 24) * 2 * Math.PI * (angle / 360);
 
-		/*
-		double innerVelocity = -1 * (speed * (innerCircumference / outerCircumference)) * MAX_VELOCITY * 4096 / 600.0;
-		double outerVelocity = -1 * speed * MAX_VELOCITY * 4096 / 600.0;
-
-		double outerVelocity = -1 * (speed * ((innerCircumference + outerCircumference) / innerCircumference)) * MAX_VELOCITY * 4096 / 600.0;
-		double innerVelocity = -1 * speed * MAX_VELOCITY * 4096 / 600.0;
-		double outerVelocity = (innerVelocity * outerCircumference) / innerCircumference;
-		*/
-
 		double leftDist, rightDist;
-		// double leftVelocity, rightVelocity;
 		
 		if (direction == Direction.LEFT) {
 			leftDist = innerCircumference;
 			rightDist = outerCircumference;
-			
-			// leftVelocity = innerVelocity;
-			// rightVelocity = outerVelocity;
 		}
 		else if (direction == Direction.RIGHT) {
 			leftDist = outerCircumference;
 			rightDist = innerCircumference;
-			
-			// leftVelocity = outerVelocity;
-			// rightVelocity = innerVelocity;
 		}
 		else {
 			leftDist = 0;
 			rightDist = 0;
-			
-			// leftVelocity = 0;
-			// rightVelocity = 0;
 		}
-		
-		// System.out.println("Left Velocity: " + leftVelocity);
-		// System.out.println("Right Velocity: " + rightVelocity);
-		this.leftMaster.set(leftDist);
-		this.rightMaster.set(rightDist);
+
+		this.leftPIDCont.setReference(leftDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(rightDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public boolean reachedCircle(double angle, double radius, Direction direction) {
@@ -297,7 +276,6 @@ public class DriveSystem extends SubsystemBase {
 
 		System.out.println("Position: " + leftPos + "    " + rightPos);
 		System.out.println("Target: " + leftTarget + "    " + rightTarget);
-
 
 		return rightPos >= rightTarget;
 	}
@@ -340,8 +318,8 @@ public class DriveSystem extends SubsystemBase {
 			targetVelocity = TURBO_VELOCITY;
 		}
 
-		targetLeft = left * targetVelocity * 4096 / 600.0;
-		targetRight = right * targetVelocity * 4096 / 600.0;
+		targetLeft = left * targetVelocity;
+		targetRight = right * targetVelocity;
 
 		if (this.driveMode == DriveMode.Inverted) {
 			double temp = targetLeft;
@@ -349,8 +327,8 @@ public class DriveSystem extends SubsystemBase {
 			targetRight = -temp;
 		}
 
-		this.leftMaster.set(targetLeft);
-		this.rightMaster.set(targetRight);
+		this.leftPIDCont.setReference(targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+		this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 	}
 
 	public void voltage(double left, double right) {
@@ -385,25 +363,6 @@ public class DriveSystem extends SubsystemBase {
 			this.voltage(0, 0);
 		}
 	}
-
-	/*
-	public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-		// Convert the measured rate of velocity to meters per second.
-		//
-		// The function 'getSelectedSensorVelocity' returns values that are raw
-		// units (pulses or ticks) per 100ms. We need to convert this value into
-		// meters per second.
-		//
-		// First we must convert the raw units in to meters. This is done by
-		// multiplying measured value by the value of METERS_PER_TICK. The result
-		// of this will be the measured value in meters per 100ms. Since 1 s =
-		// 1000ms, we know that we need to multiply the value by 10, which will give
-		// us the meters per second value.
-		double left = this.leftMaster.getSelectedSensorVelocity() * METERS_PER_TICK * 1000;
-		double right = this.rightMaster.getSelectedSensorVelocity() * METERS_PER_TICK * 1000;
-		return new DifferentialDriveWheelSpeeds(left, right);
-	}
-	*/
 
 	@Override
 	public void periodic() {
