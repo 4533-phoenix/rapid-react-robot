@@ -52,4 +52,14 @@ public class ShooterCommands {
             Robot.shooter
         );
     } 
+
+    public static Command autoFlywheelPos() {
+        return new FunctionalCommand(
+            () -> Robot.shooter.setFlywheelReset(), 
+            () -> Robot.shooter.setFlywheelPos(), 
+            (interrupt) -> Robot.shooter.stopFlywheelPos(), 
+            () -> Robot.shooter.flywheelReachedPosition(), 
+            Robot.shooter
+        );
+    }
 }
