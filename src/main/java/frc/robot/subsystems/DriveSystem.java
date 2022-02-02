@@ -367,7 +367,7 @@ public class DriveSystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		double leftDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
-		double rightDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
+		double rightDist = rightEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
 
 		robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
 		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
