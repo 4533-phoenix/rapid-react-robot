@@ -134,8 +134,8 @@ public class DriveSystem extends SubsystemBase {
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
 
-		this.leftMaster.setInverted(true);
-		this.leftSlave.setInverted(true);
+		this.rightMaster.setInverted(true);
+		this.rightSlave.setInverted(true);
 		
 		this.rightMaster.setIdleMode(IdleMode.kCoast);
 		this.rightSlave.setIdleMode(IdleMode.kCoast);
