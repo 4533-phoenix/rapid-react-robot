@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import java.util.*;
+import static java.lang.Math.*;
 
 public class AutoCommands {
 
@@ -53,12 +55,12 @@ public class AutoCommands {
         );
     }
 
-    public static Command ballExitCommand() {
+    public static Command ballExitCommand(int balls) {
         return new FunctionalCommand(
             () -> Robot.shooter.resetPosition(),
             () -> Robot.shooter.flywheelAndFlywheelIntakeOut(),
             (interrupt) -> Robot.shooter.flywheelAndFlywheelIntakeStop(),
-            () -> Robot.shooter.flywheelDoneShootBalls(1),
+            () -> Robot.shooter.flywheelDoneShootBalls(balls),
             Robot.shooter
         );
     }
@@ -74,11 +76,47 @@ public class AutoCommands {
         );
     }
 
-    public static Command shootBallAutoCommand() {
+    public static Command shootBallAutoCommand(int balls) {
         return new SequentialCommandGroup(
             activateFlywheel(),
             flywheelWait(),
-            ballExitCommand()
+            ballExitCommand(balls)
+        );
+    }
+
+//Mesurements in Inches and Radians, angle and distance measurements are needed to be tested.
+
+    public static Command meuleDeFromage() {
+        return new SequentialCommandGroup(
+            shootBallAutoCommand(1),
+            driveDistanceAutoCommand(41, Direction.BACKWARD),
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.LEFT),
+            circleTurnAutoCommand(0.1, (Math.PI/6), Direction.RIGHT, 153),
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.RIGHT),
+            shootBallAutoCommand(2)
+        );
+    }
+
+    public static Command trancheDeFromage() {
+        return new SequentialCommandGroup(
+            shootBallAutoCommand(1),
+            driveDistanceAutoCommand(41, Direction.BACKWARD),
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.RIGHT),
+            circleTurnAutoCommand(0.1, (Math.PI/18), Direction.LEFT, 153),
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.LEFT),
+            shootBallAutoCommand(1)
+        );
+    }
+
+
+    public static Command meuleDeFromagePourBebe() {
+        return new SequentialCommandGroup(
+            shootBallAutoCommand(1),
+            driveDistanceAutoCommand(41, Direction.BACKWARD),
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.RIGHT),
+            circleTurnAutoCommand(0.1, (Math.PI/18), Direction.LEFT, 153),
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.LEFT),
+            shootBallAutoCommand(1)
         );
     }
 
