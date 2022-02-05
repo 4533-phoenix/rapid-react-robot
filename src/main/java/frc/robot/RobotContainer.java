@@ -43,10 +43,24 @@ public class RobotContainer {
   
 
   // Defines button bindings for commands
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+    JoystickButton toggleTurbo = new JoystickButton(controller, Constants.BUTTON_RB);
+    toggleTurbo.whenPressed(DriveCommands.toggleTurbo());
+  }
+
+  private void toggleDriveMode() {
+    if (controller.getPOV() == 180) {
+      Robot.drive.toggleDriveMode();
+    }
+  }
 
   private void configureDefaultCommands() {
 		CommandScheduler scheduler = CommandScheduler.getInstance();
+
+    scheduler.setDefaultCommand(Robot.drive, defaultDriveCommand);
+    scheduler.addButton(
+      () -> toggleDriveMode()
+    );
 	}
 
   /**

@@ -11,5 +11,17 @@ import frc.robot.Robot;
 public class DriveCommands {
     public DriveCommands() {}
 
-    
+    public static Command toggleTurbo() {
+        return new InstantCommand(
+            () -> Robot.drive.toggleTurbo(),
+            Robot.drive
+        );
+    }
+
+    public static Command toggleDriveMode() {
+        return new InstantCommand(
+            () -> Robot.drive.toggleDriveMode(),
+            Robot.drive
+        );
+    }
 }

@@ -132,7 +132,7 @@ public class Robot extends TimedRobot {
 		Robot.drive.resetAngle();
 		this.robotLogger.info("reset drive system angle: {}", Robot.drive.getAngle());
 
-		Robot.drive.resetPosition();
+		// Robot.drive.resetPosition();
 
 		this.autoCommand = this.container.getAutonomousCommand();
 
@@ -173,7 +173,7 @@ public class Robot extends TimedRobot {
 		);
 
 		Robot.drive.resetAngle();
-		Robot.drive.resetPosition();
+		// Robot.drive.resetPosition();
 
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to

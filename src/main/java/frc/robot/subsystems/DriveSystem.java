@@ -42,8 +42,8 @@ public class DriveSystem extends SubsystemBase {
 	// Onboard IMU.
 	private AHRS navX;
 
-	private static final double MAX_VELOCITY = 400;
-	private static final double TURBO_VELOCITY = 475;
+	private static final double MAX_VELOCITY = 5000;
+	private static final double TURBO_VELOCITY = 6000;
 	private static final double PEAK_OUTPUT = 1.0;
 	private boolean turbo = false;
 
@@ -62,7 +62,7 @@ public class DriveSystem extends SubsystemBase {
 	public static final double VELOCITY_I = 0.0;
 	public static final double VELOCITY_D = 0.0;
 	public static final double VELOCITY_I_ZONE = 0.0;
-	public static final double VELOCITY_FEED_FORWARD = 0.243;
+	public static final double VELOCITY_FEED_FORWARD = 0.0;
 
 	// Position PIDF values
 	public static final double POSITION_P = 0.06;
@@ -133,14 +133,11 @@ public class DriveSystem extends SubsystemBase {
 
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
-
-		this.rightMaster.setInverted(true);
-		this.rightSlave.setInverted(true);
 		
-		this.rightMaster.setIdleMode(IdleMode.kCoast);
-		this.rightSlave.setIdleMode(IdleMode.kCoast);
-		this.leftMaster.setIdleMode(IdleMode.kCoast);
-		this.leftSlave.setIdleMode(IdleMode.kCoast);
+		this.rightMaster.setIdleMode(IdleMode.kBrake);
+		this.rightSlave.setIdleMode(IdleMode.kBrake);
+		this.leftMaster.setIdleMode(IdleMode.kBrake);
+		this.leftSlave.setIdleMode(IdleMode.kBrake);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
@@ -169,7 +166,7 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
-	public void resetPosition() {
+	public void Position() {
 		this.rightEncoder.setPosition(0);
 		this.leftEncoder.setPosition(0);
 	}
@@ -309,6 +306,14 @@ public class DriveSystem extends SubsystemBase {
 	}
 	
 	public void tank(double left, double right) {
+		if (left > -0.1 && left < 0.1) {
+			left = 0.0;
+		}
+
+		if (right > -0.1 && right < 0.1) {
+			right = 0.0;
+		}
+
 		double targetLeft;
 		double targetRight;
 
@@ -327,7 +332,9 @@ public class DriveSystem extends SubsystemBase {
 			targetRight = -temp;
 		}
 
-		this.leftPIDCont.setReference(targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+		System.out.println(this.driveMode);
+
+		this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 		this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 	}
 

@@ -34,17 +34,17 @@ public class ShooterSystem extends SubsystemBase {
 
     private AHRS shooterNAVX;
 
-    PhotonCamera visionCam;
-    PhotonPipelineResult result;
-    PhotonTrackedTarget target;
+    // PhotonCamera visionCam;
+    // PhotonPipelineResult result;
+    // PhotonTrackedTarget target;
 
-    private double yaw;
-    private double pitch;
-    private double skew;
-    private double area;
+    // private double yaw;
+    // private double pitch;
+    // private double skew;
+    // private double area;
 
-    Transform2d pos;
-    List<TargetCorner> corners;
+    // Transform2d pos;
+    // List<TargetCorner> corners;
 
     public ShooterSystem() {
         leftFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_LEFT);
@@ -61,16 +61,16 @@ public class ShooterSystem extends SubsystemBase {
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
-        visionCam = new PhotonCamera("WARCam");
-        result = null;
-        target = null;
+        // visionCam = new PhotonCamera("WARCam");
+        // result = null;
+        // target = null;
         
-        yaw = 0.0;
-        pitch = 0.0;
-        skew = 0.0;
+        // yaw = 0.0;
+        // pitch = 0.0;
+        // skew = 0.0;
 
-        pos = null;
-        corners = null ;
+        // pos = null;
+        // corners = null ;
     }
 
     public void flywheelIn() {
@@ -108,19 +108,19 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setFlywheelReset() {
-        Robot.drive.resetPosition();
+        // Robot.drive.resetPosition();
     }
 
     public void setFlywheelPos() {
-        if (yaw >= 1) {
-            Robot.drive.percent(0.5, -0.5);
-        }
-        else if (yaw <= -1) {
-            Robot.drive.percent(-0.5, 0.5);
-        }
-        else {
-            Robot.drive.percent(0.0, 0.0);
-        }
+        // if (yaw >= 1) {
+        //     Robot.drive.percent(0.5, -0.5);
+        // }
+        // else if (yaw <= -1) {
+        //     Robot.drive.percent(-0.5, 0.5);
+        // }
+        // else {
+        //     Robot.drive.percent(0.0, 0.0);
+        // }
     }
 
     public void stopFlywheelPos() {
@@ -128,23 +128,24 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public boolean flywheelReachedPosition() {
-        return yaw <= 1 && yaw >= -1;
+        // return yaw <= 1 && yaw >= -1;
+        return true;
     }
 
     @Override
     public void periodic() {
-        result = visionCam.getLatestResult();
+        // result = visionCam.getLatestResult();
 
-        if (result.hasTargets()) {
-            target = result.getBestTarget();
-        }
+        // if (result.hasTargets()) {
+        //     target = result.getBestTarget();
+        // }
         
-        yaw = target.getYaw();
-        pitch = target.getPitch();
-        skew = target.getSkew();
-        area = target.getArea();
+        // yaw = target.getYaw();
+        // pitch = target.getPitch();
+        // skew = target.getSkew();
+        // area = target.getArea();
 
-        pos = target.getCameraToTarget();
-        corners = target.getCorners();
+        // pos = target.getCameraToTarget();
+        // corners = target.getCorners();
     }
 }
