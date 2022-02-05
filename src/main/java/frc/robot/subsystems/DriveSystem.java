@@ -358,6 +358,11 @@ public class DriveSystem extends SubsystemBase {
 		navX.reset();
 	}
 
+	public void resetPosition() {
+		this.rightEncoder.setPosition(0);
+		this.leftEncoder.setPosition(0);
+	}
+
 	public void turn(double speed, Direction direction) {
 		switch (direction) {
 		case LEFT:
@@ -374,7 +379,7 @@ public class DriveSystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		double leftDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
-		double rightDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
+		double rightDist = rightEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
 
 		robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
 		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);

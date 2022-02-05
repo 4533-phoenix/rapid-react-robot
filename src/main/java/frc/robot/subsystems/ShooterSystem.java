@@ -100,10 +100,27 @@ public class ShooterSystem extends SubsystemBase {
         flywheelIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
+    public void flywheelAndFlywheelIntakeIn() {
+        leftFlywheelMotor.set(ControlMode.PercentOutput, -FLYWHEEL_MOTOR_PERCENT);
+        rightFlywheelMotor.set(ControlMode.PercentOutput, -FLYWHEEL_MOTOR_PERCENT);
+        flywheelIntakeMotor.set(ControlMode.PercentOutput, FLYWHEEL_INTAKE_MOTOR_PERCENT);
+    }
+
+    public void flywheelAndFlywheelIntakeOut() {
+        leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+        rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+        flywheelIntakeMotor.set(ControlMode.PercentOutput, -FLYWHEEL_INTAKE_MOTOR_PERCENT);
+    }
+
+    public void flywheelAndFlywheelIntakeStop() {
+        leftFlywheelMotor.set(ControlMode.PercentOutput, 0.0);
+        rightFlywheelMotor.set(ControlMode.PercentOutput, 0.0);
+        flywheelIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+    }
+
     public void resetPosition() {
         leftFlywheelMotor.setSelectedSensorPosition(0);
         rightFlywheelMotor.setSelectedSensorPosition(0);
-
         flywheelIntakeMotor.setSelectedSensorPosition(0);
     }
 
@@ -130,6 +147,11 @@ public class ShooterSystem extends SubsystemBase {
     public boolean flywheelReachedPosition() {
         // return yaw <= 1 && yaw >= -1;
         return true;
+    }
+
+    public boolean flywheelDoneShootBalls(int balls) {
+        double targetPosition = (balls * 30) * DriveSystem.TICKS_PER_ROTATION;
+        return rightFlywheelMotor.getSelectedSensorPosition() >= targetPosition;
     }
 
     @Override
