@@ -95,36 +95,6 @@ public class AutoCommands {
         );
     }
 
-    public static Command trancheDeFromageDroite() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            driveDistanceAutoCommand(41, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            circleTurnAutoCommand(0.1, 10, Direction.LEFT, 153),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            shootBallAutoCommand(1),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            circleTurnAutoCommand(0.1, 30, Direction.RIGHT, 153),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            shootBallAutoCommand(1)
-        );
-    }
-
-    public static Command trancheDeFromageRestante() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            driveDistanceAutoCommand(41, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            circleTurnAutoCommand(0.1, 10, Direction.RIGHT, 153),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            shootBallAutoCommand(1),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            circleTurnAutoCommand(0.1, 30, Direction.LEFT, 153),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            shootBallAutoCommand(1)
-        );
-    }
-
     public static Command meuleDeFromagePourBebe() {
         return new SequentialCommandGroup(
             shootBallAutoCommand(1),
