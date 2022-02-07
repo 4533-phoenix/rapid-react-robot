@@ -166,18 +166,13 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
-	public void Position() {
-		this.rightEncoder.setPosition(0);
-		this.leftEncoder.setPosition(0);
-	}
-
 	public boolean reachedPosition() {
 		double leftPos = this.leftEncoder.getPosition();
 		double rightPos = this.rightEncoder.getPosition();
 
-		System.out.println("Left: " + leftPos + " Right: " + rightPos);
+		// System.out.println("Left: " + leftPos + " Right: " + rightPos);
 		if (targetDirection == Direction.FORWARD) {
-			System.out.printf("%f : %f : %f\n", leftPos, rightPos, targetPosition);
+			// System.out.printf("%f : %f : %f\n", leftPos, rightPos, targetPosition);
 			return (leftPos <= targetPosition) && (rightPos <= targetPosition);
 		} else if (targetDirection == Direction.BACKWARD) {
 			return (leftPos >= targetPosition) && (rightPos >= targetPosition);
@@ -260,22 +255,26 @@ public class DriveSystem extends SubsystemBase {
 		double rightTarget, leftTarget;
 
 		if (direction == Direction.LEFT) {
-			leftTarget = radius * 2 * Math.PI * (angle / 360) * TICKS_PER_INCH;
-			rightTarget = (radius + 24) * 2 * Math.PI * (angle / 360) * TICKS_PER_INCH;
+			leftTarget = radius * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+			rightTarget = (radius + 24) * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+
+			return (leftPos >= leftTarget) && (rightPos >= rightTarget);
 		}
 		else if (direction == Direction.RIGHT) {
-			rightTarget = radius * 2 * Math.PI * (angle / 360) * TICKS_PER_INCH;
-			leftTarget = (radius + 24) * 2 * Math.PI * (angle / 360) * TICKS_PER_INCH;
+			rightTarget = radius * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+			leftTarget = (radius + 24) * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+
+			return (leftPos >= leftTarget) && (rightPos >= rightTarget);
 		}
 		else {
 			rightTarget = 0;
 			leftTarget = 0;
+
+			return true;
 		}
 
-		System.out.println("Position: " + leftPos + "    " + rightPos);
-		System.out.println("Target: " + leftTarget + "    " + rightTarget);
-
-		return rightPos >= rightTarget;
+		// System.out.println("Position: " + leftPos + "    " + rightPos);
+		// System.out.println("Target: " + leftTarget + "    " + rightTarget);
 	}
 
 	public double getPosition() {
@@ -379,8 +378,8 @@ public class DriveSystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		double leftDist = leftEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
-		double rightDist = rightEncoder.getPosition() / WHEEL_CIRCUMFERENCE_M;
+		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
+		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 
 		robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
 		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
