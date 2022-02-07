@@ -84,7 +84,7 @@ public class AutoCommands {
 
 //Mesurements in Inches and DEGREES, angle and distance measurements are needed to be tested. Pour Bebe Commands are 2 ball auto, non Pour Bebes are 3 ball auto.
 
-    public static Command meuleDeFromage() {
+    public static Command circle3Ball() {
         return new SequentialCommandGroup(
             shootBallAutoCommand(1),
             driveDistanceAutoCommand(41, Direction.BACKWARD),
@@ -95,7 +95,7 @@ public class AutoCommands {
         );
     }
 
-    public static Command meuleDeFromagePourBebe() {
+    public static Command circle1BallTop() {
         return new SequentialCommandGroup(
             shootBallAutoCommand(1),
             driveDistanceAutoCommand(41, Direction.BACKWARD),
@@ -106,48 +106,13 @@ public class AutoCommands {
         );
     }
 
-    public static Command trancheDeFromagePourBebeDroite() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            driveDistanceAutoCommand(41, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            circleTurnAutoCommand(0.1, 10, Direction.LEFT, 153),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            shootBallAutoCommand(1)
-        );
-    }
-
-    public static Command trancheDeFromagePourBebeRestante() {
+    public static Command circle1BallBottom() {
         return new SequentialCommandGroup(
             shootBallAutoCommand(1),
             driveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT),
             circleTurnAutoCommand(0.1, 10, Direction.RIGHT, 153),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            shootBallAutoCommand(1)
-        );
-    }
-
-    public static Command manœuvreDeBretzel() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            driveDistanceAutoCommand(200, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            driveDistanceAutoCommand(20, Direction.FORWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            driveDistanceAutoCommand(200, Direction.FORWARD),
-            shootBallAutoCommand(2)
-        );
-    }
-
-    public static Command manœuvreDeBretzelPourBebe() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            driveDistanceAutoCommand(200, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            driveDistanceAutoCommand(20, Direction.FORWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            driveDistanceAutoCommand(200, Direction.FORWARD),
             shootBallAutoCommand(1)
         );
     }
