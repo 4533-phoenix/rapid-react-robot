@@ -70,7 +70,7 @@ public class ShooterSystem extends SubsystemBase {
         // skew = 0.0;
 
         // pos = null;
-        // corners = null ;
+        // corners = null;
     }
 
     public void flywheelIn() {
@@ -125,7 +125,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setFlywheelReset() {
-        // Robot.drive.resetPosition();
+        Robot.drive.resetPosition();
     }
 
     public void setFlywheelPos() {

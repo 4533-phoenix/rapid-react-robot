@@ -201,10 +201,11 @@ public class DriveSystem extends SubsystemBase {
 
 	public void driveDistance(double inches, Direction direction) {
 		targetDirection = direction;
+		
 		if (direction == Direction.FORWARD) {
-			targetPosition = -1 * inches * TICKS_PER_INCH;
+			targetPosition = -1 * inches / WHEEL_CIRCUMFERENCE;
 		} else if (direction == Direction.BACKWARD) {
-			targetPosition = inches * TICKS_PER_INCH;
+			targetPosition = inches / WHEEL_CIRCUMFERENCE;
 		} else {
 			targetPosition = 0;
 		}
@@ -216,11 +217,11 @@ public class DriveSystem extends SubsystemBase {
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
 		targetDirection = direction;
 		if (direction == Direction.FORWARD) {
-			leftDist = -1 * (leftDist * TICKS_PER_INCH);
-			rightDist = -1 * (rightDist * TICKS_PER_INCH);
+			leftDist = -1 * leftDist / WHEEL_CIRCUMFERENCE;
+			rightDist = -1 * rightDist / WHEEL_CIRCUMFERENCE;
 		} else if (direction == Direction.BACKWARD) {
-			leftDist = leftDist * TICKS_PER_INCH;
-			rightDist = rightDist * TICKS_PER_INCH;
+			leftDist = leftDist / WHEEL_CIRCUMFERENCE;
+			rightDist = rightDist / WHEEL_CIRCUMFERENCE;
 		} else {
 			leftDist = 0;
 			rightDist = 0;
@@ -236,12 +237,12 @@ public class DriveSystem extends SubsystemBase {
 		double leftDist, rightDist;
 		
 		if (direction == Direction.LEFT) {
-			leftDist = innerCircumference;
-			rightDist = outerCircumference;
+			leftDist = innerCircumference / WHEEL_CIRCUMFERENCE;
+			rightDist = outerCircumference / WHEEL_CIRCUMFERENCE;
 		}
 		else if (direction == Direction.RIGHT) {
-			leftDist = outerCircumference;
-			rightDist = innerCircumference;
+			leftDist = outerCircumference / WHEEL_CIRCUMFERENCE;
+			rightDist = innerCircumference / WHEEL_CIRCUMFERENCE;
 		}
 		else {
 			leftDist = 0;

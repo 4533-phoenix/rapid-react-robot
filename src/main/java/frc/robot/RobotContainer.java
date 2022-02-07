@@ -38,7 +38,7 @@ public class RobotContainer {
 
     // Creates a hash map of commands for the robot
     private Map<String, Command> commands = Map.ofEntries(
-      Map.entry("defaultDrive",defaultDriveCommand)
+      Map.entry("autoCommand", AutoCommands.meuleDeFromage())
     );
   
 
@@ -68,8 +68,13 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand(String key) {
     // An ExampleCommand will run in autonomous
-    return defaultDriveCommand;
+    Command autoCommand = commands.get("autoCommand");
+
+    if (autoCommand == null) {
+      return defaultDriveCommand;
+    }
+    return autoCommand;
   }
 }

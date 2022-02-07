@@ -88,12 +88,12 @@ public class AutoCommands {
 
     public static Command meuleDeFromage() {
         return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
+            // shootBallAutoCommand(1),
             driveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, (Math.PI/2), Direction.LEFT),
             circleTurnAutoCommand(0.1, (Math.PI/6), Direction.RIGHT, 153),
-            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.RIGHT),
-            shootBallAutoCommand(2)
+            angularTurnAutoCommand(0.2, (Math.PI/2), Direction.RIGHT)
+            // shootBallAutoCommand(2)
         );
     }
 
