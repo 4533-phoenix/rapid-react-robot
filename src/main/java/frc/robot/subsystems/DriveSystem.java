@@ -112,6 +112,7 @@ public class DriveSystem extends SubsystemBase {
 
 	private static Pose2d targetPosition;
 	private static Direction targetDirection;
+	private static double oldTargetPosition;
 
 	private static Direction turnDirection;
 	private static Direction driveDirection;
@@ -224,7 +225,7 @@ public class DriveSystem extends SubsystemBase {
 		return targetPosition;
 	}
 
-	// TODO: Add back old drive distance code in a different method for use of non-odometry autonomous commands 
+	// TODONE: Add back old drive distance code in a different method for use of non-odometry autonomous commands 
 	public void driveDistance() {
 		double targetDist = targetPosition.getY() / Math.sin(targetPosition.getRotation().getRadians());
 		
@@ -238,6 +239,20 @@ public class DriveSystem extends SubsystemBase {
 
 		this.leftPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+	}
+
+	public void oldDriveDistance(double inches, Direction direction) {
+		targetDirection = direction;
+		if (direction == Direction.FORWARD) {
+			oldTargetPosition = -1 * inches * TICKS_PER_INCH;
+		} else if (direction == Direction.BACKWARD) {
+			oldTargetPosition = inches * TICKS_PER_INCH;
+		} else {
+			oldTargetPosition = 0;
+		}
+
+		this.leftMaster.set(oldTargetPosition);
+		this.rightMaster.set(oldTargetPosition);
 	}
 
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
@@ -394,9 +409,22 @@ public class DriveSystem extends SubsystemBase {
 		this.leftEncoder.setPosition(0);
 	}
 
-	// TODO: Add back old turn code in a different method for use of non-odometry autonomous commands
+	// TODONE: Add back old turn code in a different method for use of non-odometry autonomous commands
 	public void turn(double speed) {
 		switch (turnDirection) {
+		case LEFT:
+			this.voltage(speed, -speed);
+			break;
+		case RIGHT:
+			this.voltage(-speed, speed);
+			break;
+		default:
+			this.voltage(0, 0);
+		}
+	}
+
+	public void oldTurn(double speed, Direction direction) {
+		switch (direction) {
 		case LEFT:
 			this.voltage(speed, -speed);
 			break;
