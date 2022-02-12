@@ -80,7 +80,7 @@ public class AutoCommands {
 
     public static Command ballExitCommand(int balls) {
         return new FunctionalCommand(
-            () -> Robot.shooter.resetPosition(),
+            () -> Robot.shooter.setFlywheelReset(),
             () -> Robot.shooter.flywheelAndFlywheelIntakeOut(),
             (interrupt) -> Robot.shooter.flywheelAndFlywheelIntakeStop(),
             () -> Robot.shooter.flywheelDoneShootBalls(balls),
@@ -88,8 +88,8 @@ public class AutoCommands {
         );
     }
 
-    public static Command flywheelWait() {
-        return new WaitCommand(3);
+    public static Command flywheelWait(int seconds) {
+        return new WaitCommand(seconds);
     }
 
     public static Command activateFlywheel() {
@@ -102,12 +102,12 @@ public class AutoCommands {
     public static Command shootBallAutoCommand(int balls) {
         return new SequentialCommandGroup(
             activateFlywheel(),
-            flywheelWait(),
+            flywheelWait(3),
             ballExitCommand(balls)
         );
     }
 
-//Mesurements in Inches and DEGREES, angle and distance measurements are needed to be tested. Pour Bebe Commands are 2 ball auto, non Pour Bebes are 3 ball auto.
+//Mesurements in Inches and Degrees, all auto needs to be tested.
 
     public static Command threeBallAutoBottom() {
         return new SequentialCommandGroup(
@@ -122,7 +122,7 @@ public class AutoCommands {
 
     public static Command twoBallAutoTop() {
         return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
+            //shootBallAutoCommand(1),
             driveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
             circleTurnAutoCommand(0.1, 10, Direction.LEFT, 153),
