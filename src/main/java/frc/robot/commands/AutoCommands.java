@@ -12,8 +12,23 @@ public class AutoCommands {
 
     public AutoCommands() {
     }
-        
-    public static Command driveDistanceAutoCommand(double distance, Direction direction) {
+
+    // Test Commands:
+    public static Command testDriveToPos() {
+        return new SequentialCommandGroup(
+            driveToPosAutoCommand(5, 10),
+            driveToPosAutoCommand(0, 0),
+            driveToPosAutoCommand(-5, 10),
+            driveToPosAutoCommand(0, 0),
+            driveToPosAutoCommand(-5, -10),
+            driveToPosAutoCommand(0, 0),
+            driveToPosAutoCommand(5, -10),
+            driveToPosAutoCommand(0, 0)
+        );
+    }
+
+    // Normal Commands:    
+    public static Command driveDistanceAutoCommand() {
         return new FunctionalCommand(
             null,
             () -> Robot.drive.driveDistance(),
@@ -23,7 +38,7 @@ public class AutoCommands {
         );
     }
 
-    public static Command turnCommand(Direction direction) {
+    public static Command turnCommand() {
         return new FunctionalCommand(
             null,
             () -> Robot.drive.turn(0.5),
@@ -43,8 +58,9 @@ public class AutoCommands {
     public static Command driveToPosAutoCommand(double xMeters, double yMeters) {
         return new SequentialCommandGroup(
             driveToPosition(xMeters, yMeters),
-            turnCommand(null),
-            driveDistanceAutoCommand(0.0, null)
+            turnCommand(),
+            driveDistanceAutoCommand(),
+            oldAngularTurnAutoCommand(0.5, 0.0, Direction.RIGHT)
         );
     }
 
@@ -117,12 +133,12 @@ public class AutoCommands {
 		);
 	}
 
-	public static Command oldAnglularTurnAutoCommand(double speed, double angle, Direction direction) {
+	public static Command oldAngularTurnAutoCommand(double speed, double angle, Direction direction) {
 		return new FunctionalCommand(
 			() -> Robot.drive.resetAngle(),
 			() -> Robot.drive.oldTurn(speed, direction),
 			(interrupt) -> Robot.drive.tank(0, 0),
-			() -> Robot.drive.getAngle() >= angle,
+			() -> Robot.drive.oldReachedTurn(angle),
 			Robot.drive
 		);
 	}
@@ -132,7 +148,7 @@ public class AutoCommands {
     public static Command threeBallAutoBottom() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            driveDistanceAutoCommand(41, Direction.BACKWARD),
+            oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT),
             circleTurnAutoCommand(0.1, 30, Direction.RIGHT, 153),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT)
@@ -143,7 +159,7 @@ public class AutoCommands {
     public static Command twoBallAutoTop() {
         return new SequentialCommandGroup(
             //shootBallAutoCommand(1),
-            driveDistanceAutoCommand(41, Direction.BACKWARD),
+            oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
             circleTurnAutoCommand(0.1, 10, Direction.LEFT, 153),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT)
@@ -154,7 +170,7 @@ public class AutoCommands {
     public static Command twoBallAutoBottom() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            driveDistanceAutoCommand(41, Direction.BACKWARD),
+            oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT),
             circleTurnAutoCommand(0.1, 10, Direction.RIGHT, 153),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT)

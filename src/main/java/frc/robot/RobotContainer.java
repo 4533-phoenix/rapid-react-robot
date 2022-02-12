@@ -38,6 +38,7 @@ public class RobotContainer {
 
     // Creates a hash map of commands for the robot
     private Map<String, Command> commands = Map.ofEntries(
+      Map.entry("testDrivePositionOne", AutoCommands.driveToPosAutoCommand(5, 10)),
       Map.entry("threeBallAutoBottom", AutoCommands.threeBallAutoBottom()),
       Map.entry("twoBallAutoBottom", AutoCommands.twoBallAutoBottom()),
       Map.entry("twoBallAutoTop", AutoCommands.twoBallAutoTop())
@@ -72,7 +73,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand(String key) {
     // An ExampleCommand will run in autonomous
-    Command autoCommand = commands.get("autoCommand");
+    Command autoCommand = commands.get(key);
 
     if (autoCommand == null) {
       return defaultDriveCommand;

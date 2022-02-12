@@ -113,6 +113,7 @@ public class DriveSystem extends SubsystemBase {
 	private static Pose2d targetPosition;
 	private static Direction targetDirection;
 	private static double oldTargetPosition;
+	private static double oldTargetAngle;
 
 	private static Direction turnDirection;
 	private static Direction driveDirection;
@@ -181,10 +182,10 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public boolean reachedPosition() {
-		if (targetDirection == Direction.FORWARD) {
+		if (driveDirection == Direction.FORWARD) {
 			return (robotPos.getX() >= targetPosition.getX()) && (robotPos.getY() >= targetPosition.getY());
 		}
-		else if (targetDirection == Direction.BACKWARD) {
+		else if (driveDirection == Direction.BACKWARD) {
 			return (robotPos.getX() <= targetPosition.getX()) && (robotPos.getY() <= targetPosition.getY());
 		}
 		return true;
@@ -205,13 +206,18 @@ public class DriveSystem extends SubsystemBase {
 
 	public Pose2d driveToPosition(double xMeters, double yMeters) {
 		Translation2d translation = new Translation2d(xMeters, yMeters);
-		Rotation2d angle = Rotation2d.fromDegrees((360 - (Math.atan(yMeters / xMeters)) * (180 / Math.PI)));
+		Rotation2d angle = Rotation2d.fromDegrees(Math.atan(yMeters / xMeters) * (180 / Math.PI));
+
+		if (angle.getDegrees() < 0) {
+			angle = Rotation2d.fromDegrees(360 + angle.getDegrees());
+		}
+
 		targetPosition = new Pose2d(translation, angle);
 
-		if (targetPosition.getRotation().getDegrees() >= 90 && targetPosition.getRotation().getDegrees() <= 270) {
+		if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() >= 0) {
 			turnDirection = Direction.LEFT;
 		}
-		else if (targetPosition.getRotation().getDegrees() < 90 || targetPosition.getRotation().getDegrees() > 270) {
+		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() < 0) {
 			turnDirection = Direction.RIGHT;
 		}
 
@@ -436,23 +442,32 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
-	public boolean reachedTurn() {
-		if (targetDirection == Direction.LEFT) {
-			// - 1 is to account for motors going past angle
-			return robotAngle.getDegrees() >= targetPosition.getRotation().getDegrees() - 1; 
+	public boolean oldReachedTurn(double angle) {
+		if (angle == 0 && robotAngle.getDegrees() >= 0) {
+			return robotAngle.getDegrees() <= angle + 1 && -robotAngle.getDegrees() >= angle - 1;
 		}
-		else if (targetDirection == Direction.RIGHT) {
-			// + 1 is to account for motors going past angle
-			return robotAngle.getDegrees() <= targetPosition.getRotation().getDegrees() + 1; 
+		else if (angle == 0 && robotAngle.getDegrees() < 0) {
+			return 360 - robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
+		}
+		else if (angle != 0) {
+			return robotAngle.getDegrees() <= angle + 1 && robotAngle.getDegrees() >= angle - 1;
 		}
 		return true;
 	}
 
-	public boolean oldReachedTurn() {
-		if (getAngle() >= ( + 2) && getAngle() <= ( - 2)) {
-			return true;
+	public boolean reachedTurn() {
+		double angle = targetPosition.getRotation().getDegrees();
+		
+		if (angle == 0 && robotAngle.getDegrees() >= 0) {
+			return robotAngle.getDegrees() <= angle + 1 && -robotAngle.getDegrees() >= angle - 1;
 		}
-		return false;
+		else if (angle == 0 && robotAngle.getDegrees() < 0) {
+			return 360 - robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
+		}
+		else if (angle != 0) {
+			return robotAngle.getDegrees() <= angle + 1 && robotAngle.getDegrees() >= angle - 1;
+		}
+		return true;
 	}
 
 	@Override
@@ -461,6 +476,14 @@ public class DriveSystem extends SubsystemBase {
 		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 
 		robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
-		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
+
+		// ensures there is never a negative angle value
+		// this is useful for turning, as we don't have to worry about the robot making unecessarily long turns
+		if (-navX.getAngle() < 0) {
+			robotAngle = Rotation2d.fromDegrees(360 - (navX.getAngle() % 360));
+		}
+		else {
+			robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
+		}
 	}
 }
