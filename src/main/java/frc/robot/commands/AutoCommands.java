@@ -17,13 +17,13 @@ public class AutoCommands {
     public static Command testDriveToPos() {
         return new SequentialCommandGroup(
             driveToPosAutoCommand(0.5, 1),
-            driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(-0.5, 1),
-            driveToPosAutoCommand(0, 0),
             driveToPosAutoCommand(-0.5, -1),
-            driveToPosAutoCommand(0, 0),
+            driveToPosAutoCommand(-0.5, 1),
             driveToPosAutoCommand(0.5, -1),
-            driveToPosAutoCommand(0, 0)
+            driveToPosAutoCommand(-0.5, -1),
+            driveToPosAutoCommand(0.5, 1),
+            driveToPosAutoCommand(0.5, -1),
+            driveToPosAutoCommand(-0.5, 1)
         );
     }
 
