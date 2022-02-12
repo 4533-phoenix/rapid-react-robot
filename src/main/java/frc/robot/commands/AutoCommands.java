@@ -107,6 +107,26 @@ public class AutoCommands {
         );
     }
 
+	public static Command oldDriveDistanceAutoCommand(double distance, Direction direction) {
+		return new FunctionalCommand(
+			() -> Robot.drive.resetPosition(),
+			() -> Robot.drive.oldDriveDistance(distance, direction),
+			(interrupt) -> Robot.drive.tank(0, 0),
+			() -> Robot.drive.reachedPosition(),
+			Robot.drive
+		);
+	}
+
+	public static Command oldAnglularTurnAutoCommand(double speed, double angle, Direction direction) {
+		return new FunctionalCommand(
+			() -> Robot.drive.resetAngle(),
+			() -> Robot.drive.oldTurn(speed, direction),
+			(interrupt) -> Robot.drive.tank(0, 0),
+			() -> Robot.drive.getAngle() >= angle,
+			Robot.drive
+		);
+	}
+
 //Mesurements in Inches and Degrees, all auto needs to be tested.
 
     public static Command threeBallAutoBottom() {
