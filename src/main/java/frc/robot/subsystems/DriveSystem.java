@@ -448,6 +448,13 @@ public class DriveSystem extends SubsystemBase {
 		return true;
 	}
 
+	public boolean oldReachedTurn() {
+		if (getAngle() >= ( + 2) && getAngle() <= ( - 2)) {
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public void periodic() {
 		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
