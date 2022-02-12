@@ -38,7 +38,7 @@ public class RobotContainer {
 
     // Creates a hash map of commands for the robot
     private Map<String, Command> commands = Map.ofEntries(
-      Map.entry("testDrivePositionOne", AutoCommands.driveToPosAutoCommand(5, 10)),
+      Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos()),
       Map.entry("threeBallAutoBottom", AutoCommands.threeBallAutoBottom()),
       Map.entry("twoBallAutoBottom", AutoCommands.twoBallAutoBottom()),
       Map.entry("twoBallAutoTop", AutoCommands.twoBallAutoTop())
