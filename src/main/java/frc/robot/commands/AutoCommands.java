@@ -143,6 +143,22 @@ public class AutoCommands {
 		);
 	}
 
+    public static Command intakeInAutoCommand() {
+        return new InstantCommand(
+            () -> Robot.intake.intakeIn(),
+            Robot.intake
+        );
+    }
+
+    public static Command intakeStopAutoCommand() {
+        return new InstantCommand(
+            () -> Robot.intake.intakeStop(),
+            Robot.intake
+        );
+    }
+
+
+
 //Mesurements in Inches and Degrees, all auto needs to be tested.
 
     public static Command threeBallAutoBottom() {
@@ -150,7 +166,9 @@ public class AutoCommands {
             // shootBallAutoCommand(1),
             oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT),
+            //intakeInAutoCommand(),
             circleTurnAutoCommand(0.1, 30, Direction.RIGHT, 153),
+            //intakeStopAutoCommand(),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT)
             // shootBallAutoCommand(2)
         );
@@ -161,7 +179,9 @@ public class AutoCommands {
             //shootBallAutoCommand(1),
             oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
+            //intakeInAutoCommand(),
             circleTurnAutoCommand(0.1, 10, Direction.LEFT, 153),
+            //intakeStopAutoCommand(),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT)
             // shootBallAutoCommand(1)
         );
@@ -172,7 +192,9 @@ public class AutoCommands {
             // shootBallAutoCommand(1),
             oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT),
+            //intakeInAutoCommand(),
             circleTurnAutoCommand(0.1, 10, Direction.RIGHT, 153),
+            //intakeStopAutoCommand(),
             angularTurnAutoCommand(0.2, 90, Direction.RIGHT)
             // shootBallAutoCommand(1)
         );
