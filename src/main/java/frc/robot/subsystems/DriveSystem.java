@@ -485,5 +485,7 @@ public class DriveSystem extends SubsystemBase {
 		else {
 			robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
 		}
+
+		System.out.println(robotAngle.getDegrees());
 	}
 }
