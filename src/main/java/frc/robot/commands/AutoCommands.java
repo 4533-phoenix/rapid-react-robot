@@ -15,18 +15,43 @@ public class AutoCommands {
         
     public static Command driveDistanceAutoCommand(double distance, Direction direction) {
         return new FunctionalCommand(
-            () -> Robot.drive.resetPosition(),
-            () -> Robot.drive.driveDistance(distance, direction),
+            null,
+            () -> Robot.drive.driveDistance(),
             (interrupt) -> Robot.drive.tank(0, 0),
             () -> Robot.drive.reachedPosition(),
             Robot.drive
-            );
+        );
+    }
+
+    public static Command turnCommand(Direction direction) {
+        return new FunctionalCommand(
+            null,
+            () -> Robot.drive.turn(0.5),
+            (interrupt) -> Robot.drive.tank(0, 0),
+            () -> Robot.drive.reachedTurn(),
+            Robot.drive
+        );
+    }
+
+    public static Command driveToPosition(double xMeters, double yMeters) {
+        return new InstantCommand(
+            () -> Robot.drive.driveToPosition(xMeters, yMeters),
+            Robot.drive
+        );
+    }
+
+    public static Command driveToPosAutoCommand(double xMeters, double yMeters) {
+        return new SequentialCommandGroup(
+            driveToPosition(xMeters, yMeters),
+            turnCommand(null),
+            driveDistanceAutoCommand(0.0, null)
+        );
     }
 
     public static Command angularTurnAutoCommand(double speed, double angle, Direction direction) {
         return new FunctionalCommand(
             () -> Robot.drive.resetAngle(),
-            () -> Robot.drive.turn(speed, direction),
+            () -> Robot.drive.turn(speed),
             (interrupt) -> Robot.drive.tank(0, 0),
             () -> Robot.drive.getAngle() >= angle,
             Robot.drive

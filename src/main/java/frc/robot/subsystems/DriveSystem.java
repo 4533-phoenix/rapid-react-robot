@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +27,8 @@ import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import java.lang.Math.*;
 
 public class DriveSystem extends SubsystemBase {
     
@@ -56,6 +60,10 @@ public class DriveSystem extends SubsystemBase {
 	private static final double TICKS_PER_INCH = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE;
 	private static final double TICKS_PER_METER = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE_M;
 	private static final double METERS_PER_TICK = WHEEL_CIRCUMFERENCE_M / TICKS_PER_ROTATION;
+
+	// Unit specific constants.
+	private static final double INCHES_PER_METER = 39.3701;
+	private static final double METERS_PER_INCH = 1 / 39.3701;
 
 	// Velocity PIDF values
 	public static final double VELOCITY_P = 0.000213;
@@ -102,8 +110,11 @@ public class DriveSystem extends SubsystemBase {
 	/** Default timeout in milliseconds */
 	private static final int DEFAULT_TIMEOUT = 30;
 
-	private static double targetPosition = 0;
+	private static Pose2d targetPosition;
 	private static Direction targetDirection;
+
+	private static Direction turnDirection;
+	private static Direction driveDirection;
 
 	public enum DriveMode {
 		Normal, Inverted
@@ -144,6 +155,8 @@ public class DriveSystem extends SubsystemBase {
 
 		this.robotPos = new Pose2d(5, 5, new Rotation2d());
 		this.odometry = new Odometry(navX.getRotation2d(), robotPos);
+
+		this.targetPosition = null;
 	}
 
 	public SparkMaxPIDController getLeftPIDCont() {
@@ -167,18 +180,13 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public boolean reachedPosition() {
-		double leftPos = this.leftEncoder.getPosition();
-		double rightPos = this.rightEncoder.getPosition();
-
-		// System.out.println("Left: " + leftPos + " Right: " + rightPos);
 		if (targetDirection == Direction.FORWARD) {
-			// System.out.printf("%f : %f : %f\n", leftPos, rightPos, targetPosition);
-			return (leftPos <= targetPosition) && (rightPos <= targetPosition);
-		} else if (targetDirection == Direction.BACKWARD) {
-			return (leftPos >= targetPosition) && (rightPos >= targetPosition);
-		} else {
-			return true;
+			return (robotPos.getX() >= targetPosition.getX()) && (robotPos.getY() >= targetPosition.getY());
 		}
+		else if (targetDirection == Direction.BACKWARD) {
+			return (robotPos.getX() <= targetPosition.getX()) && (robotPos.getY() <= targetPosition.getY());
+		}
+		return true;
 	}
 
 	public boolean reachedCurve(double targetL, double targetR) {
@@ -194,19 +202,42 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
-	public void driveDistance(double inches, Direction direction) {
-		targetDirection = direction;
-		
-		if (direction == Direction.FORWARD) {
-			targetPosition = -1 * inches / WHEEL_CIRCUMFERENCE;
-		} else if (direction == Direction.BACKWARD) {
-			targetPosition = inches / WHEEL_CIRCUMFERENCE;
-		} else {
-			targetPosition = 0;
+	public Pose2d driveToPosition(double xMeters, double yMeters) {
+		Translation2d translation = new Translation2d(xMeters, yMeters);
+		Rotation2d angle = Rotation2d.fromDegrees((360 - (Math.atan(yMeters / xMeters)) * (180 / Math.PI)));
+		targetPosition = new Pose2d(translation, angle);
+
+		if (targetPosition.getRotation().getDegrees() >= 90 && targetPosition.getRotation().getDegrees() <= 270) {
+			turnDirection = Direction.LEFT;
+		}
+		else if (targetPosition.getRotation().getDegrees() < 90 || targetPosition.getRotation().getDegrees() > 270) {
+			turnDirection = Direction.RIGHT;
 		}
 
-		this.leftPIDCont.setReference(targetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
-		this.rightPIDCont.setReference(targetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		if (targetPosition.getY() >= 0) {
+			driveDirection = Direction.FORWARD;
+		}
+		else if (targetPosition.getY() < 0) {
+			driveDirection = Direction.BACKWARD;
+		}
+
+		return targetPosition;
+	}
+
+	// TODO: Add back old drive distance code in a different method for use of non-odometry autonomous commands 
+	public void driveDistance() {
+		double targetDist = targetPosition.getY() / Math.sin(targetPosition.getRotation().getRadians());
+		
+		if (driveDirection == Direction.FORWARD) {
+			targetDist *= -1 * INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+		} else if (driveDirection == Direction.BACKWARD) {
+			targetDist *= INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+		} else {
+			targetDist = 0;
+		}
+
+		this.leftPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
@@ -363,8 +394,9 @@ public class DriveSystem extends SubsystemBase {
 		this.leftEncoder.setPosition(0);
 	}
 
-	public void turn(double speed, Direction direction) {
-		switch (direction) {
+	// TODO: Add back old turn code in a different method for use of non-odometry autonomous commands
+	public void turn(double speed) {
+		switch (turnDirection) {
 		case LEFT:
 			this.voltage(speed, -speed);
 			break;
@@ -374,6 +406,18 @@ public class DriveSystem extends SubsystemBase {
 		default:
 			this.voltage(0, 0);
 		}
+	}
+
+	public boolean reachedTurn() {
+		if (targetDirection == Direction.LEFT) {
+			// - 1 is to account for motors going past angle
+			return robotAngle.getDegrees() >= targetPosition.getRotation().getDegrees() - 1; 
+		}
+		else if (targetDirection == Direction.RIGHT) {
+			// + 1 is to account for motors going past angle
+			return robotAngle.getDegrees() <= targetPosition.getRotation().getDegrees() + 1; 
+		}
+		return true;
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import edu.wpi.first.math.MathUsageId;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class Odometry {
     /* All distances are in meters */
@@ -57,5 +58,22 @@ public class Odometry {
         position = new Pose2d(newPosition.getTranslation(), angle);
 
         return position;
+    }
+
+    public Translation2d getTransformation(Rotation2d updateAngle, double leftDist, double rightDist) {
+        double deltaLeft = leftDist - prevLeftDistance;
+        double deltaRight = rightDist - prevRightDistance;
+
+        prevLeftDistance = leftDist;
+        prevRightDistance = rightDist;
+
+        double averageDeltaDist = (deltaLeft + deltaRight) / 2.0;
+        var angle = updateAngle.plus(gyroOffset);
+
+        var newPosition = position.exp(new Twist2d(averageDeltaDist, 0.0, angle.minus(previousAngle).getRadians()));
+
+        previousAngle = angle;
+
+        return newPosition.getTranslation();
     }
 }
