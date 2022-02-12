@@ -16,13 +16,13 @@ public class AutoCommands {
     // Test Commands:
     public static Command testDriveToPos() {
         return new SequentialCommandGroup(
-            driveToPosAutoCommand(1, 2),
+            driveToPosAutoCommand(0.5, 1),
             driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(-1, 2),
+            driveToPosAutoCommand(-0.5, 1),
             driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(-1, -2),
+            driveToPosAutoCommand(-0.5, -1),
             driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(1, -2),
+            driveToPosAutoCommand(0.5, -1),
             driveToPosAutoCommand(0, 0)
         );
     }
@@ -30,7 +30,7 @@ public class AutoCommands {
     // Normal Commands:    
     public static Command driveDistanceAutoCommand() {
         return new FunctionalCommand(
-            null,
+            () -> Robot.drive.getAngle(),
             () -> Robot.drive.driveDistance(),
             (interrupt) -> Robot.drive.tank(0, 0),
             () -> Robot.drive.reachedPosition(),
@@ -40,8 +40,8 @@ public class AutoCommands {
 
     public static Command turnCommand() {
         return new FunctionalCommand(
-            null,
-            () -> Robot.drive.turn(0.5),
+            () -> Robot.drive.getAngle(),
+            () -> Robot.drive.turn(0.1),
             (interrupt) -> Robot.drive.tank(0, 0),
             () -> Robot.drive.reachedTurn(),
             Robot.drive
@@ -60,7 +60,7 @@ public class AutoCommands {
             driveToPosition(xMeters, yMeters),
             turnCommand(),
             driveDistanceAutoCommand(),
-            oldAngularTurnAutoCommand(0.5, 0.0, Direction.RIGHT)
+            oldAngularTurnAutoCommand(0.1, 0.0, Direction.RIGHT)
         );
     }
 
