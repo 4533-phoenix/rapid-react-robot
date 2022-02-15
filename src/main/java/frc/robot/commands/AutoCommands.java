@@ -161,41 +161,54 @@ public class AutoCommands {
 
 //Mesurements in Inches and Degrees, all auto needs to be tested.
 
-    public static Command threeBallAutoBottom() {
+    public static Command threeBallAutoBlue() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
+            driveToPosAutoCommand(0,-150.76),
+            oldAngularTurnAutoCommand(0.2, 90, Direction.LEFT),
             //intakeInAutoCommand(),
-            circleTurnAutoCommand(0.1, 30, Direction.RIGHT, 153),
+            circleTurnAutoCommand(0.1, 45, Direction.RIGHT, 153),
             //intakeStopAutoCommand(),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT)
+            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT)
             // shootBallAutoCommand(2)
         );
     }
 
-    public static Command twoBallAutoTop() {
+    public static Command threeBallAutoRed() {
+        return new SequentialCommandGroup(
+            // shootBallAutoCommand(1),
+            driveToPosAutoCommand(0,150.76),
+            oldAngularTurnAutoCommand(0.2, 90, Direction.LEFT),
+            //intakeInAutoCommand(),
+            circleTurnAutoCommand(0.1, 45, Direction.RIGHT, 153),
+            //intakeStopAutoCommand(),
+            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT)
+            // shootBallAutoCommand(2)
+        );
+    }
+
+    public static Command twoBallAutoTopRed() {
         return new SequentialCommandGroup(
             //shootBallAutoCommand(1),
-            oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT),
+            driveToPosAutoCommand(0,150.76),
+            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
             //intakeInAutoCommand(),
-            circleTurnAutoCommand(0.1, 10, Direction.LEFT, 153),
+            driveToPosAutoCommand(41.42,150.76),
             //intakeStopAutoCommand(),
             angularTurnAutoCommand(0.2, 90, Direction.LEFT)
             // shootBallAutoCommand(1)
         );
     }
 
-    public static Command twoBallAutoBottom() {
+    public static Command twoBallAutoBottomBlue() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            oldDriveDistanceAutoCommand(41, Direction.BACKWARD),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT),
+            driveToPosAutoCommand(0,-150.76),
+            oldAngularTurnAutoCommand(0.2, 90, Direction.LEFT),
             //intakeInAutoCommand(),
-            circleTurnAutoCommand(0.1, 10, Direction.RIGHT, 153),
+            driveToPosAutoCommand(-41.42,-150.76),
             //intakeStopAutoCommand(),
-            angularTurnAutoCommand(0.2, 90, Direction.RIGHT)
+            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT)
             // shootBallAutoCommand(1)
         );
     }
