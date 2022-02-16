@@ -212,11 +212,20 @@ public class DriveSystem extends SubsystemBase {
 
 		targetPosition = new Pose2d(translation, angle);
 
-		if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() >= 0) {
+		if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() > 180) {
+			turnDirection = Direction.RIGHT;
+		}
+		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() <= 180) {
 			turnDirection = Direction.LEFT;
 		}
-		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() < 0) {
+		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() < -180) {
 			turnDirection = Direction.RIGHT;
+		}
+		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() >= -180) {
+			turnDirection = Direction.LEFT;
+		}
+		else {
+			turnDirection = Direction.LEFT;
 		}
 
 		System.out.println(turnDirection);
@@ -226,6 +235,9 @@ public class DriveSystem extends SubsystemBase {
 		}
 		else if (targetPosition.getY() < 0) {
 			driveDirection = Direction.BACKWARD;
+		}
+		else {
+			driveDirection = Direction.FORWARD;
 		}
 
 		return targetPosition;
@@ -443,31 +455,29 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public boolean oldReachedTurn(double angle) {
-		if (angle == 0 && robotAngle.getDegrees() >= 0) {
-			return robotAngle.getDegrees() <= angle + 1 && -robotAngle.getDegrees() >= angle - 1;
+		if (angle + 1 > 360) {
+			return 360 - robotAngle.getDegrees() <= (angle + 1) % 360 && robotAngle.getDegrees() >= angle - 1;
 		}
-		else if (angle == 0 && robotAngle.getDegrees() < 0) {
-			return 360 - robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
+		else if (angle - 1 < 0) {
+			return robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
 		}
-		else if (angle != 0) {
+		else {
 			return robotAngle.getDegrees() <= angle + 1 && robotAngle.getDegrees() >= angle - 1;
 		}
-		return true;
 	}
 
 	public boolean reachedTurn() {
 		double angle = targetPosition.getRotation().getDegrees();
 		
-		if (angle == 0 && robotAngle.getDegrees() >= 0) {
-			return robotAngle.getDegrees() <= angle + 1 && -robotAngle.getDegrees() >= angle - 1;
+		if (angle + 1 > 360) {
+			return 360 - robotAngle.getDegrees() <= (angle + 1) % 360 && robotAngle.getDegrees() >= angle - 1;
 		}
-		else if (angle == 0 && robotAngle.getDegrees() < 0) {
-			return 360 - robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
+		else if (angle - 1 < 0) {
+			return robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
 		}
-		else if (angle != 0) {
+		else {
 			return robotAngle.getDegrees() <= angle + 1 && robotAngle.getDegrees() >= angle - 1;
 		}
-		return true;
 	}
 
 	@Override
