@@ -62,8 +62,8 @@ public class DriveSystem extends SubsystemBase {
 	private static final double METERS_PER_TICK = WHEEL_CIRCUMFERENCE_M / TICKS_PER_ROTATION;
 
 	// Unit specific constants.
-	private static final double INCHES_PER_METER = 39.3701;
-	private static final double METERS_PER_INCH = 1 / 39.3701;
+	public static final double INCHES_PER_METER = 39.3701;
+	public static final double METERS_PER_INCH = 1 / 39.3701;
 
 	// Velocity PIDF values
 	public static final double VELOCITY_P = 0.000213;
