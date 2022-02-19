@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
+import frc.robot.subsystems.DriveSystem;
 
 public class AutoCommands {
 
@@ -159,15 +160,14 @@ public class AutoCommands {
 
 
 
-//Mesurements in Inches and Degrees, all auto needs to be tested.
+//Mesurements in Inches and Degrees, all auto needs to be tested. DriveSystem.INCHES_PER_METER is inches to meters
 
     public static Command threeBallAutoBlue() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            driveToPosAutoCommand(0,-150.76),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.LEFT),
-            //intakeInAutoCommand(),
-            circleTurnAutoCommand(0.1, 45, Direction.RIGHT, 153),
+            //intakeInAutoCommand(),            
+            driveToPosAutoCommand(-25.91/DriveSystem.INCHES_PER_METER,-149.79/DriveSystem.INCHES_PER_METER),
+            driveToPosAutoCommand(-124.95/DriveSystem.INCHES_PER_METER,-87.30/DriveSystem.INCHES_PER_METER),
             //intakeStopAutoCommand(),
             oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT)
             // shootBallAutoCommand(2)
@@ -177,10 +177,9 @@ public class AutoCommands {
     public static Command threeBallAutoRed() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            driveToPosAutoCommand(0,150.76),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.LEFT),
             //intakeInAutoCommand(),
-            circleTurnAutoCommand(0.1, 45, Direction.RIGHT, 153),
+            driveToPosAutoCommand(25.91/DriveSystem.INCHES_PER_METER,149.79/DriveSystem.INCHES_PER_METER),
+            driveToPosAutoCommand(149.23/DriveSystem.INCHES_PER_METER,32.77/DriveSystem.INCHES_PER_METER),
             //intakeStopAutoCommand(),
             oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT)
             // shootBallAutoCommand(2)
@@ -190,12 +189,10 @@ public class AutoCommands {
     public static Command twoBallAutoTopRed() {
         return new SequentialCommandGroup(
             //shootBallAutoCommand(1),
-            driveToPosAutoCommand(0,150.76),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
             //intakeInAutoCommand(),
-            driveToPosAutoCommand(41.42,150.76),
+            driveToPosAutoCommand(25.91/DriveSystem.INCHES_PER_METER,149.79/DriveSystem.INCHES_PER_METER),
             //intakeStopAutoCommand(),
-            angularTurnAutoCommand(0.2, 90, Direction.LEFT)
+            angularTurnAutoCommand(0.2, 180, Direction.LEFT)
             // shootBallAutoCommand(1)
         );
     }
@@ -203,12 +200,32 @@ public class AutoCommands {
     public static Command twoBallAutoBottomBlue() {
         return new SequentialCommandGroup(
             // shootBallAutoCommand(1),
-            driveToPosAutoCommand(0,-150.76),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.LEFT),
             //intakeInAutoCommand(),
-            driveToPosAutoCommand(-41.42,-150.76),
+            driveToPosAutoCommand(-25.91/DriveSystem.INCHES_PER_METER,-149.79/DriveSystem.INCHES_PER_METER),
             //intakeStopAutoCommand(),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT)
+            oldAngularTurnAutoCommand(0.2, 180, Direction.RIGHT)
+            // shootBallAutoCommand(1)
+        );
+    }
+
+    public static Command twoBallAutoBottomRed() {
+        return new SequentialCommandGroup(
+            //shootBallAutoCommand(1),
+            //intakeInAutoCommand(),
+             driveToPosAutoCommand(88.30/DriveSystem.INCHES_PER_METER,-125.95/DriveSystem.INCHES_PER_METER),
+            //intakeStopAutoCommand(),
+            angularTurnAutoCommand(0.2, 180, Direction.LEFT)
+            // shootBallAutoCommand(1)
+        );
+    }
+
+    public static Command twoBallAutoTopBlue() {
+        return new SequentialCommandGroup(
+            //shootBallAutoCommand(1),
+            //intakeInAutoCommand(),
+             driveToPosAutoCommand(-129.40/DriveSystem.INCHES_PER_METER,82.69/DriveSystem.INCHES_PER_METER),
+            //intakeStopAutoCommand(),
+            angularTurnAutoCommand(0.2, 180, Direction.LEFT)
             // shootBallAutoCommand(1)
         );
     }
