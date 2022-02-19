@@ -55,6 +55,9 @@ public class DriveSystem extends SubsystemBase {
 	private static final double PEAK_OUTPUT = 1.0;
 	private boolean turbo = false;
 
+	private static final double MAX_VOLTAGE = 9.0;
+	private static final double TURBO_VOLTAGE = 9.5;
+
 	// Wheel specific constants.
 	public static final double TICKS_PER_ROTATION = 4096.0;
 	private static final double WHEEL_DIAMETER = 6.0;
@@ -387,14 +390,14 @@ public class DriveSystem extends SubsystemBase {
 		double targetLeft;
 		double targetRight;
 
-		double targetVelocity = MAX_VELOCITY;
+		double targetVoltage = MAX_VOLTAGE;
 
 		if (this.turbo) {
-			targetVelocity = TURBO_VELOCITY;
+			targetVoltage = TURBO_VOLTAGE;
 		}
 
-		targetLeft = left * targetVelocity;
-		targetRight = right * targetVelocity;
+		targetLeft = left * targetVoltage;
+		targetRight = right * targetVoltage;
 
 		if (this.driveMode == DriveMode.Inverted) {
 			double temp = targetLeft;
@@ -402,10 +405,7 @@ public class DriveSystem extends SubsystemBase {
 			targetRight = -temp;
 		}
 
-		System.out.println(this.driveMode);
-
-		this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
-		this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+		voltage(targetLeft, targetRight);
 	}
 
 	public void voltage(double left, double right) {
