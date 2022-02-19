@@ -24,4 +24,11 @@ public class DriveCommands {
             Robot.drive
         );
     }
+
+    public static Command testPID() {
+        return new RunCommand(
+            () -> Robot.drive.tank(0.5, 0.5),
+            Robot.drive
+        );
+    }
 }

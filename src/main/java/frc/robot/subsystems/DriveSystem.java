@@ -45,8 +45,6 @@ public class DriveSystem extends SubsystemBase {
 	private SparkMaxPIDController leftPIDCont;
 	private SparkMaxPIDController rightPIDCont;
 
-	private PIDController dashboardCont;
-
 	// Onboard IMU.
 	private AHRS navX;
 
@@ -149,8 +147,6 @@ public class DriveSystem extends SubsystemBase {
 
 		this.rightPIDCont = rightMaster.getPIDController();
 		rightPIDCont.setFeedbackDevice(rightEncoder);
-
-		this.dashboardCont = new PIDController(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
 
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
@@ -493,9 +489,6 @@ public class DriveSystem extends SubsystemBase {
 			navXCount++;
 		}
 
-		dashboardCont.setPID(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
-		SmartDashboard.putData("PID Controller", dashboardCont);
-
 		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 
@@ -510,6 +503,6 @@ public class DriveSystem extends SubsystemBase {
 			robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
 		}
 
-		System.out.println("Robot Angle: " + robotAngle.getDegrees());
+		// System.out.println("Robot Angle: " + robotAngle.getDegrees());
 	}
 }
