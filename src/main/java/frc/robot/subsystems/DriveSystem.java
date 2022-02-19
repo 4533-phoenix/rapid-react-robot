@@ -14,6 +14,8 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,6 +44,8 @@ public class DriveSystem extends SubsystemBase {
 	private RelativeEncoder leftEncoder;
 	private SparkMaxPIDController leftPIDCont;
 	private SparkMaxPIDController rightPIDCont;
+
+	private PIDController dashboardCont;
 
 	// Onboard IMU.
 	private AHRS navX;
@@ -146,13 +150,15 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont = rightMaster.getPIDController();
 		rightPIDCont.setFeedbackDevice(rightEncoder);
 
+		this.dashboardCont = new PIDController(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
+
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
 		
-		this.rightMaster.setIdleMode(IdleMode.kBrake);
-		this.rightSlave.setIdleMode(IdleMode.kBrake);
-		this.leftMaster.setIdleMode(IdleMode.kBrake);
-		this.leftSlave.setIdleMode(IdleMode.kBrake);
+		this.rightMaster.setIdleMode(IdleMode.kCoast);
+		this.rightSlave.setIdleMode(IdleMode.kCoast);
+		this.leftMaster.setIdleMode(IdleMode.kCoast);
+		this.leftSlave.setIdleMode(IdleMode.kCoast);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
@@ -486,6 +492,9 @@ public class DriveSystem extends SubsystemBase {
 			navX.reset();
 			navXCount++;
 		}
+
+		dashboardCont.setPID(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
+		SmartDashboard.putData("PID Controller", dashboardCont);
 
 		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
