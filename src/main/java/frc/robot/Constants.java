@@ -15,10 +15,12 @@ public final class Constants {
 	public static final int INTAKE_MOTOR = 11;
 	public static final int FLYWHEEL_MOTOR_RIGHT = 14;
 	public static final int FLYWHEEL_MOTOR_LEFT = 10;
-	public static final int TURRET_WHEEL_MOTOR = 13;
+	public static final int TURRET_WHEEL_MOTOR = 6;
 	public static final int TURRET_SWIVEL_MOTOR = 12;
-	public static final int WINCH_MOTOR = 8;
+	//TODO Winch needs new motor id
+	public static final int WINCH_MOTOR = 7;
 	public static final int ELEVATOR_MOTOR = 4;
+	public static final int HOOD_MOTOR = 8;
 
 	// logitech controller buttons and ports
 	public static final int DRIVER_CONTROLLER = 0;

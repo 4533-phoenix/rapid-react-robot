@@ -42,7 +42,9 @@ public class RobotContainer {
       Map.entry("threeBallAutoBlue", AutoCommands.threeBallAutoBlue()),
       Map.entry("threeBallAutoRed", AutoCommands.threeBallAutoRed()),
       Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue()),
-      Map.entry("twoBallAutoTopRed", AutoCommands.twoBallAutoTopRed())
+      Map.entry("twoBallAutoTopRed", AutoCommands.twoBallAutoTopRed()),
+      Map.entry("twoBallAutoTopBlue",AutoCommands.twoBallAutoTopBlue()),
+      Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue())
     );
   
 
