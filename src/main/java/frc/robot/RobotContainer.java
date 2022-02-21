@@ -52,11 +52,27 @@ public class RobotContainer {
   private void configureButtonBindings() {
     JoystickButton toggleTurbo = new JoystickButton(controller, Constants.BUTTON_RB);
     toggleTurbo.whenPressed(DriveCommands.toggleTurbo());
+
+    JoystickButton flywheelButton = new JoystickButton(controller, Constants.BUTTON_LB);
+    flywheelButton.whenPressed(ShooterCommands.flywheelOutCommand());
+    flywheelButton.whenReleased(ShooterCommands.flywheelStopCommand());
   }
 
   private void toggleDriveMode() {
     if (controller.getPOV() == 180) {
       Robot.drive.toggleDriveMode();
+    }
+  }
+
+  private void toggleIntake() {
+    if (controller.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.2) {
+      Robot.intake.intakeIn();
+    }
+  }
+
+  private void toggleFlywheelIntake() {
+    if (controller.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.2) {
+      Robot.shooter.flywheelIntakeIn();
     }
   }
 
@@ -66,6 +82,14 @@ public class RobotContainer {
     scheduler.setDefaultCommand(Robot.drive, defaultDriveCommand);
     scheduler.addButton(
       () -> toggleDriveMode()
+    );
+    
+    scheduler.addButton(
+      () -> Robot.intake.intakeIn()
+    );
+
+    scheduler.addButton(
+      () -> Robot.shooter.flywheelIntakeIn()
     );
 	}
 

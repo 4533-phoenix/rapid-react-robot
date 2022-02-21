@@ -28,11 +28,17 @@ public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX rightFlywheelMotor;
 
     private WPI_VictorSPX flywheelIntakeMotor;
+    private WPI_VictorSPX hoodMotor;
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
+    private static final double HOOD_MOTOR_PERCENT = 0.1;
+    private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
+    private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
 
     private AHRS shooterNAVX;
+
+    public double hoodAngle;
 
     // PhotonCamera visionCam;
     // PhotonPipelineResult result;
@@ -51,6 +57,7 @@ public class ShooterSystem extends SubsystemBase {
         rightFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_RIGHT);
 
         flywheelIntakeMotor = new WPI_VictorSPX(Constants.TURRET_WHEEL_MOTOR);
+        hoodMotor = new WPI_VictorSPX(Constants.HOOD_MOTOR);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
@@ -60,6 +67,8 @@ public class ShooterSystem extends SubsystemBase {
         leftFlywheelMotor.setInverted(true);
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
+
+        hoodAngle = 0;
 
         // visionCam = new PhotonCamera("WARCam");
         // result = null;
@@ -126,6 +135,33 @@ public class ShooterSystem extends SubsystemBase {
 
     public void setFlywheelReset() {
         Robot.drive.resetPosition();
+    }
+
+    public double setHoodAngle(double angle) {
+        double initialAngle = getHoodAngle();
+        double targetAngle = angle;
+        
+        while (Math.abs(targetAngle - getHoodAngle()) > 1) {
+            if (initialAngle > targetAngle) { 
+                hoodMotor.set(ControlMode.PercentOutput, HOOD_MOTOR_PERCENT);
+            }
+            else { 
+                hoodMotor.set(ControlMode.PercentOutput, -HOOD_MOTOR_PERCENT);
+            }
+        }
+        
+        hoodAngle = this.hoodMotor.getSelectedSensorPosition()*HOOD_DEGREES_PER_TICK;
+        return getHoodAngle();
+    }
+
+    public double getHoodAngle() {
+        hoodAngle = this.hoodMotor.getSelectedSensorPosition()*HOOD_DEGREES_PER_TICK;
+        return hoodAngle;
+    }
+
+    public void resetHoodAngle(double angle) {
+        hoodAngle = angle;
+        hoodMotor.setSelectedSensorPosition(hoodAngle/HOOD_DEGREES_PER_TICK);
     }
 
     public void setFlywheelPos() {
