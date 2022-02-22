@@ -14,7 +14,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.util.sendable.SendableRegistry;
+
 import com.revrobotics.SparkMaxPIDController;
+
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.HighClimbSystem;
 import frc.robot.subsystems.IntakeSystem;
@@ -22,7 +28,7 @@ import frc.robot.subsystems.MidClimbSystem;
 import frc.robot.subsystems.ShooterSystem;
 
 public class Robot extends TimedRobot {
-  private Logger stateLogger = LogManager.getLogger("robot_state");
+  	private Logger stateLogger = LogManager.getLogger("robot_state");
 	private Logger robotLogger = LogManager.getLogger("robot");
 
 	private ObjectMapper mapper = new ObjectMapper();
@@ -34,7 +40,7 @@ public class Robot extends TimedRobot {
 	/**
    * Tracks the current state of the robot
    */
-  private RobotState robotState = null;
+  	private RobotState robotState = null;
 
 	/**
 	 * Thread pool for handling interval based tasks that are outside of the
@@ -72,11 +78,23 @@ public class Robot extends TimedRobot {
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
+
+	private PIDController leftPidCont;
+	private PIDController rightPidCont;
+
 	@Override
 	public void robotInit() {
 		// Instantiate our RobotContainer.  This will perform all our button
 		// bindings, and put our autonomous chooser on the dashboard.
 		this.container = new RobotContainer();
+
+		leftPidCont = new PIDController(0.0004, 0.0, 0.001);
+		rightPidCont = new PIDController(0.0004, 0.0, 0.001);
+
+		SmartDashboard.clearPersistent("PID Controller");
+
+		SendableRegistry.setName(rightPidCont, "DriveSystem", "RightPidController");
+		SendableRegistry.setName(leftPidCont, "DriveSystem", "LeftPidController");
 	}
 
 	public static void setPIDF(SparkMaxPIDController controller, double p, double i, double d, double iz, double ff, int slotID) {
@@ -112,8 +130,8 @@ public class Robot extends TimedRobot {
 		setPIDF(
 			drive.getLeftPIDCont(), 
 			DriveSystem.POSITION_P, 
-			DriveSystem.POSITION_D, 
 			DriveSystem.POSITION_I, 
+			DriveSystem.POSITION_D, 
 			DriveSystem.POSITION_I_ZONE, 
 			DriveSystem.POSITION_FEED_FORWARD,
 			Constants.POSITION_SLOT_ID
@@ -122,8 +140,8 @@ public class Robot extends TimedRobot {
 		setPIDF(
 			drive.getRightPIDCont(), 
 			DriveSystem.POSITION_P, 
-			DriveSystem.POSITION_D, 
 			DriveSystem.POSITION_I, 
+			DriveSystem.POSITION_D, 
 			DriveSystem.POSITION_I_ZONE, 
 			DriveSystem.POSITION_FEED_FORWARD,
 			Constants.POSITION_SLOT_ID
@@ -155,8 +173,8 @@ public class Robot extends TimedRobot {
 		setPIDF(
 			drive.getLeftPIDCont(), 
 			DriveSystem.VELOCITY_P, 
-			DriveSystem.VELOCITY_D, 
 			DriveSystem.VELOCITY_I, 
+			DriveSystem.VELOCITY_D, 
 			DriveSystem.VELOCITY_I_ZONE, 
 			DriveSystem.VELOCITY_FEED_FORWARD,
 			Constants.VELOCITY_SLOT_ID
@@ -165,12 +183,14 @@ public class Robot extends TimedRobot {
 		setPIDF(
 			drive.getRightPIDCont(), 
 			DriveSystem.VELOCITY_P, 
-			DriveSystem.VELOCITY_D, 
 			DriveSystem.VELOCITY_I, 
+			DriveSystem.VELOCITY_D, 
 			DriveSystem.VELOCITY_I_ZONE, 
 			DriveSystem.VELOCITY_FEED_FORWARD,
 			Constants.VELOCITY_SLOT_ID
 		);
+
+		
 
 		Robot.drive.resetAngle();
 		// Robot.drive.resetPosition();
@@ -195,6 +215,28 @@ public class Robot extends TimedRobot {
 	public void testInit() {
 		// Cancels all running commands at the start of test mode.
 		CommandScheduler.getInstance().cancelAll();
+
+		setPIDF(
+			drive.getLeftPIDCont(), 
+			0.0004, 
+			0.0, 
+			0.001, 
+			DriveSystem.VELOCITY_I_ZONE, 
+			DriveSystem.VELOCITY_FEED_FORWARD,
+			Constants.VELOCITY_SLOT_ID
+		);
+
+		setPIDF(
+			drive.getRightPIDCont(), 
+			0.0004, 
+			0.0, 
+			0.001, 
+			DriveSystem.VELOCITY_I_ZONE, 
+			DriveSystem.VELOCITY_FEED_FORWARD,
+			Constants.VELOCITY_SLOT_ID
+		);
+
+		Robot.drive.tank(0.5, 0.5);
 	}
 
 	/**
@@ -202,6 +244,30 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+		// System.out.println("LeftPidCont:   P: " + leftPidCont.getP() + "   I: " + leftPidCont.getI() + "   D: " + leftPidCont.getD());
+		// System.out.println("RightPidCont:   P: " + rightPidCont.getP() + "   I: " + rightPidCont.getI() + "   D: " + rightPidCont.getD());
+
+		setPIDF(
+			drive.getLeftPIDCont(), 
+			leftPidCont.getP(), 
+			leftPidCont.getI(), 
+			leftPidCont.getD(), 
+			DriveSystem.VELOCITY_I_ZONE, 
+			DriveSystem.VELOCITY_FEED_FORWARD,
+			Constants.VELOCITY_SLOT_ID
+		);
+
+		setPIDF(
+			drive.getRightPIDCont(), 
+			rightPidCont.getP(), 
+			rightPidCont.getI(), 
+			rightPidCont.getD(), 
+			DriveSystem.VELOCITY_I_ZONE, 
+			DriveSystem.VELOCITY_FEED_FORWARD,
+			Constants.VELOCITY_SLOT_ID
+		);
+
+		// System.out.println("Velocity: " + drive.getVelocity());
 	}
 
 	@Override

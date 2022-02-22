@@ -53,6 +53,27 @@ public class ShooterCommands {
         );
     } 
 
+    public static Command hoodUp() {
+        return new InstantCommand(
+            () -> Robot.shooter.hoodUp(),
+            Robot.shooter
+        );
+    }
+
+    public static Command hoodDown() {
+        return new InstantCommand(
+            () -> Robot.shooter.hoodDown(),
+            Robot.shooter
+        );
+    }
+
+    public static Command hoodStop() {
+        return new InstantCommand(
+            () -> Robot.shooter.hoodStop(),
+            Robot.shooter
+        );
+    }
+    
     public static Command autoFlywheelPos() {
         return new FunctionalCommand(
             () -> Robot.shooter.setFlywheelReset(), 

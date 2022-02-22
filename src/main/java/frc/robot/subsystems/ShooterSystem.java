@@ -164,6 +164,18 @@ public class ShooterSystem extends SubsystemBase {
         hoodMotor.setSelectedSensorPosition(hoodAngle/HOOD_DEGREES_PER_TICK);
     }
 
+    public void hoodUp() {
+        this.hoodMotor.set(ControlMode.PercentOutput, HOOD_MOTOR_PERCENT);
+    }
+
+    public void hoodDown() {
+        this.hoodMotor.set(ControlMode.PercentOutput, -HOOD_MOTOR_PERCENT);
+    }
+
+    public void hoodStop() {
+        this.hoodMotor.set(ControlMode.PercentOutput, 0.0);
+    }
+
     public void setFlywheelPos() {
         // if (yaw >= 1) {
         //     Robot.drive.percent(0.5, -0.5);

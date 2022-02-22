@@ -56,6 +56,14 @@ public class RobotContainer {
     JoystickButton flywheelButton = new JoystickButton(controller, Constants.BUTTON_LB);
     flywheelButton.whenPressed(ShooterCommands.flywheelOutCommand());
     flywheelButton.whenReleased(ShooterCommands.flywheelStopCommand());
+
+    JoystickButton hoodUpButton = new JoystickButton(controller, Constants.BUTTON_Y);
+    hoodUpButton.whenPressed(ShooterCommands.hoodUp());
+    hoodUpButton.whenReleased(ShooterCommands.hoodStop());
+
+    JoystickButton hoodDownButton = new JoystickButton(controller, Constants.BUTTON_A);
+    hoodDownButton.whenPressed(ShooterCommands.hoodDown());
+    hoodDownButton.whenReleased(ShooterCommands.hoodStop());
   }
 
   private void toggleDriveMode() {
