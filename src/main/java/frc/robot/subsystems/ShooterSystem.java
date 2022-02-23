@@ -32,7 +32,7 @@ public class ShooterSystem extends SubsystemBase {
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
-    private static final double HOOD_MOTOR_PERCENT = 0.1;
+    private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
 
@@ -63,6 +63,7 @@ public class ShooterSystem extends SubsystemBase {
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
 
         flywheelIntakeMotor.setNeutralMode(NeutralMode.Brake);
+        hoodMotor.setNeutralMode(NeutralMode.Brake);
 
         leftFlywheelMotor.setInverted(true);
 
