@@ -44,7 +44,7 @@ public class RobotContainer {
       Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue()),
       Map.entry("twoBallAutoTopRed", AutoCommands.twoBallAutoTopRed()),
       Map.entry("twoBallAutoTopBlue",AutoCommands.twoBallAutoTopBlue()),
-      Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue())
+      Map.entry("twoBallAutoBottomRed", AutoCommands.twoBallAutoBottomRed())
     );
   
 
@@ -73,14 +73,20 @@ public class RobotContainer {
   }
 
   private void toggleIntake() {
-    if (controller.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.2) {
+    if (controller.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.6) {
       Robot.intake.intakeIn();
+    }
+    else {
+      Robot.intake.intakeStop();
     }
   }
 
   private void toggleFlywheelIntake() {
-    if (controller.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.2) {
+    if (controller.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.6) {
       Robot.shooter.flywheelIntakeIn();
+    }
+    else {
+      Robot.shooter.flywheelIntakeStop();
     }
   }
 
@@ -93,11 +99,11 @@ public class RobotContainer {
     );
     
     scheduler.addButton(
-      () -> Robot.intake.intakeIn()
+      () -> toggleIntake()
     );
 
     scheduler.addButton(
-      () -> Robot.shooter.flywheelIntakeIn()
+      () -> toggleFlywheelIntake()
     );
 	}
 

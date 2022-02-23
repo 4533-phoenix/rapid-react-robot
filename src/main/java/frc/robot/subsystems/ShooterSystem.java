@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import org.photonvision.PhotonCamera;
@@ -27,12 +29,12 @@ public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX leftFlywheelMotor;
     private WPI_TalonFX rightFlywheelMotor;
 
-    private WPI_VictorSPX flywheelIntakeMotor;
-    private WPI_VictorSPX hoodMotor;
+    private WPI_TalonSRX flywheelIntakeMotor;
+    private WPI_TalonSRX hoodMotor;
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
-    private static final double HOOD_MOTOR_PERCENT = 0.1;
+    private static final double HOOD_MOTOR_PERCENT = 0.25;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
 
@@ -56,15 +58,21 @@ public class ShooterSystem extends SubsystemBase {
         leftFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_LEFT);
         rightFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_RIGHT);
 
-        flywheelIntakeMotor = new WPI_VictorSPX(Constants.TURRET_WHEEL_MOTOR);
-        hoodMotor = new WPI_VictorSPX(Constants.HOOD_MOTOR);
+        flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
+        hoodMotor = new WPI_TalonSRX(Constants.HOOD_MOTOR);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
 
+        hoodMotor.setNeutralMode(NeutralMode.Brake);
+
         flywheelIntakeMotor.setNeutralMode(NeutralMode.Brake);
 
         leftFlywheelMotor.setInverted(true);
+
+        hoodMotor.setInverted(true);
+        
+        flywheelIntakeMotor.setInverted(true);
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
