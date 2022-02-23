@@ -17,6 +17,8 @@ public class IntakeSystem extends SubsystemBase {
 		this.intakeMotor = new WPI_TalonSRX(Constants.INTAKE_MOTOR);
 
 		this.intakeMotor.setNeutralMode(NeutralMode.Brake);
+
+		this.intakeMotor.setInverted(true);
   }
 
   public void intakeIn() {

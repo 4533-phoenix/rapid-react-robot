@@ -27,7 +27,7 @@ public class ShooterCommands {
 
     public static Command flywheelStopCommand() {
         return new InstantCommand(
-            () -> Robot.shooter.flywheelOut(),
+            () -> Robot.shooter.flywheelStop(),
             Robot.shooter
         );
     }
@@ -73,7 +73,7 @@ public class ShooterCommands {
             Robot.shooter
         );
     }
-    
+
     public static Command autoFlywheelPos() {
         return new FunctionalCommand(
             () -> Robot.shooter.setFlywheelReset(), 
