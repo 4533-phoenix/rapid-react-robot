@@ -6,6 +6,10 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.*;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -30,7 +34,8 @@ public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX rightFlywheelMotor;
 
     private WPI_TalonSRX flywheelIntakeMotor;
-    private WPI_TalonSRX hoodMotor;
+    private CANSparkMax hoodMotor;
+    private RelativeEncoder hoodEncoder;
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
@@ -59,12 +64,13 @@ public class ShooterSystem extends SubsystemBase {
         rightFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_RIGHT);
 
         flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
-        hoodMotor = new WPI_TalonSRX(Constants.HOOD_MOTOR);
+
+        hoodMotor = new CANSparkMax(Constants.HOOD_MOTOR, MotorType.kBrushless);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
 
-        hoodMotor.setNeutralMode(NeutralMode.Brake);
+        hoodMotor.setIdleMode(IdleMode.kBrake);
 
         flywheelIntakeMotor.setNeutralMode(NeutralMode.Brake);
 
@@ -151,37 +157,36 @@ public class ShooterSystem extends SubsystemBase {
         
         while (Math.abs(targetAngle - getHoodAngle()) > 1) {
             if (initialAngle > targetAngle) { 
-                hoodMotor.set(ControlMode.PercentOutput, HOOD_MOTOR_PERCENT);
+                hoodMotor.set(HOOD_MOTOR_PERCENT);
             }
             else { 
-                hoodMotor.set(ControlMode.PercentOutput, -HOOD_MOTOR_PERCENT);
+                hoodMotor.set(-HOOD_MOTOR_PERCENT);
             }
         }
         
-        hoodAngle = this.hoodMotor.getSelectedSensorPosition()*HOOD_DEGREES_PER_TICK;
+        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
         return getHoodAngle();
     }
 
     public double getHoodAngle() {
-        hoodAngle = this.hoodMotor.getSelectedSensorPosition()*HOOD_DEGREES_PER_TICK;
         return hoodAngle;
     }
 
     public void resetHoodAngle(double angle) {
         hoodAngle = angle;
-        hoodMotor.setSelectedSensorPosition(hoodAngle/HOOD_DEGREES_PER_TICK);
+        hoodEncoder.setPosition(hoodAngle/360);
     }
 
     public void hoodUp() {
-        this.hoodMotor.set(ControlMode.PercentOutput, HOOD_MOTOR_PERCENT);
+        this.hoodMotor.set(HOOD_MOTOR_PERCENT);
     }
 
     public void hoodDown() {
-        this.hoodMotor.set(ControlMode.PercentOutput, -HOOD_MOTOR_PERCENT);
+        this.hoodMotor.set(-HOOD_MOTOR_PERCENT);
     }
 
     public void hoodStop() {
-        this.hoodMotor.set(ControlMode.PercentOutput, 0.0);
+        this.hoodMotor.set(0.0);
     }
 
     public void setFlywheelPos() {
@@ -225,5 +230,7 @@ public class ShooterSystem extends SubsystemBase {
 
         // pos = target.getCameraToTarget();
         // corners = target.getCorners();
+
+        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
     }
 }
