@@ -83,4 +83,14 @@ public class ShooterCommands {
             Robot.shooter
         );
     }
+
+    public static Command oldAutoFlywheelPos() {
+        return new FunctionalCommand(
+            () -> Robot.shooter.setFlywheelReset(),
+            () -> Robot.shooter.autoTurretSwivel(),
+            (interrupt) -> Robot.shooter.stopFlywheelPos(),
+            () -> Robot.shooter.turretReachedPosition(),
+            Robot.shooter
+        );
+    }
 }

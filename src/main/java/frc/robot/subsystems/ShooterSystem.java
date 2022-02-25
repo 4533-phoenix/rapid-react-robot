@@ -19,7 +19,7 @@ import org.photonvision.targeting.TargetCorner;
 import edu.wpi.first.math.geometry.Transform2d;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SPI ;
 
 import frc.robot.Constants;
 import frc.robot.Robot;
@@ -29,6 +29,8 @@ import java.util.ArrayList;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX leftFlywheelMotor;
     private WPI_TalonFX rightFlywheelMotor;
@@ -39,13 +41,20 @@ public class ShooterSystem extends SubsystemBase {
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
-    private static final double HOOD_MOTOR_PERCENT = 0.25;
+    private static final double HOOD_MOTOR_PERCENT = 0.4;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
 
     private AHRS shooterNAVX;
 
     public double hoodAngle;
+
+    private NetworkTable limelight;
+
+    private double targetOffsetAngle_Horizontal;
+    private double targetOffsetAngle_Vertical;
+    private double targetArea;
+    private double targetSkew;
 
     // PhotonCamera visionCam;
     // PhotonPipelineResult result;
@@ -83,6 +92,8 @@ public class ShooterSystem extends SubsystemBase {
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
         hoodAngle = 0;
+
+        limelight = NetworkTableInstance.getDefault().getTable("limelight");
 
         // visionCam = new PhotonCamera("WARCam");
         // result = null;
@@ -169,6 +180,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public double getHoodAngle() {
+        hoodAngle = hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
         return hoodAngle;
     }
 
@@ -215,8 +227,30 @@ public class ShooterSystem extends SubsystemBase {
         return rightFlywheelMotor.getSelectedSensorPosition() >= targetPosition;
     }
 
+    public void autoTurretSwivel() {
+		// System.out.println("test");
+		if (targetOffsetAngle_Horizontal > 1) {
+			Robot.drive.percent(0.25, -0.25);
+		} 
+		else if (targetOffsetAngle_Horizontal < -1) {
+			Robot.drive.percent(-0.25, 0.25);
+		}
+        else {
+            Robot.drive.percent(0.0, 0.0);
+        }
+	}
+
+	public boolean turretReachedPosition() {
+		return targetOffsetAngle_Horizontal > -1 && targetOffsetAngle_Horizontal < 1;
+	}
+
     @Override
     public void periodic() {
+        targetOffsetAngle_Horizontal = limelight.getEntry("tx").getDouble(0);
+		targetOffsetAngle_Vertical = limelight.getEntry("ty").getDouble(0);
+		targetArea = limelight.getEntry("ta").getDouble(0);
+		targetSkew = limelight.getEntry("ts").getDouble(0);
+
         // result = visionCam.getLatestResult();
 
         // if (result.hasTargets()) {
@@ -230,7 +264,5 @@ public class ShooterSystem extends SubsystemBase {
 
         // pos = target.getCameraToTarget();
         // corners = target.getCorners();
-
-        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
     }
 }
