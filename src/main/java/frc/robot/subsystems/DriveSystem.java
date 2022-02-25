@@ -404,8 +404,14 @@ public class DriveSystem extends SubsystemBase {
 
 		System.out.println(this.driveMode);
 
-		this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
-		this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+		if ((left < 0.1 && left > -0.1) && (right < 0.1 && right > -0.1)) {
+			this.leftPIDCont.setReference(0.0, ControlType.kDutyCycle);
+			this.rightPIDCont.setReference(0.0, ControlType.kDutyCycle);
+		}
+		else {
+			this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+			this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+		}
 	}
 
 	public void voltage(double left, double right) {
