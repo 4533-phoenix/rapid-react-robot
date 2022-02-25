@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -41,7 +40,7 @@ public class ShooterSystem extends SubsystemBase {
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
-    private static final double HOOD_MOTOR_PERCENT = 0.4;
+    private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
 
@@ -84,10 +83,6 @@ public class ShooterSystem extends SubsystemBase {
         flywheelIntakeMotor.setNeutralMode(NeutralMode.Brake);
 
         leftFlywheelMotor.setInverted(true);
-
-        hoodMotor.setInverted(true);
-        
-        flywheelIntakeMotor.setInverted(true);
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
