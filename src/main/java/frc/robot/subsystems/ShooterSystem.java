@@ -175,7 +175,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public double getHoodAngle() {
-        hoodAngle = hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
+        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
         return hoodAngle;
     }
 
