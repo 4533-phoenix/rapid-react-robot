@@ -169,6 +169,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public double getHoodAngle() {
+        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
         return hoodAngle;
     }
 
@@ -230,7 +231,5 @@ public class ShooterSystem extends SubsystemBase {
 
         // pos = target.getCameraToTarget();
         // corners = target.getCorners();
-
-        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
     }
 }

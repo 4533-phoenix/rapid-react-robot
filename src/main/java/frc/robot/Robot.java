@@ -216,27 +216,27 @@ public class Robot extends TimedRobot {
 		// Cancels all running commands at the start of test mode.
 		CommandScheduler.getInstance().cancelAll();
 
-		setPIDF(
-			drive.getLeftPIDCont(), 
-			0.0004, 
-			0.0, 
-			0.001, 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
+		// setPIDF(
+		// 	drive.getLeftPIDCont(), 
+		// 	0.0004, 
+		// 	0.0, 
+		// 	0.001, 
+		// 	DriveSystem.VELOCITY_I_ZONE, 
+		// 	DriveSystem.VELOCITY_FEED_FORWARD,
+		// 	Constants.VELOCITY_SLOT_ID
+		// );
 
-		setPIDF(
-			drive.getRightPIDCont(), 
-			0.0004, 
-			0.0, 
-			0.001, 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
+		// setPIDF(
+		// 	drive.getRightPIDCont(), 
+		// 	0.0004, 
+		// 	0.0, 
+		// 	0.001, 
+		// 	DriveSystem.VELOCITY_I_ZONE, 
+		// 	DriveSystem.VELOCITY_FEED_FORWARD,
+		// 	Constants.VELOCITY_SLOT_ID
+		// );
 
-		Robot.drive.tank(0.5, 0.5);
+		// Robot.drive.tank(0.5, 0.5);
 	}
 
 	/**
@@ -247,25 +247,25 @@ public class Robot extends TimedRobot {
 		// System.out.println("LeftPidCont:   P: " + leftPidCont.getP() + "   I: " + leftPidCont.getI() + "   D: " + leftPidCont.getD());
 		// System.out.println("RightPidCont:   P: " + rightPidCont.getP() + "   I: " + rightPidCont.getI() + "   D: " + rightPidCont.getD());
 
-		setPIDF(
-			drive.getLeftPIDCont(), 
-			leftPidCont.getP(), 
-			leftPidCont.getI(), 
-			leftPidCont.getD(), 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
+		// setPIDF(
+		// 	drive.getLeftPIDCont(), 
+		// 	leftPidCont.getP(), 
+		// 	leftPidCont.getI(), 
+		// 	leftPidCont.getD(), 
+		// 	DriveSystem.VELOCITY_I_ZONE, 
+		// 	DriveSystem.VELOCITY_FEED_FORWARD,
+		// 	Constants.VELOCITY_SLOT_ID
+		// );
 
-		setPIDF(
-			drive.getRightPIDCont(), 
-			rightPidCont.getP(), 
-			rightPidCont.getI(), 
-			rightPidCont.getD(), 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
+		// setPIDF(
+		// 	drive.getRightPIDCont(), 
+		// 	rightPidCont.getP(), 
+		// 	rightPidCont.getI(), 
+		// 	rightPidCont.getD(), 
+		// 	DriveSystem.VELOCITY_I_ZONE, 
+		// 	DriveSystem.VELOCITY_FEED_FORWARD,
+		// 	Constants.VELOCITY_SLOT_ID
+		// );
 
 		// System.out.println("Velocity: " + drive.getVelocity());
 	}
