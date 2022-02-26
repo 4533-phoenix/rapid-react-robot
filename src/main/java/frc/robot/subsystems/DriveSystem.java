@@ -132,8 +132,6 @@ public class DriveSystem extends SubsystemBase {
 	private Pose2d robotPos;
 	private Rotation2d robotAngle;
 
-	private static int navXCount = 0;
-
 	public DriveSystem() {
 		// Initialize all of the drive systems motor controllers.
 		this.leftMaster = new CANSparkMax(Constants.LEFT_MASTER_MOTOR,MotorType.kBrushless);
@@ -488,11 +486,6 @@ public class DriveSystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		if (navXCount == 0) {
-			navX.reset();
-			navXCount++;
-		}
-
 		dashboardCont.setPID(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
 		SmartDashboard.putData("PID Controller", dashboardCont);
 

@@ -259,5 +259,7 @@ public class ShooterSystem extends SubsystemBase {
 
         // pos = target.getCameraToTarget();
         // corners = target.getCorners();
+
+        System.out.println("Hood Motor Output: " + hoodMotor.getAppliedOutput());
     }
 }
