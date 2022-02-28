@@ -28,6 +28,10 @@ public class AutoCommands {
         );
     }
 
+    public static Command driveOffTarmac() {
+        return oldDriveDistanceAutoCommand(150, Direction.BACKWARD);
+    }
+
     // Normal Commands:    
     public static Command driveDistanceAutoCommand() {
         return new FunctionalCommand(
@@ -128,8 +132,8 @@ public class AutoCommands {
 		return new FunctionalCommand(
 			() -> Robot.drive.resetPosition(),
 			() -> Robot.drive.oldDriveDistance(distance, direction),
-			(interrupt) -> Robot.drive.tank(0, 0),
-			() -> Robot.drive.reachedPosition(),
+			(interrupt) -> Robot.drive.percent(0, 0),
+			() -> Robot.drive.oldReachedPosition(),
 			Robot.drive
 		);
 	}

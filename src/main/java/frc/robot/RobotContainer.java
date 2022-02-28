@@ -38,6 +38,7 @@ public class RobotContainer {
 
     // Creates a hash map of commands for the robot
     private Map<String, Command> commands = Map.ofEntries(
+      Map.entry("driveOffTarmac", AutoCommands.driveOffTarmac()),
       Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos()),
       Map.entry("threeBallAutoBlue", AutoCommands.threeBallAutoBlue()),
       Map.entry("threeBallAutoRed", AutoCommands.threeBallAutoRed()),
@@ -76,7 +77,7 @@ public class RobotContainer {
   }
 
   private void toggleIntake() {
-    if (controller.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.6) {
+    if (controller.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.6) {
       Robot.intake.intakeIn();
     }
     else {
@@ -85,7 +86,7 @@ public class RobotContainer {
   }
 
   private void toggleFlywheelIntake() {
-    if (controller.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.6) {
+    if (controller.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.6) {
       Robot.shooter.flywheelIntakeIn();
     }
     else {

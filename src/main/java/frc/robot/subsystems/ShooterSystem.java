@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax.*;
@@ -36,9 +37,10 @@ public class ShooterSystem extends SubsystemBase {
 
     private WPI_TalonSRX flywheelIntakeMotor;
     private CANSparkMax hoodMotor;
+    private SparkMaxPIDController hoodPIDCont;
     private RelativeEncoder hoodEncoder;
 
-    private static final double FLYWHEEL_MOTOR_PERCENT = 0.75;
+    private static final double FLYWHEEL_MOTOR_PERCENT = 0.90;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
@@ -83,6 +85,10 @@ public class ShooterSystem extends SubsystemBase {
         flywheelIntakeMotor.setNeutralMode(NeutralMode.Brake);
 
         leftFlywheelMotor.setInverted(true);
+
+        flywheelIntakeMotor.setInverted(true);
+
+        hoodPIDCont = hoodMotor.getPIDController();
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
@@ -185,15 +191,17 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void hoodUp() {
-        this.hoodMotor.set(HOOD_MOTOR_PERCENT);
+        this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+        System.out.println("Y Button Clicked!");
     }
 
     public void hoodDown() {
-        this.hoodMotor.set(-HOOD_MOTOR_PERCENT);
+        this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+        System.out.println("A Button Clicked!");
     }
 
     public void hoodStop() {
-        this.hoodMotor.set(0.0);
+        this.hoodPIDCont.setReference(0.0, ControlType.kDutyCycle);
     }
 
     public void setFlywheelPos() {
@@ -225,10 +233,10 @@ public class ShooterSystem extends SubsystemBase {
     public void autoTurretSwivel() {
 		// System.out.println("test");
 		if (targetOffsetAngle_Horizontal > 1) {
-			Robot.drive.percent(0.25, -0.25);
+			Robot.drive.percent(0.05, 0.05);
 		} 
 		else if (targetOffsetAngle_Horizontal < -1) {
-			Robot.drive.percent(-0.25, 0.25);
+			Robot.drive.percent(-0.05, -0.05);
 		}
         else {
             Robot.drive.percent(0.0, 0.0);
@@ -236,7 +244,7 @@ public class ShooterSystem extends SubsystemBase {
 	}
 
 	public boolean turretReachedPosition() {
-		return targetOffsetAngle_Horizontal > -1 && targetOffsetAngle_Horizontal < 1;
+		return targetOffsetAngle_Horizontal > -1.2 && targetOffsetAngle_Horizontal < 1.2;
 	}
 
     @Override
@@ -260,6 +268,6 @@ public class ShooterSystem extends SubsystemBase {
         // pos = target.getCameraToTarget();
         // corners = target.getCorners();
 
-        System.out.println("Hood Motor Output: " + hoodMotor.getAppliedOutput());
+        // System.out.println("Hood Motor Output: " + hoodMotor.getOutputCurrent());
     }
 }

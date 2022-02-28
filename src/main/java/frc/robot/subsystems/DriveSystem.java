@@ -77,11 +77,11 @@ public class DriveSystem extends SubsystemBase {
 	public static final double VELOCITY_FEED_FORWARD = 0.000015;
 
 	// Position PIDF values
-	public static final double POSITION_P = 0.06;
-	public static final double POSITION_I = 0.0;
-	public static final double POSITION_D = 0.0;
+	public static final double POSITION_P = 0.02;
+	public static final double POSITION_I = 1e-5;
+	public static final double POSITION_D = 0.0008;
 	public static final double POSITION_I_ZONE = 0.0;
-	public static final double POSITION_FEED_FORWARD = 0.0;
+	public static final double POSITION_FEED_FORWARD = 0.01;
 
 	// Feed Forward Gains
 	// kS - the voltage needed to overcome the motor's static friction (V).
@@ -243,15 +243,17 @@ public class DriveSystem extends SubsystemBase {
 
 		System.out.println(turnDirection);
 
-		if (targetPosition.getY() >= 0) {
-			driveDirection = Direction.FORWARD;
-		}
-		else if (targetPosition.getY() < 0) {
-			driveDirection = Direction.BACKWARD;
-		}
-		else {
-			driveDirection = Direction.FORWARD;
-		}
+		// if (targetPosition.getY() >= 0) {
+		// 	driveDirection = Direction.FORWARD;
+		// }
+		// else if (targetPosition.getY() < 0) {
+		// 	driveDirection = Direction.BACKWARD;
+		// }
+		// else {
+		// 	driveDirection = Direction.FORWARD;
+		// }
+
+		driveDirection = Direction.FORWARD;
 
 		return targetPosition;
 	}
@@ -272,18 +274,34 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
+	public boolean oldReachedPosition() {
+		double leftPos = leftEncoder.getPosition();
+		double rightPos = rightEncoder.getPosition() * -1;
+
+		if (targetDirection == Direction.FORWARD) {
+			return (leftPos >= oldTargetPosition) && (rightPos >= oldTargetPosition);
+		} else if (targetDirection == Direction.BACKWARD) {
+			return (leftPos <= oldTargetPosition) && (rightPos <= oldTargetPosition);
+		} else {
+			return true;
+		}
+	}
+
 	public void oldDriveDistance(double inches, Direction direction) {
 		targetDirection = direction;
 		if (direction == Direction.FORWARD) {
-			oldTargetPosition = -1 * inches * TICKS_PER_INCH;
+			oldTargetPosition = inches / WHEEL_CIRCUMFERENCE;
 		} else if (direction == Direction.BACKWARD) {
-			oldTargetPosition = inches * TICKS_PER_INCH;
+			oldTargetPosition = -1 * inches / WHEEL_CIRCUMFERENCE;
 		} else {
 			oldTargetPosition = 0;
 		}
 
-		this.leftMaster.set(oldTargetPosition);
-		this.rightMaster.set(oldTargetPosition);
+		System.out.println("Left: " + leftEncoder.getPosition());
+		System.out.println("Right: " + rightEncoder.getPosition());
+
+		this.leftPIDCont.setReference(oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(-oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
@@ -409,15 +427,13 @@ public class DriveSystem extends SubsystemBase {
 			targetRight = -temp;
 		}
 
-		System.out.println(this.driveMode);
-
-		if (Math.abs(left) < Math.abs(prevLeft) - 0.06) {
+		if (Math.abs(left) < Math.abs(prevLeft) - 0.08) {
 			this.leftPIDCont.setReference(0, ControlType.kDutyCycle);
 		}
 		else {
 			this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 		}
-		if (Math.abs(right) < Math.abs(prevRight) - 0.06) {
+		if (Math.abs(right) < Math.abs(prevRight) - 0.08) {
 			this.rightPIDCont.setReference(0, ControlType.kDutyCycle);
 		}
 		else {
@@ -448,8 +464,8 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public void resetPosition() {
-		this.rightEncoder.setPosition(0);
 		this.leftEncoder.setPosition(0);
+		this.rightEncoder.setPosition(0);
 	}
 
 	// TODONE: Add back old turn code in a different method for use of non-odometry autonomous commands
@@ -525,6 +541,6 @@ public class DriveSystem extends SubsystemBase {
 			robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
 		}
 
-		System.out.println("Robot Angle: " + robotAngle.getDegrees());
+		// System.out.println("Robot Angle: " + robotAngle.getDegrees());
 	}
 }
