@@ -41,7 +41,7 @@ public class ShooterSystem extends SubsystemBase {
     private RelativeEncoder hoodEncoder;
 
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.90;
-    private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.5;
+    private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.25;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
@@ -192,12 +192,10 @@ public class ShooterSystem extends SubsystemBase {
 
     public void hoodUp() {
         this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
-        System.out.println("Y Button Clicked!");
     }
 
     public void hoodDown() {
         this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
-        System.out.println("A Button Clicked!");
     }
 
     public void hoodStop() {
