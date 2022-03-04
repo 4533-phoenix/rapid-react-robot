@@ -74,6 +74,48 @@ public class ShooterCommands {
         );
     }
 
+    public static Command hood0() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(0)
+        );
+    }
+
+    public static Command hood15() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(15)
+        );
+    }
+
+    public static Command hood30() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(30)
+        );
+    }
+
+    public static Command hood45() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(45)
+        );
+    }
+
+    public static Command hood60() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(60)
+        );
+    }
+
+    public static Command hood75() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(75)
+        );
+    }
+
+    public static Command hood90() {
+        return new InstantCommand(
+            () -> setHoodAngleCommand(90)
+        );
+    }
+
     public static Command autoFlywheelPos() {
         return new FunctionalCommand(
             () -> Robot.shooter.setFlywheelReset(), 
