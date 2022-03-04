@@ -167,17 +167,17 @@ public class ShooterSystem extends SubsystemBase {
         double initialAngle = getHoodAngle();
         double targetAngle = angle;
         
-        while (Math.abs(targetAngle - getHoodAngle()) > 1) {
-            if (initialAngle > targetAngle) { 
-                hoodMotor.set(HOOD_MOTOR_PERCENT);
-            }
-            else { 
-                hoodMotor.set(-HOOD_MOTOR_PERCENT);
-            }
-        }
-        
         hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
         return getHoodAngle();
+    }
+
+    public boolean hoodReachedPosition() {
+        if (initialAngle > targetAngle) { 
+            hoodMotor.set(HOOD_MOTOR_PERCENT);
+        }
+        else { 
+            hoodMotor.set(-HOOD_MOTOR_PERCENT);
+        }
     }
 
     public double getHoodAngle() {

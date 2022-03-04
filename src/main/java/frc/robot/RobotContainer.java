@@ -70,9 +70,15 @@ public class RobotContainer {
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
   }
 
-  private void toggleDriveMode() {
-    if (controller.getPOV() == 180) {
-      Robot.drive.toggleDriveMode();
+  private void changeHoodAngle() {
+    if (controller.getPOV() == 0) {
+      ShooterCommands.setHoodAngleCommand(0);
+    } else if (controller.getPOV() == 90) {
+      ShooterCommands.setHoodAngleCommand(15);
+    } else if (controller.getPOV() == 180) {
+      ShooterCommands.setHoodAngleCommand(30);
+    } else if (controller.getPOV() == 270) {
+      ShooterCommands.setHoodAngleCommand(45);
     }
   }
 
@@ -99,7 +105,7 @@ public class RobotContainer {
 
     scheduler.setDefaultCommand(Robot.drive, defaultDriveCommand);
     scheduler.addButton(
-      () -> toggleDriveMode()
+      () -> changeHoodAngle()
     );
     
     scheduler.addButton(
