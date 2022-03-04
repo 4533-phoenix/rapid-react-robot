@@ -427,13 +427,13 @@ public class DriveSystem extends SubsystemBase {
 			targetRight = -temp;
 		}
 
-		if (Math.abs(left) < Math.abs(prevLeft) - 0.08) {
+		if (Math.abs(left) < Math.abs(prevLeft) - 0.1) {
 			this.leftPIDCont.setReference(0, ControlType.kDutyCycle);
 		}
 		else {
 			this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 		}
-		if (Math.abs(right) < Math.abs(prevRight) - 0.08) {
+		if (Math.abs(right) < Math.abs(prevRight) - 0.1) {
 			this.rightPIDCont.setReference(0, ControlType.kDutyCycle);
 		}
 		else {
