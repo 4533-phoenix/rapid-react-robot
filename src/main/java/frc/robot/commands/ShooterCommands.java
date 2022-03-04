@@ -84,6 +84,16 @@ public class ShooterCommands {
         );
     }
 
+    public static Command setHoodAngleCommand(double angle) {
+        return new FunctionalCommand(
+            () -> Robot.shooter.resetHoodAngle(),
+            () -> Robot.shooter.setHoodAngle(angle),
+            (interrupt) -> Robot.shooter.hoodStop(),
+            () -> Robot.shooter.hoodReachedPosition(),
+            Robot.shooter
+        );
+    }
+
     public static Command oldAutoFlywheelPos() {
         return new FunctionalCommand(
             () -> Robot.shooter.setFlywheelReset(),
