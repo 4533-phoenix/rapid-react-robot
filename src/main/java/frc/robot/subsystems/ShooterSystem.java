@@ -40,6 +40,9 @@ public class ShooterSystem extends SubsystemBase {
     private SparkMaxPIDController hoodPIDCont;
     private RelativeEncoder hoodEncoder;
 
+    double initialAngle;
+    double targetAngle;
+
     private static final double FLYWHEEL_MOTOR_PERCENT = 0.90;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.25;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
@@ -164,19 +167,24 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public double setHoodAngle(double angle) {
-        double initialAngle = getHoodAngle();
-        double targetAngle = angle;
+        initialAngle = getHoodAngle();
+        targetAngle = angle;
         
         hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
         return getHoodAngle();
     }
 
     public boolean hoodReachedPosition() {
-        if (initialAngle > targetAngle) { 
-            hoodMotor.set(HOOD_MOTOR_PERCENT);
-        }
-        else { 
-            hoodMotor.set(-HOOD_MOTOR_PERCENT);
+        if (hoodEncoder.getVelocity() > 0) {
+            if (initialAngle > targetAngle) { 
+                return true;
+            }
+            return false;
+        } else {
+            if (initialAngle < targetAngle) { 
+                return true;
+            }
+            return false;
         }
     }
 
