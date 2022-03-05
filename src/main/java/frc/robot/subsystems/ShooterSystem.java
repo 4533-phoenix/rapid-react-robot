@@ -47,7 +47,8 @@ public class ShooterSystem extends SubsystemBase {
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.25;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
-    private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/2;
+    private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/800;
+    private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
 
     private AHRS shooterNAVX;
 
@@ -91,6 +92,7 @@ public class ShooterSystem extends SubsystemBase {
 
         flywheelIntakeMotor.setInverted(true);
 
+        hoodEncoder = hoodMotor.getEncoder();
         hoodPIDCont = hoodMotor.getPIDController();
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
@@ -170,7 +172,13 @@ public class ShooterSystem extends SubsystemBase {
         initialAngle = getHoodAngle();
         targetAngle = angle;
         
-        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
+        if (targetAngle < initialAngle) {
+            hoodMotor.set(-HOOD_MOTOR_PERCENT);
+        }
+        else {
+            hoodMotor.set(HOOD_MOTOR_PERCENT);
+        }
+
         return getHoodAngle();
     }
 
@@ -189,13 +197,13 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public double getHoodAngle() {
-        hoodAngle = this.hoodEncoder.getPosition()*(HOOD_DEGREES_PER_TICK * 4096);
+        hoodAngle = (this.hoodEncoder.getPosition()*HOOD_DEGREES_PER_ROTATION) % 360;
         return hoodAngle;
     }
 
     public void resetHoodAngle(double angle) {
         hoodAngle = angle;
-        hoodEncoder.setPosition(hoodAngle/360);
+        hoodEncoder.setPosition(hoodAngle % 360);
     }
 
     public void hoodUp() {
@@ -259,6 +267,10 @@ public class ShooterSystem extends SubsystemBase {
 		targetOffsetAngle_Vertical = limelight.getEntry("ty").getDouble(0);
 		targetArea = limelight.getEntry("ta").getDouble(0);
 		targetSkew = limelight.getEntry("ts").getDouble(0);
+
+        // System.out.println(hoodEncoder.getCountsPerRevolution());
+
+        System.out.println("Hood angle: " + getHoodAngle());
 
         // result = visionCam.getLatestResult();
 

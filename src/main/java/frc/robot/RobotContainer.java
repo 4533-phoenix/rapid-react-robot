@@ -68,6 +68,9 @@ public class RobotContainer {
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controller, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
+
+    JoystickButton hoodThirtyButton = new JoystickButton(controller, Constants.BUTTON_X);
+    hoodThirtyButton.whenPressed(ShooterCommands.setHoodAngleCommand(30));
   }
 
   private void changeHoodAngle() {

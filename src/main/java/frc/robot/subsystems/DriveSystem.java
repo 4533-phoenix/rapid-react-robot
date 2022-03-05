@@ -50,8 +50,8 @@ public class DriveSystem extends SubsystemBase {
 	// Onboard IMU.
 	private AHRS navX;
 
-	private static final double MAX_VELOCITY = 7000;
-	private static final double TURBO_VELOCITY = 7500;
+	private static final double MAX_VELOCITY = 4000;
+	private static final double TURBO_VELOCITY = 4500;
 	private static final double PEAK_OUTPUT = 1.0;
 	private boolean turbo = false;
 
@@ -70,26 +70,26 @@ public class DriveSystem extends SubsystemBase {
 	public static final double METERS_PER_INCH = 1 / 39.3701;
 
 	// Velocity PIDF values
-	public static final double VELOCITY_P = 6e-5;
+	public static final double VELOCITY_P = 5.6816E-10;
 	public static final double VELOCITY_I = 0.0;
 	public static final double VELOCITY_D = 0.0;
 	public static final double VELOCITY_I_ZONE = 0.0;
-	public static final double VELOCITY_FEED_FORWARD = 0.000015;
+	public static final double VELOCITY_FEED_FORWARD = 524.0510;
 
 	// Position PIDF values
-	public static final double POSITION_P = 0.02;
-	public static final double POSITION_I = 1e-5;
-	public static final double POSITION_D = 0.0008;
+	public static final double POSITION_P = 0.000171;
+	public static final double POSITION_I = 0.0;
+	public static final double POSITION_D = 0.016677;
 	public static final double POSITION_I_ZONE = 0.0;
-	public static final double POSITION_FEED_FORWARD = 0.01;
+	public static final double POSITION_FEED_FORWARD = 0.0;
 
 	// Feed Forward Gains
 	// kS - the voltage needed to overcome the motor's static friction (V).
 	// kV - the voltage needed to maintain a given constant velocity (V * s/m).
 	// kA - the voltage needed to induce a given acceleration (V * s^2/m).
-	public static final double FEED_FORWARD_KS = 0.456;
-	public static final double FEED_FORWARD_KV = 0.145;
-	public static final double FEED_FORWARD_KA = 0.0227;
+	public static final double FEED_FORWARD_KS = 0.16203;
+	public static final double FEED_FORWARD_KV = 0.13098;
+	public static final double FEED_FORWARD_KA = 0.026747;
 
 	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(FEED_FORWARD_KV,
 			FEED_FORWARD_KV, FEED_FORWARD_KA);
@@ -162,10 +162,10 @@ public class DriveSystem extends SubsystemBase {
 		this.leftMaster.setIdleMode(IdleMode.kCoast);
 		this.leftSlave.setIdleMode(IdleMode.kCoast);
 
-		this.rightMaster.setClosedLoopRampRate(1.5);
-		this.rightSlave.setClosedLoopRampRate(1.5);
-		this.leftMaster.setClosedLoopRampRate(1.5);
-		this.leftSlave.setClosedLoopRampRate(1.5);
+		this.rightMaster.setClosedLoopRampRate(0.5);
+		this.rightSlave.setClosedLoopRampRate(0.5);
+		this.leftMaster.setClosedLoopRampRate(0.5);
+		this.leftSlave.setClosedLoopRampRate(0.5);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
@@ -426,22 +426,9 @@ public class DriveSystem extends SubsystemBase {
 			targetLeft = -targetRight;
 			targetRight = -temp;
 		}
-
-		if (Math.abs(left) < Math.abs(prevLeft) - 0.1) {
-			this.leftPIDCont.setReference(0, ControlType.kDutyCycle);
-		}
-		else {
-			this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
-		}
-		if (Math.abs(right) < Math.abs(prevRight) - 0.1) {
-			this.rightPIDCont.setReference(0, ControlType.kDutyCycle);
-		}
-		else {
-			this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
-		}
-
-		prevLeft = left;
-		prevRight = right;
+		
+		this.leftPIDCont.setReference(-targetLeft, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+		this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 	}
 
 	public void voltage(double left, double right) {
@@ -540,7 +527,5 @@ public class DriveSystem extends SubsystemBase {
 		else {
 			robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
 		}
-
-		// System.out.println("Robot Angle: " + robotAngle.getDegrees());
 	}
 }

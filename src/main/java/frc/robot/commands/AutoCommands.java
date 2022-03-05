@@ -29,7 +29,7 @@ public class AutoCommands {
     }
 
     public static Command driveOffTarmac() {
-        return oldDriveDistanceAutoCommand(150, Direction.BACKWARD);
+        return oldDriveDistanceAutoCommand(50, Direction.BACKWARD);
     }
 
     // Normal Commands:    
