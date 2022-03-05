@@ -71,6 +71,14 @@ public class RobotContainer {
 
     JoystickButton hoodThirtyButton = new JoystickButton(controller, Constants.BUTTON_X);
     hoodThirtyButton.whenPressed(ShooterCommands.setHoodAngleCommand(30));
+    
+    JoystickButton climbUpButton = new JoystickButton(controller, Constants.BUTTON_BACK);
+    climbUpButton.whenPressed(MidClimbCommands.climberUp());
+    climbUpButton.whenReleased(MidClimbCommands.climberStop());
+
+    JoystickButton climbDownButton = new JoystickButton(controller, Constants.BUTTON_START);
+    climbDownButton.whenPressed(MidClimbCommands.climberDown());
+    climbDownButton.whenReleased(MidClimbCommands.climberStop());
   }
 
   private void changeHoodAngle() {
