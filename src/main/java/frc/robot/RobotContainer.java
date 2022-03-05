@@ -68,6 +68,14 @@ public class RobotContainer {
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controller, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
+
+    JoystickButton climbUpButton = new JoystickButton(controller, Constants.BUTTON_BACK);
+    climbUpButton.whenPressed(MidClimbCommands.climberUp());
+    climbUpButton.whenReleased(MidClimbCommands.climberStop());
+
+    JoystickButton climbDownButton = new JoystickButton(controller, Constants.BUTTON_START);
+    climbDownButton.whenPressed(MidClimbCommands.climberDown());
+    climbDownButton.whenReleased(MidClimbCommands.climberStop());
   }
 
   private void changeHoodAngle() {

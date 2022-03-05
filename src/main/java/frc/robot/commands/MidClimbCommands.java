@@ -10,6 +10,25 @@ import frc.robot.Robot;
 
 public class MidClimbCommands {
     public MidClimbCommands() {}
+  
+    public static Command climberDown() {
+        return new InstantCommand(
+            () -> Robot.midClimber.climberDown(),
+            Robot.midClimber
+        );
+    }
 
+    public static Command climberUp() {
+        return new InstantCommand(
+            () -> Robot.midClimber.climberUp(),
+            Robot.midClimber
+        );
+    } 
     
+    public static Command climberStop() {
+        return new InstantCommand(
+            () -> Robot.midClimber.climberStop(),
+            Robot.midClimber
+        );
+    }
 }
