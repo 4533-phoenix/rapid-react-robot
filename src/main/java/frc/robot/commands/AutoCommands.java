@@ -17,19 +17,36 @@ public class AutoCommands {
     // Test Commands:
     public static Command testDriveToPos() {
         return new SequentialCommandGroup(
-            driveToPosAutoCommand(1, 2),
+            driveToPosAutoCommand(0.5, 1),
             driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(-1, 2),
+            driveToPosAutoCommand(-0.5, 1),
             driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(-1, -2),
+            driveToPosAutoCommand(-0.5, -1),
             driveToPosAutoCommand(0, 0),
-            driveToPosAutoCommand(1, -2),
+            driveToPosAutoCommand(0.5, -1),
             driveToPosAutoCommand(0, 0)
         );
     }
 
-    public static Command driveOffTarmac() {
-        return oldDriveDistanceAutoCommand(50, Direction.BACKWARD);
+    // Normal Commands:
+    public static Command basicDriveOffTarmac() {
+        return new SequentialCommandGroup(
+            voltageDriveCommand(-5, -5),
+            new WaitCommand(3),
+            stopDriveCommand()
+        );
+    }
+    public static Command shootAndDriveOffTarmac() {
+        return  new SequentialCommandGroup(
+            // ShooterCommands.setHoodAngleCommand(12.0),
+            ShooterCommands.flywheelOutCommand()
+            // new WaitCommand(4)
+            // ShooterCommands.flywheelIntakeInCommand(),
+            // new WaitCommand(3),
+            // ShooterCommands.flywheelStopCommand(),
+            // ShooterCommands.flywheelIntakeStopCommand()
+            // oldDriveDistanceAutoCommand(400, Direction.BACKWARD)
+        );
     }
 
     // Normal Commands:    
@@ -132,7 +149,7 @@ public class AutoCommands {
 		return new FunctionalCommand(
 			() -> Robot.drive.resetPosition(),
 			() -> Robot.drive.oldDriveDistance(distance, direction),
-			(interrupt) -> Robot.drive.percent(0, 0),
+			(interrupt) -> Robot.drive.tank(0, 0),
 			() -> Robot.drive.oldReachedPosition(),
 			Robot.drive
 		);
@@ -159,6 +176,20 @@ public class AutoCommands {
         return new InstantCommand(
             () -> Robot.intake.intakeStop(),
             Robot.intake
+        );
+    }
+
+    public static Command voltageDriveCommand(double leftVolt, double rightVolt) {
+        return new InstantCommand(
+            () -> Robot.drive.voltage(leftVolt, rightVolt),
+            Robot.drive
+        );
+    }
+
+    public static Command stopDriveCommand() {
+        return new InstantCommand(
+            () -> Robot.drive.tank(0, 0),
+            Robot.drive
         );
     }
 

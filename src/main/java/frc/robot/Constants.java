@@ -19,7 +19,7 @@ public final class Constants {
 	public static final int TURRET_SWIVEL_MOTOR = 12;
 	//TODO Winch needs new motor id
 	public static final int WINCH_MOTOR = 7;
-	public static final int ELEVATOR_MOTOR = 4;
+	public static final int ELEVATOR_MOTOR = 9;
 	public static final int HOOD_MOTOR = 8;
 
 	// logitech controller buttons and ports

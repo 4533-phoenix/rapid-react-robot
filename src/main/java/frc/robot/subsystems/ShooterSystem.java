@@ -31,6 +31,9 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+
 public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX leftFlywheelMotor;
     private WPI_TalonFX rightFlywheelMotor;
@@ -47,7 +50,7 @@ public class ShooterSystem extends SubsystemBase {
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.25;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
-    private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/800;
+    private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
 
     private AHRS shooterNAVX;
@@ -60,6 +63,8 @@ public class ShooterSystem extends SubsystemBase {
     private double targetOffsetAngle_Vertical;
     private double targetArea;
     private double targetSkew;
+
+    private DigitalInput limitSwitch;
 
     // PhotonCamera visionCam;
     // PhotonPipelineResult result;
@@ -99,6 +104,8 @@ public class ShooterSystem extends SubsystemBase {
 
         hoodAngle = 0;
 
+        limitSwitch = new DigitalInput(0);
+
         limelight = NetworkTableInstance.getDefault().getTable("limelight");
 
         // visionCam = new PhotonCamera("WARCam");
@@ -119,8 +126,8 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void flywheelOut() {
-        leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
-        rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+        this.leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+        this.rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
     }
 
     public void flywheelStop() {
@@ -173,10 +180,14 @@ public class ShooterSystem extends SubsystemBase {
         targetAngle = angle;
         
         if (targetAngle < initialAngle) {
-            hoodMotor.set(-HOOD_MOTOR_PERCENT);
+            while (hoodEncoder.getVelocity() == 0) {
+                this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+            }
         }
         else {
-            hoodMotor.set(HOOD_MOTOR_PERCENT);
+            while (hoodEncoder.getVelocity() == 0) {
+                this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+            }
         }
 
         return getHoodAngle();
@@ -189,7 +200,7 @@ public class ShooterSystem extends SubsystemBase {
             }
             return false;
         } else {
-            if (initialAngle < targetAngle) { 
+            if (initialAngle < targetAngle + 2.8) { 
                 return true;
             }
             return false;
@@ -268,9 +279,14 @@ public class ShooterSystem extends SubsystemBase {
 		targetArea = limelight.getEntry("ta").getDouble(0);
 		targetSkew = limelight.getEntry("ts").getDouble(0);
 
-        // System.out.println(hoodEncoder.getCountsPerRevolution());
+        // System.out.println("Hood angle: " + getHoodAngle());
 
-        System.out.println("Hood angle: " + getHoodAngle());
+        getHoodAngle();
+
+        if (!limitSwitch.get()) {
+            // System.out.println("Limit Switch Pressed!");
+            hoodEncoder.setPosition(0.0);
+        }
 
         // result = visionCam.getLatestResult();
 
@@ -285,7 +301,5 @@ public class ShooterSystem extends SubsystemBase {
 
         // pos = target.getCameraToTarget();
         // corners = target.getCorners();
-
-        // System.out.println("Hood Motor Output: " + hoodMotor.getOutputCurrent());
     }
 }

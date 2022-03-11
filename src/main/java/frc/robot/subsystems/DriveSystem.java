@@ -52,11 +52,13 @@ public class DriveSystem extends SubsystemBase {
 
 	private static final double MAX_VELOCITY = 4000;
 	private static final double TURBO_VELOCITY = 4500;
+	private static final double QUARTER_VELOCITY = 1000;
 	private static final double PEAK_OUTPUT = 1.0;
 	private boolean turbo = false;
+	private boolean quarter = false;
 
 	// Wheel specific constants.
-	public static final double TICKS_PER_ROTATION = 4096.0;
+	public static final double TICKS_PER_ROTATION = 42.0;
 	private static final double WHEEL_DIAMETER = 6.0;
 	private static final double WHEEL_DIAMETER_M = 0.1524;
 	private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
@@ -70,16 +72,16 @@ public class DriveSystem extends SubsystemBase {
 	public static final double METERS_PER_INCH = 1 / 39.3701;
 
 	// Velocity PIDF values
-	public static final double VELOCITY_P = 5.6816E-10;
+	public static final double VELOCITY_P = 0.0003; // 0.3 / 1000 RPM Error
 	public static final double VELOCITY_I = 0.0;
-	public static final double VELOCITY_D = 0.0;
+	public static final double VELOCITY_D = 0.003; // will tune
 	public static final double VELOCITY_I_ZONE = 0.0;
-	public static final double VELOCITY_FEED_FORWARD = 524.0510;
+	public static final double VELOCITY_FEED_FORWARD = 1.25E-4; // 0.5 / MAX_VELOCITY
 
 	// Position PIDF values
-	public static final double POSITION_P = 0.000171;
+	public static final double POSITION_P = 0.006;
 	public static final double POSITION_I = 0.0;
-	public static final double POSITION_D = 0.016677;
+	public static final double POSITION_D = 0.06; // 0.016677 will tune
 	public static final double POSITION_I_ZONE = 0.0;
 	public static final double POSITION_FEED_FORWARD = 0.0;
 
@@ -91,7 +93,7 @@ public class DriveSystem extends SubsystemBase {
 	public static final double FEED_FORWARD_KV = 0.13098;
 	public static final double FEED_FORWARD_KA = 0.026747;
 
-	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(FEED_FORWARD_KV,
+	public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(FEED_FORWARD_KS,
 			FEED_FORWARD_KV, FEED_FORWARD_KA);
 
 	// TODO: These values were calculated as part of the robot characterization
@@ -162,10 +164,10 @@ public class DriveSystem extends SubsystemBase {
 		this.leftMaster.setIdleMode(IdleMode.kCoast);
 		this.leftSlave.setIdleMode(IdleMode.kCoast);
 
-		this.rightMaster.setClosedLoopRampRate(0.5);
-		this.rightSlave.setClosedLoopRampRate(0.5);
-		this.leftMaster.setClosedLoopRampRate(0.5);
-		this.leftSlave.setClosedLoopRampRate(0.5);
+		this.rightMaster.setClosedLoopRampRate(0.25);
+		this.rightSlave.setClosedLoopRampRate(0.25);
+		this.leftMaster.setClosedLoopRampRate(0.25);
+		this.leftSlave.setClosedLoopRampRate(0.25);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
@@ -182,6 +184,14 @@ public class DriveSystem extends SubsystemBase {
 
 	public SparkMaxPIDController getRightPIDCont() {
 		return rightPIDCont;
+	}
+
+	public void quarterTrue() {
+		quarter = true;
+	}
+
+	public void quarterFalse() {
+		quarter = false;
 	}
 
 	public void setDriveMode(DriveMode mode) {
@@ -274,25 +284,13 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
-	public boolean oldReachedPosition() {
-		double leftPos = leftEncoder.getPosition();
-		double rightPos = rightEncoder.getPosition() * -1;
-
-		if (targetDirection == Direction.FORWARD) {
-			return (leftPos >= oldTargetPosition) && (rightPos >= oldTargetPosition);
-		} else if (targetDirection == Direction.BACKWARD) {
-			return (leftPos <= oldTargetPosition) && (rightPos <= oldTargetPosition);
-		} else {
-			return true;
-		}
-	}
-
 	public void oldDriveDistance(double inches, Direction direction) {
 		targetDirection = direction;
-		if (direction == Direction.FORWARD) {
-			oldTargetPosition = inches / WHEEL_CIRCUMFERENCE;
-		} else if (direction == Direction.BACKWARD) {
-			oldTargetPosition = -1 * inches / WHEEL_CIRCUMFERENCE;
+
+		if (targetDirection == Direction.FORWARD) {
+			oldTargetPosition = (inches / WHEEL_CIRCUMFERENCE) * 42;
+		} else if (targetDirection == Direction.BACKWARD) {
+			oldTargetPosition = -1 * (inches / WHEEL_CIRCUMFERENCE) * 42;
 		} else {
 			oldTargetPosition = 0;
 		}
@@ -302,6 +300,19 @@ public class DriveSystem extends SubsystemBase {
 
 		this.leftPIDCont.setReference(oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 		this.rightPIDCont.setReference(-oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+	}
+
+	public boolean oldReachedPosition() {
+		double leftPos = leftEncoder.getPosition();
+		double rightPos = rightEncoder.getPosition();
+
+		if (targetDirection == Direction.FORWARD) {
+			return (leftPos >= oldTargetPosition) && (rightPos >= oldTargetPosition);
+		} else if (targetDirection == Direction.BACKWARD) {
+			return (leftPos <= oldTargetPosition) && (rightPos <= oldTargetPosition);
+		} else {
+			return true;
+		}
 	}
 
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
@@ -418,6 +429,10 @@ public class DriveSystem extends SubsystemBase {
 			targetVelocity = TURBO_VELOCITY;
 		}
 
+		if (this.quarter) {
+			targetVelocity = QUARTER_VELOCITY;
+		}
+
 		targetLeft = left * targetVelocity;
 		targetRight = right * targetVelocity;
 
@@ -511,9 +526,6 @@ public class DriveSystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		dashboardCont.setPID(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
-		SmartDashboard.putData("PID Controller", dashboardCont);
-
 		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 

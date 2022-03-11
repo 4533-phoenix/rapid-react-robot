@@ -24,4 +24,18 @@ public class DriveCommands {
             Robot.drive
         );
     }
+
+    public static Command quarterTrue() {
+        return new InstantCommand(
+            () -> Robot.drive.quarterTrue(),
+            Robot.drive
+        );
+    }
+
+    public static Command quarterFalse() {
+        return new InstantCommand(
+            () -> Robot.drive.quarterFalse(),
+            Robot.drive
+        );
+    }
 }

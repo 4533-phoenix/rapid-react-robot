@@ -17,7 +17,8 @@ import frc.robot.commands.*;
 
 public class RobotContainer {
   // Initialize the driver controls
-	private Joystick controller = new Joystick(Constants.DRIVER_CONTROLLER);
+	private Joystick controllerOne = new Joystick(Constants.DRIVER_CONTROLLER);
+  private Joystick controllerTwo = new Joystick(Constants.SECOND_DRIVER_CONTROLLER);
 
   // The container for the robot. Contains subsystems, OI devices, and commands.
   public RobotContainer() {
@@ -30,15 +31,16 @@ public class RobotContainer {
   // Initialize the drive command
 	private final Command defaultDriveCommand = new RunCommand(
 		() -> Robot.drive.tank(
-			this.controller.getRawAxis(Constants.LEFT_STICK_AXIS),
-			this.controller.getRawAxis(Constants.RIGHT_STICK_AXIS)
+			this.controllerOne.getRawAxis(Constants.LEFT_STICK_AXIS),
+			this.controllerOne.getRawAxis(Constants.RIGHT_STICK_AXIS)
 		),
 		Robot.drive
 	);
 
     // Creates a hash map of commands for the robot
     private Map<String, Command> commands = Map.ofEntries(
-      Map.entry("driveOffTarmac", AutoCommands.driveOffTarmac()),
+      Map.entry("basicDriveOffTarmac", AutoCommands.basicDriveOffTarmac()),
+      Map.entry("shootAndDriveOffTarmac", AutoCommands.shootAndDriveOffTarmac()),
       Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos()),
       Map.entry("threeBallAutoBlue", AutoCommands.threeBallAutoBlue()),
       Map.entry("threeBallAutoRed", AutoCommands.threeBallAutoRed()),
@@ -51,50 +53,54 @@ public class RobotContainer {
 
   // Defines button bindings for commands
   private void configureButtonBindings() {
-    JoystickButton toggleTurbo = new JoystickButton(controller, Constants.BUTTON_RB);
-    toggleTurbo.whenPressed(DriveCommands.toggleTurbo());
+    JoystickButton toggleTurboButton = new JoystickButton(controllerOne, Constants.BUTTON_RB);
+    toggleTurboButton.whenPressed(DriveCommands.toggleTurbo());
 
-    JoystickButton flywheelButton = new JoystickButton(controller, Constants.BUTTON_LB);
-    flywheelButton.whenPressed(ShooterCommands.flywheelOutCommand());
-    flywheelButton.whenReleased(ShooterCommands.flywheelStopCommand());
+    JoystickButton toggleOuttakeButton = new JoystickButton(controllerOne, Constants.BUTTON_A);
+    toggleOuttakeButton.whenPressed(IntakeCommands.intakeOutCommand());
+    toggleOuttakeButton.whenReleased(IntakeCommands.intakeStopCommand());
 
-    JoystickButton hoodUpButton = new JoystickButton(controller, Constants.BUTTON_Y);
+    JoystickButton quarterVelocityButton = new JoystickButton(controllerOne, Constants.BUTTON_LB);
+    quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
+    toggleOuttakeButton.whenReleased(DriveCommands.quarterFalse());
+
+    JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
     hoodUpButton.whenPressed(ShooterCommands.hoodUp());
     hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
-    JoystickButton hoodDownButton = new JoystickButton(controller, Constants.BUTTON_A);
+    JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
     hoodDownButton.whenPressed(ShooterCommands.hoodDown());
     hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
-    JoystickButton oldAutoFlywheel = new JoystickButton(controller, Constants.BUTTON_B);
+    JoystickButton oldAutoFlywheel = new JoystickButton(controllerTwo, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
 
-    JoystickButton hoodThirtyButton = new JoystickButton(controller, Constants.BUTTON_X);
-    hoodThirtyButton.whenPressed(ShooterCommands.setHoodAngleCommand(30));
+    JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
+    setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(17.9));
     
-    JoystickButton climbUpButton = new JoystickButton(controller, Constants.BUTTON_BACK);
+    JoystickButton climbUpButton = new JoystickButton(controllerOne, Constants.BUTTON_BACK);
     climbUpButton.whenPressed(MidClimbCommands.climberUp());
     climbUpButton.whenReleased(MidClimbCommands.climberStop());
 
-    JoystickButton climbDownButton = new JoystickButton(controller, Constants.BUTTON_START);
+    JoystickButton climbDownButton = new JoystickButton(controllerOne, Constants.BUTTON_START);
     climbDownButton.whenPressed(MidClimbCommands.climberDown());
     climbDownButton.whenReleased(MidClimbCommands.climberStop());
   }
 
   private void changeHoodAngle() {
-    if (controller.getPOV() == 0) {
+    if (controllerTwo.getPOV() == 0) {
       ShooterCommands.setHoodAngleCommand(0);
-    } else if (controller.getPOV() == 90) {
+    } else if (controllerTwo.getPOV() == 90) {
       ShooterCommands.setHoodAngleCommand(15);
-    } else if (controller.getPOV() == 180) {
+    } else if (controllerTwo.getPOV() == 180) {
       ShooterCommands.setHoodAngleCommand(30);
-    } else if (controller.getPOV() == 270) {
+    } else if (controllerTwo.getPOV() == 270) {
       ShooterCommands.setHoodAngleCommand(45);
     }
   }
 
   private void toggleIntake() {
-    if (controller.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.6) {
+    if (controllerOne.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.3) {
       Robot.intake.intakeIn();
     }
     else {
@@ -103,7 +109,7 @@ public class RobotContainer {
   }
 
   private void toggleFlywheelIntake() {
-    if (controller.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.6) {
+    if (controllerTwo.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.3) {
       Robot.shooter.flywheelIntakeIn();
     }
     else {
@@ -111,10 +117,20 @@ public class RobotContainer {
     }
   }
 
+  private void toggleFlywheel() {
+    if (controllerTwo.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.3) {
+      Robot.shooter.flywheelOut();
+    }
+    else {
+      Robot.shooter.flywheelStop();
+    }
+  }
+
   private void configureDefaultCommands() {
 		CommandScheduler scheduler = CommandScheduler.getInstance();
 
     scheduler.setDefaultCommand(Robot.drive, defaultDriveCommand);
+
     scheduler.addButton(
       () -> changeHoodAngle()
     );
@@ -125,6 +141,10 @@ public class RobotContainer {
 
     scheduler.addButton(
       () -> toggleFlywheelIntake()
+    );
+
+    scheduler.addButton(
+      () -> toggleFlywheel()
     );
 	}
 
