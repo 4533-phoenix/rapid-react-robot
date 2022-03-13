@@ -33,7 +33,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.commands.Direction;
 public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX leftFlywheelMotor;
     private WPI_TalonFX rightFlywheelMotor;
@@ -43,11 +44,12 @@ public class ShooterSystem extends SubsystemBase {
     private SparkMaxPIDController hoodPIDCont;
     private RelativeEncoder hoodEncoder;
 
-    double initialAngle;
-    double targetAngle;
+    private double initialAngle;
+    private double targetAngle;
+    private Direction targetDirection;
 
-    private static final double FLYWHEEL_MOTOR_PERCENT = 0.90;
-    private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.25;
+    private static final double FLYWHEEL_MOTOR_PERCENT = 0.85;
+    private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.40;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
@@ -165,6 +167,44 @@ public class ShooterSystem extends SubsystemBase {
         flywheelIntakeMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
+    public void flywheelAndFlywheelIntakeRun(double hoodAngle, int balls, boolean flywheelRunning) {
+        Timer timer = new Timer();
+        timer.reset();
+        timer.start();
+
+        int time, flywheelIntakeTime;
+
+        if (flywheelRunning) {
+            time = 1 + (2 * balls);
+            flywheelIntakeTime = 0;
+        }
+        else {
+            time = 5 + (2 * balls);
+            flywheelIntakeTime = 4;
+        }
+        
+        initialAngle = getHoodAngle();
+        targetAngle = hoodAngle;
+        targetDirection = Direction.FORWARD;
+
+        while (timer.get() < time) {
+            if (!flywheelRunning) {
+                leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+                rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+            }
+            
+            if (timer.get() > flywheelIntakeTime && timer.get() < time) {
+                flywheelIntakeMotor.set(ControlMode.PercentOutput, FLYWHEEL_INTAKE_MOTOR_PERCENT);
+            }
+
+            // if (!hoodReachedPosition()) {
+            //     setHoodAngle(hoodAngle);
+            // }
+        }
+
+        timer.stop();
+    }
+
     public void resetPosition() {
         leftFlywheelMotor.setSelectedSensorPosition(0);
         rightFlywheelMotor.setSelectedSensorPosition(0);
@@ -180,30 +220,41 @@ public class ShooterSystem extends SubsystemBase {
         targetAngle = angle;
         
         if (targetAngle < initialAngle) {
-            while (hoodEncoder.getVelocity() == 0) {
+            targetDirection = Direction.BACKWARD;
+
+            do {
                 this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
             }
+            while (hoodEncoder.getVelocity() <= 0);
         }
         else {
-            while (hoodEncoder.getVelocity() == 0) {
+            targetDirection = Direction.FORWARD;
+
+            do {
                 this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+
             }
+            while (hoodEncoder.getVelocity() <= 0);
         }
 
         return getHoodAngle();
     }
 
     public boolean hoodReachedPosition() {
-        if (hoodEncoder.getVelocity() > 0) {
+        if (targetDirection == Direction.FORWARD) {
             if (initialAngle > targetAngle) { 
                 return true;
             }
             return false;
-        } else {
+        } 
+        else if (targetDirection == Direction.BACKWARD) {
             if (initialAngle < targetAngle + 2.8) { 
                 return true;
             }
             return false;
+        }
+        else {
+            return true;
         }
     }
 

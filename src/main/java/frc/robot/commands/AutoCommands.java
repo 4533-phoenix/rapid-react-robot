@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Robot;
@@ -38,14 +39,12 @@ public class AutoCommands {
     }
     public static Command shootAndDriveOffTarmac() {
         return  new SequentialCommandGroup(
-            // ShooterCommands.setHoodAngleCommand(12.0),
-            ShooterCommands.flywheelOutCommand()
-            // new WaitCommand(4)
-            // ShooterCommands.flywheelIntakeInCommand(),
-            // new WaitCommand(3),
-            // ShooterCommands.flywheelStopCommand(),
-            // ShooterCommands.flywheelIntakeStopCommand()
-            // oldDriveDistanceAutoCommand(400, Direction.BACKWARD)
+            ShooterCommands.autoShoot(20.0, 1, false),
+            oldDriveDistanceAutoCommand(20, Direction.BACKWARD).withTimeout(3)
+            // oldAngularTurnAutoCommand(0.2, 180, Direction.LEFT),
+            // oldGetBallAutoCommand(20, Direction.FORWARD),
+            // oldAngularTurnAutoCommand(0.2, 180, Direction.RIGHT),
+            // ShooterCommands.autoShoot(35.0, 1, true),
         );
     }
 
@@ -83,6 +82,21 @@ public class AutoCommands {
             turnCommand(),
             driveDistanceAutoCommand(),
             oldAngularTurnAutoCommand(0.1, 0.0, Direction.RIGHT)
+        );
+    }
+
+    public static Command getBallAutoCommand(double xMeters, double yMeters) {
+        return new ParallelCommandGroup(
+            driveToPosAutoCommand(xMeters, yMeters),
+            IntakeCommands.intakeRunCommand()
+        );
+    }
+
+    public static Command oldGetBallAutoCommand(double distance, Direction direction) {
+        return new ParallelCommandGroup(
+            oldDriveDistanceAutoCommand(distance, direction),
+            IntakeCommands.intakeRunCommand()
+            // ShooterCommands.flywheelRunCommand()
         );
     }
 
@@ -197,71 +211,65 @@ public class AutoCommands {
 
 //Mesurements in Inches and Degrees, all auto needs to be tested. DriveSystem.INCHES_PER_METER is inches to meters
 
-    public static Command threeBallAutoBlue() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            intakeInAutoCommand(),            
-            driveToPosAutoCommand(-25.91/DriveSystem.INCHES_PER_METER,-149.79/DriveSystem.INCHES_PER_METER),
-            driveToPosAutoCommand(-124.95/DriveSystem.INCHES_PER_METER,-87.30/DriveSystem.INCHES_PER_METER),
-            intakeStopAutoCommand(),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            shootBallAutoCommand(2)
-        );
-    }
+    // public static Command threeBallAutoBlue() {
+    //     return new SequentialCommandGroup(
+    //         ShooterCommands.autoShoot(20, 1),
+    //         getBallAutoCommand(-25.91/DriveSystem.INCHES_PER_METER, -149.79/DriveSystem.INCHES_PER_METER),
+    //         getBallAutoCommand(-124.95/DriveSystem.INCHES_PER_METER, -87.30/DriveSystem.INCHES_PER_METER),       
+    //         IntakeCommands.intakeStopCommand(),
+    //         oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
+    //         ShooterCommands.autoShoot(35, 2)
+    //     );
+    // }
 
-    public static Command threeBallAutoRed() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            intakeInAutoCommand(),
-            driveToPosAutoCommand(25.91/DriveSystem.INCHES_PER_METER,149.79/DriveSystem.INCHES_PER_METER),
-            driveToPosAutoCommand(149.23/DriveSystem.INCHES_PER_METER,32.77/DriveSystem.INCHES_PER_METER),
-            intakeStopAutoCommand(),
-            oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
-            shootBallAutoCommand(2)
-        );
-    }
+    // public static Command threeBallAutoRed() {
+    //     return new SequentialCommandGroup(
+    //         ShooterCommands.autoShoot(20, 1),
+    //         getBallAutoCommand(25.91/DriveSystem.INCHES_PER_METER, 149.79/DriveSystem.INCHES_PER_METER),
+    //         getBallAutoCommand(149.23/DriveSystem.INCHES_PER_METER, 32.77/DriveSystem.INCHES_PER_METER),
+    //         IntakeCommands.intakeStopCommand(),
+    //         oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
+    //         ShooterCommands.autoShoot(35, 2)
+    //     );
+    // }
 
-    public static Command twoBallAutoTopRed() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            intakeInAutoCommand(),
-            driveToPosAutoCommand(25.91/DriveSystem.INCHES_PER_METER,149.79/DriveSystem.INCHES_PER_METER),
-            intakeStopAutoCommand(),
-            angularTurnAutoCommand(0.2, 180, Direction.LEFT),
-            shootBallAutoCommand(1)
-        );
-    }
+    // public static Command twoBallAutoTopRed() {
+    //     return new SequentialCommandGroup(
+    //         ShooterCommands.autoShoot(20, 1),
+    //         getBallAutoCommand(25.91/DriveSystem.INCHES_PER_METER, 149.79/DriveSystem.INCHES_PER_METER),
+    //         IntakeCommands.intakeStopCommand(),
+    //         angularTurnAutoCommand(0.2, 180, Direction.LEFT),
+    //         ShooterCommands.autoShoot(35, 1)
+    //     );
+    // }
 
-    public static Command twoBallAutoBottomBlue() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            intakeInAutoCommand(),
-            driveToPosAutoCommand(-25.91/DriveSystem.INCHES_PER_METER,-149.79/DriveSystem.INCHES_PER_METER),
-            intakeStopAutoCommand(),
-            oldAngularTurnAutoCommand(0.2, 180, Direction.RIGHT),
-            shootBallAutoCommand(1)
-        );
-    }
+    // public static Command twoBallAutoBottomBlue() {
+    //     return new SequentialCommandGroup(
+    //         ShooterCommands.autoShoot(20, 1),
+    //         getBallAutoCommand(-25.91/DriveSystem.INCHES_PER_METER, -149.79/DriveSystem.INCHES_PER_METER),
+    //         IntakeCommands.intakeStopCommand(),
+    //         oldAngularTurnAutoCommand(0.2, 180, Direction.RIGHT),
+    //         ShooterCommands.autoShoot(35, 1)
+    //     );
+    // }
 
-    public static Command twoBallAutoBottomRed() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            intakeInAutoCommand(),
-             driveToPosAutoCommand(88.30/DriveSystem.INCHES_PER_METER,-125.95/DriveSystem.INCHES_PER_METER),
-            intakeStopAutoCommand(),
-            angularTurnAutoCommand(0.2, 180, Direction.LEFT),
-            shootBallAutoCommand(1)
-        );
-    }
+    // public static Command twoBallAutoBottomRed() {
+    //     return new SequentialCommandGroup(
+    //         ShooterCommands.autoShoot(20, 1),
+    //         getBallAutoCommand(88.30/DriveSystem.INCHES_PER_METER, -125.95/DriveSystem.INCHES_PER_METER),
+    //         IntakeCommands.intakeStopCommand(),
+    //         angularTurnAutoCommand(0.2, 180, Direction.LEFT),
+    //         ShooterCommands.autoShoot(35, 1)
+    //     );
+    // }
 
-    public static Command twoBallAutoTopBlue() {
-        return new SequentialCommandGroup(
-            shootBallAutoCommand(1),
-            intakeInAutoCommand(),
-             driveToPosAutoCommand(-129.40/DriveSystem.INCHES_PER_METER,82.69/DriveSystem.INCHES_PER_METER),
-            intakeStopAutoCommand(),
-            angularTurnAutoCommand(0.2, 180, Direction.LEFT),
-            shootBallAutoCommand(1)
-        );
-    }
+    // public static Command twoBallAutoTopBlue() {
+    //     return new SequentialCommandGroup(
+    //         ShooterCommands.autoShoot(20, 1),
+    //         getBallAutoCommand(-129.40/DriveSystem.INCHES_PER_METER, 82.69/DriveSystem.INCHES_PER_METER),
+    //         IntakeCommands.intakeStopCommand(),
+    //         angularTurnAutoCommand(0.2, 180, Direction.LEFT),
+    //         ShooterCommands.autoShoot(35, 1)
+    //     );
+    // }
 }

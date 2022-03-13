@@ -38,8 +38,6 @@ public class Robot extends TimedRobot {
 
 	private RobotContainer container = null;
 
-	Timer timer = new Timer();
-
 	/**
    * Tracks the current state of the robot
    */
@@ -144,15 +142,12 @@ public class Robot extends TimedRobot {
 
 		// Robot.drive.resetPosition();
 
-		this.autoCommand = this.container.getAutonomousCommand("testDrivePositionOne");
+		this.autoCommand = this.container.getAutonomousCommand("shootAndDriveOffTarmac");
 
 		// schedule the autonomous command (example)
 		if (this.autoCommand != null) {
 			this.autoCommand.schedule();
 		}
-
-		timer.reset();
-		timer.start();
 	}
 
 	/**
@@ -160,21 +155,6 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		if (timer.get() < 7){
-			shooter.flywheelOut();
-		}
-
-		if (timer.get() > 4 && timer.get() < 7) {
-			shooter.flywheelIntakeIn();
-		}
-
-		if (timer.get() > 7) {
-			shooter.flywheelStop();
-			shooter.flywheelIntakeStop();
-
-			timer.stop();
-			timer = null;
-		}
 	}
 
 	@Override

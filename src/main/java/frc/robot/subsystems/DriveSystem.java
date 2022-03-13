@@ -71,17 +71,17 @@ public class DriveSystem extends SubsystemBase {
 	public static final double INCHES_PER_METER = 39.3701;
 	public static final double METERS_PER_INCH = 1 / 39.3701;
 
-	// Velocity PIDF values
+	// Velocity PIDF values *Don't mess with, pretty much perfect
 	public static final double VELOCITY_P = 0.0003; // 0.3 / 1000 RPM Error
 	public static final double VELOCITY_I = 0.0;
 	public static final double VELOCITY_D = 0.003; // will tune
 	public static final double VELOCITY_I_ZONE = 0.0;
-	public static final double VELOCITY_FEED_FORWARD = 1.25E-4; // 0.5 / MAX_VELOCITY
+	public static final double VELOCITY_FEED_FORWARD = 8.75E-5; // 0.35 / MAX_VELOCITY
 
 	// Position PIDF values
-	public static final double POSITION_P = 0.006;
+	public static final double POSITION_P = 0.015;
 	public static final double POSITION_I = 0.0;
-	public static final double POSITION_D = 0.06; // 0.016677 will tune
+	public static final double POSITION_D = 0.15; // 0.016677 will tune
 	public static final double POSITION_I_ZONE = 0.0;
 	public static final double POSITION_FEED_FORWARD = 0.0;
 
@@ -235,18 +235,22 @@ public class DriveSystem extends SubsystemBase {
 
 		targetPosition = new Pose2d(translation, angle);
 
-		if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() > 180) {
-			turnDirection = Direction.RIGHT;
+		if (targetPosition.getRotation().getDegrees() > robotAngle.getDegrees()) {
+			if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() > 180) {
+				turnDirection = Direction.LEFT;
+			}
+			else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() <= 180) {
+				turnDirection = Direction.RIGHT;
+			}
 		}
-		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() <= 180) {
-			turnDirection = Direction.LEFT;
-		}
-		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() < -180) {
-			turnDirection = Direction.RIGHT;
-		}
-		else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() >= -180) {
-			turnDirection = Direction.LEFT;
-		}
+		else if (targetPosition.getRotation().getDegrees() <= robotAngle.getDegrees()) {
+			if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() < -180) {
+				turnDirection = Direction.LEFT;
+			}
+			else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() >= -180) {
+				turnDirection = Direction.RIGHT;
+			}
+		}	
 		else {
 			turnDirection = Direction.LEFT;
 		}
@@ -270,18 +274,20 @@ public class DriveSystem extends SubsystemBase {
 
 	// TODONE: Add back old drive distance code in a different method for use of non-odometry autonomous commands 
 	public void driveDistance() {
-		double targetDist = targetPosition.getY() / Math.sin(targetPosition.getRotation().getRadians());
+		double targetDist = Math.abs(targetPosition.getY() / Math.sin(targetPosition.getRotation().getRadians()));
 		
 		if (driveDirection == Direction.FORWARD) {
 			targetDist *= INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+			targetDist *= 42;
 		} else if (driveDirection == Direction.BACKWARD) {
 			targetDist *= -1 * INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+			targetDist *= 42;
 		} else {
 			targetDist = 0;
 		}
 
 		this.leftPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
-		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(-targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public void oldDriveDistance(double inches, Direction direction) {
@@ -294,9 +300,6 @@ public class DriveSystem extends SubsystemBase {
 		} else {
 			oldTargetPosition = 0;
 		}
-
-		System.out.println("Left: " + leftEncoder.getPosition());
-		System.out.println("Right: " + rightEncoder.getPosition());
 
 		this.leftPIDCont.setReference(oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 		this.rightPIDCont.setReference(-oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
@@ -512,6 +515,9 @@ public class DriveSystem extends SubsystemBase {
 
 	public boolean reachedTurn() {
 		double angle = targetPosition.getRotation().getDegrees();
+
+		System.out.println("Robot Angle: " + robotAngle);
+		System.out.println("Target Angle: " + angle);
 		
 		if (angle + 1 > 360) {
 			return 360 - robotAngle.getDegrees() <= (angle + 1) % 360 && robotAngle.getDegrees() >= angle - 1;
@@ -529,7 +535,9 @@ public class DriveSystem extends SubsystemBase {
 		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
 
-		robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
+		Rotation2d navXAngle = Rotation2d.fromDegrees(-navX.getAngle());
+
+		robotPos = odometry.update(navXAngle, leftDist, rightDist);
 
 		// ensures there is never a negative angle value
 		// this is useful for turning, as we don't have to worry about the robot making unecessarily long turns

@@ -18,6 +18,13 @@ public class IntakeCommands {
 		);
 	}
 
+	public static Command intakeRunCommand() {
+		return new RunCommand(
+			() -> Robot.intake.intakeIn(),
+			Robot.intake
+		);
+	}
+
 	public static Command intakeOutCommand() {
 		return new InstantCommand(
 			() -> Robot.intake.intakeOut(),

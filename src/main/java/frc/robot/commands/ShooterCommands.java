@@ -4,8 +4,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.subsystems.ShooterSystem;
 import frc.robot.Robot;
 
 public class ShooterCommands {
@@ -21,6 +23,13 @@ public class ShooterCommands {
     public static Command flywheelInCommand() {
         return new InstantCommand(
             () -> Robot.shooter.flywheelIn(),
+            Robot.shooter
+        );
+    }
+    
+    public static Command flywheelRunCommand() {
+        return new RunCommand(
+            () -> Robot.shooter.flywheelOut(),
             Robot.shooter
         );
     }
@@ -52,6 +61,20 @@ public class ShooterCommands {
             Robot.shooter
         );
     } 
+
+    public static Command flywheelAndIntakeRunCommand(double hoodAngle, int balls, boolean flywheelRunning) {
+        return new InstantCommand(
+            () -> Robot.shooter.flywheelAndFlywheelIntakeRun(hoodAngle, balls, flywheelRunning),
+            Robot.shooter
+        );
+    }
+
+    public static Command flywheelAndIntakeStopCommand() {
+        return new SequentialCommandGroup(
+            flywheelStopCommand(),
+            flywheelIntakeStopCommand()
+        );
+    }
 
     public static Command hoodUp() {
         return new InstantCommand(
@@ -101,6 +124,14 @@ public class ShooterCommands {
             (interrupt) -> Robot.shooter.stopFlywheelPos(),
             () -> Robot.shooter.turretReachedPosition(),
             Robot.shooter
+        );
+    }
+
+    public static Command autoShoot(double hoodAngle, int balls, boolean flywheelRunning) {
+        return new SequentialCommandGroup(
+            // setHoodAngleCommand(hoodAngle),
+            flywheelAndIntakeRunCommand(hoodAngle, balls, flywheelRunning),
+            flywheelAndIntakeStopCommand()
         );
     }
 }

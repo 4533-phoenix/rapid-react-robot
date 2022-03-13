@@ -41,13 +41,13 @@ public class RobotContainer {
     private Map<String, Command> commands = Map.ofEntries(
       Map.entry("basicDriveOffTarmac", AutoCommands.basicDriveOffTarmac()),
       Map.entry("shootAndDriveOffTarmac", AutoCommands.shootAndDriveOffTarmac()),
-      Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos()),
-      Map.entry("threeBallAutoBlue", AutoCommands.threeBallAutoBlue()),
-      Map.entry("threeBallAutoRed", AutoCommands.threeBallAutoRed()),
-      Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue()),
-      Map.entry("twoBallAutoTopRed", AutoCommands.twoBallAutoTopRed()),
-      Map.entry("twoBallAutoTopBlue",AutoCommands.twoBallAutoTopBlue()),
-      Map.entry("twoBallAutoBottomRed", AutoCommands.twoBallAutoBottomRed())
+      Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos())
+      // Map.entry("threeBallAutoBlue", AutoCommands.threeBallAutoBlue()),
+      // Map.entry("threeBallAutoRed", AutoCommands.threeBallAutoRed()),
+      // Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue()),
+      // Map.entry("twoBallAutoTopRed", AutoCommands.twoBallAutoTopRed()),
+      // Map.entry("twoBallAutoTopBlue",AutoCommands.twoBallAutoTopBlue()),
+      // Map.entry("twoBallAutoBottomRed", AutoCommands.twoBallAutoBottomRed())
     );
   
 
@@ -62,21 +62,25 @@ public class RobotContainer {
 
     JoystickButton quarterVelocityButton = new JoystickButton(controllerOne, Constants.BUTTON_LB);
     quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
-    toggleOuttakeButton.whenReleased(DriveCommands.quarterFalse());
+    quarterVelocityButton.whenReleased(DriveCommands.quarterFalse());
 
-    JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
-    hoodUpButton.whenPressed(ShooterCommands.hoodUp());
-    hoodUpButton.whenReleased(ShooterCommands.hoodStop());
+    // JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
+    // hoodUpButton.whenPressed(ShooterCommands.hoodUp());
+    // hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
-    JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
-    hoodDownButton.whenPressed(ShooterCommands.hoodDown());
-    hoodDownButton.whenReleased(ShooterCommands.hoodStop());
+    // JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
+    // hoodDownButton.whenPressed(ShooterCommands.hoodDown());
+    // hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controllerTwo, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
 
-    JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
-    setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(17.9));
+    // JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
+    // setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(17.9));
+
+    JoystickButton reverseFlywheelIntakeButton = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
+    reverseFlywheelIntakeButton.whenPressed(ShooterCommands.flywheelIntakeOutCommand());
+    reverseFlywheelIntakeButton.whenReleased(ShooterCommands.flywheelIntakeStopCommand());
     
     JoystickButton climbUpButton = new JoystickButton(controllerOne, Constants.BUTTON_BACK);
     climbUpButton.whenPressed(MidClimbCommands.climberUp());
