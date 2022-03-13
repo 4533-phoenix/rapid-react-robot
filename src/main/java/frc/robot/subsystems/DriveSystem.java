@@ -310,12 +310,12 @@ public class DriveSystem extends SubsystemBase {
 
     this.leftPIDCont.setReference(
         targetDist,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         targetDist,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
   }
@@ -336,12 +336,12 @@ public class DriveSystem extends SubsystemBase {
 
     this.leftPIDCont.setReference(
         oldTargetPosition,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         -oldTargetPosition,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
   }
@@ -377,12 +377,12 @@ public class DriveSystem extends SubsystemBase {
     }
     this.leftPIDCont.setReference(
         leftDist,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         rightDist,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
   }
@@ -411,12 +411,12 @@ public class DriveSystem extends SubsystemBase {
 
     this.leftPIDCont.setReference(
         leftDist,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         rightDist,
-        ControlType.kPosition,
+        CANSparkMax.ControlType.kPosition,
         Constants.POSITION_SLOT_ID
       );
   }
@@ -512,12 +512,12 @@ public class DriveSystem extends SubsystemBase {
 
     this.leftPIDCont.setReference(
         -targetLeft,
-        ControlType.kVelocity,
+        CANSparkMax.ControlType.kVelocity,
         Constants.VELOCITY_SLOT_ID
       );
     this.rightPIDCont.setReference(
         targetRight,
-        ControlType.kVelocity,
+        CANSparkMax.ControlType.kVelocity,
         Constants.VELOCITY_SLOT_ID
       );
   }

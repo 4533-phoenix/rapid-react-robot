@@ -194,14 +194,14 @@ public class ShooterSystem extends SubsystemBase {
       while (hoodEncoder.getVelocity() == 0) {
         this.hoodPIDCont.setReference(
             -HOOD_MOTOR_PERCENT,
-            ControlType.kDutyCycle
+            CANSparkMax.ControlType.kDutyCycle
           );
       }
     } else {
       while (hoodEncoder.getVelocity() == 0) {
         this.hoodPIDCont.setReference(
             HOOD_MOTOR_PERCENT,
-            ControlType.kDutyCycle
+            CANSparkMax.ControlType.kDutyCycle
           );
       }
     }
@@ -235,15 +235,15 @@ public class ShooterSystem extends SubsystemBase {
   }
 
   public void hoodUp() {
-    this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+    this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, CANSparkMax.ControlType.kDutyCycle);
   }
 
   public void hoodDown() {
-    this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+    this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, CANSparkMax.ControlType.kDutyCycle);
   }
 
   public void hoodStop() {
-    this.hoodPIDCont.setReference(0.0, ControlType.kDutyCycle);
+    this.hoodPIDCont.setReference(0.0, CANSparkMax.ControlType.kDutyCycle);
   }
 
   public void setFlywheelPos() {
