@@ -1,240 +1,243 @@
 package frc.robot;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.SparkMaxPIDController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableRegistry;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-
-import com.revrobotics.SparkMaxPIDController;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.HighClimbSystem;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.MidClimbSystem;
 import frc.robot.subsystems.ShooterSystem;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Robot extends TimedRobot {
-  	private Logger stateLogger = LogManager.getLogger("robot_state");
-	private Logger robotLogger = LogManager.getLogger("robot");
+  private Logger stateLogger = LogManager.getLogger("robot_state");
+  private Logger robotLogger = LogManager.getLogger("robot");
 
-	private ObjectMapper mapper = new ObjectMapper();
+  private ObjectMapper mapper = new ObjectMapper();
 
-	private Command autoCommand = null;
+  private Command autoCommand = null;
 
-	private RobotContainer container = null;
+  private RobotContainer container = null;
 
-	Timer timer = new Timer();
-
-	/**
-   * Tracks the current state of the robot
-   */
-  	private RobotState robotState = null;
-
-	/**
-	 * Thread pool for handling interval based tasks that are outside of the
-	 * typical robot lifecyle. In other words, things that should not be on the
-	 * robot's main loop/thread.
-	 */
-	private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
-
-	/**
-	 * The robot's drive train subsystem.
-	 */
-	public final static DriveSystem drive = new DriveSystem();
-
-	/**
-	 * The robot's intake subsystem.
-	 */
-	public final static IntakeSystem intake = new IntakeSystem();
-
-	/**
-	 * The robot's mid rung climber subsystem.
-	 */
-	public final static MidClimbSystem midClimber = new MidClimbSystem();
+  Timer timer = new Timer();
 
   /**
-	 * The robot's high/transversal rung climber subsystem.
-	 */
-	public final static HighClimbSystem highClimber = new HighClimbSystem();
+   * Tracks the current state of the robot
+   */
+  private RobotState robotState = null;
 
-	/**
-	 * The robot's shooter subsystem.
-	 */
-	public final static ShooterSystem shooter = new ShooterSystem();
+  /**
+   * Thread pool for handling interval based tasks that are outside of the
+   * typical robot lifecyle. In other words, things that should not be on the
+   * robot's main loop/thread.
+   */
+  private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(
+    2
+  );
 
-	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
-	 */
+  /**
+   * The robot's drive train subsystem.
+   */
+  public static final DriveSystem drive = new DriveSystem();
 
-	@Override
-	public void robotInit() {
-		// Instantiate our RobotContainer.  This will perform all our button
-		// bindings, and put our autonomous chooser on the dashboard.
-		this.container = new RobotContainer();
-	}
+  /**
+   * The robot's intake subsystem.
+   */
+  public static final IntakeSystem intake = new IntakeSystem();
 
-	public static void setPIDF(SparkMaxPIDController controller, double p, double i, double d, double iz, double ff, int slotID) {
-		controller.setP(p,slotID);
-		controller.setI(i,slotID);
-		controller.setD(d,slotID);
-		controller.setIZone(iz,slotID);
-		controller.setFF(ff,slotID);
-	}
+  /**
+   * The robot's mid rung climber subsystem.
+   */
+  public static final MidClimbSystem midClimber = new MidClimbSystem();
 
-	@Override
-	public void robotPeriodic() {
-		CommandScheduler.getInstance().run();
-	}
+  /**
+   * The robot's high/transversal rung climber subsystem.
+   */
+  public static final HighClimbSystem highClimber = new HighClimbSystem();
 
-	/**
-	 * This function is called once each time the robot enters Disabled mode.
-	 */
-	@Override
-	public void disabledInit() {
-	}
+  /**
+   * The robot's shooter subsystem.
+   */
+  public static final ShooterSystem shooter = new ShooterSystem();
 
-	@Override
-	public void disabledPeriodic() {
-	}
+  /**
+   * This function is run when the robot is first started up and should be
+   * used for any initialization code.
+   */
 
-	/**
-	 * This autonomous runs the autonomous command selected by your
-	 * {@link RobotContainer} class.
-	 */
-	@Override
-	public void autonomousInit() {
-		setPIDF(
-			drive.getLeftPIDCont(), 
-			DriveSystem.POSITION_P, 
-			DriveSystem.POSITION_I, 
-			DriveSystem.POSITION_D, 
-			DriveSystem.POSITION_I_ZONE, 
-			DriveSystem.POSITION_FEED_FORWARD,
-			Constants.POSITION_SLOT_ID
-		);
+  @Override
+  public void robotInit() {
+    // Instantiate our RobotContainer.  This will perform all our button
+    // bindings, and put our autonomous chooser on the dashboard.
+    this.container = new RobotContainer();
+  }
 
-		setPIDF(
-			drive.getRightPIDCont(), 
-			DriveSystem.POSITION_P, 
-			DriveSystem.POSITION_I, 
-			DriveSystem.POSITION_D, 
-			DriveSystem.POSITION_I_ZONE, 
-			DriveSystem.POSITION_FEED_FORWARD,
-			Constants.POSITION_SLOT_ID
-		);
+  public static void setPIDF(
+    SparkMaxPIDController controller,
+    double p,
+    double i,
+    double d,
+    double iz,
+    double ff,
+    int slotID
+  ) {
+    controller.setP(p, slotID);
+    controller.setI(i, slotID);
+    controller.setD(d, slotID);
+    controller.setIZone(iz, slotID);
+    controller.setFF(ff, slotID);
+  }
 
-		Robot.drive.resetAngle();
-		this.robotLogger.info("reset drive system angle: {}", Robot.drive.getAngle());
+  @Override
+  public void robotPeriodic() {
+    CommandScheduler.getInstance().run();
+  }
 
-		// Robot.drive.resetPosition();
+  /**
+   * This function is called once each time the robot enters Disabled mode.
+   */
+  @Override
+  public void disabledInit() {}
 
-		this.autoCommand = this.container.getAutonomousCommand("testDrivePositionOne");
+  @Override
+  public void disabledPeriodic() {}
 
-		// schedule the autonomous command (example)
-		if (this.autoCommand != null) {
-			this.autoCommand.schedule();
-		}
+  /**
+   * This autonomous runs the autonomous command selected by your
+   * {@link RobotContainer} class.
+   */
+  @Override
+  public void autonomousInit() {
+    setPIDF(
+      drive.getLeftPIDCont(),
+      DriveSystem.POSITION_P,
+      DriveSystem.POSITION_I,
+      DriveSystem.POSITION_D,
+      DriveSystem.POSITION_I_ZONE,
+      DriveSystem.POSITION_FEED_FORWARD,
+      Constants.POSITION_SLOT_ID
+    );
 
-		timer.reset();
-		timer.start();
-	}
+    setPIDF(
+      drive.getRightPIDCont(),
+      DriveSystem.POSITION_P,
+      DriveSystem.POSITION_I,
+      DriveSystem.POSITION_D,
+      DriveSystem.POSITION_I_ZONE,
+      DriveSystem.POSITION_FEED_FORWARD,
+      Constants.POSITION_SLOT_ID
+    );
 
-	/**
-	 * This function is called periodically during autonomous.
-	 */
-	@Override
-	public void autonomousPeriodic() {
-		if (timer.get() < 7){
-			shooter.flywheelOut();
-		}
+    Robot.drive.resetAngle();
+    this.robotLogger.info(
+        "reset drive system angle: {}",
+        Robot.drive.getAngle()
+      );
 
-		if (timer.get() > 4 && timer.get() < 7) {
-			shooter.flywheelIntakeIn();
-		}
+    // Robot.drive.resetPosition();
 
-		if (timer.get() > 7) {
-			shooter.flywheelStop();
-			shooter.flywheelIntakeStop();
+    this.autoCommand =
+      this.container.getAutonomousCommand("testDrivePositionOne");
 
-			timer.stop();
-			timer = null;
-		}
-	}
+    // schedule the autonomous command (example)
+    if (this.autoCommand != null) {
+      this.autoCommand.schedule();
+    }
 
-	@Override
-	public void teleopInit() {
-		setPIDF(
-			drive.getLeftPIDCont(), 
-			DriveSystem.VELOCITY_P, 
-			DriveSystem.VELOCITY_I, 
-			DriveSystem.VELOCITY_D, 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
+    timer.reset();
+    timer.start();
+  }
 
-		setPIDF(
-			drive.getRightPIDCont(), 
-			DriveSystem.VELOCITY_P, 
-			DriveSystem.VELOCITY_I, 
-			DriveSystem.VELOCITY_D, 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
+  /**
+   * This function is called periodically during autonomous.
+   */
+  @Override
+  public void autonomousPeriodic() {
+    if (timer.get() < 7) {
+      shooter.flywheelOut();
+    }
 
-		
+    if (timer.get() > 4 && timer.get() < 7) {
+      shooter.flywheelIntakeIn();
+    }
 
-		Robot.drive.resetAngle();
-		// Robot.drive.resetPosition();
+    if (timer.get() > 7) {
+      shooter.flywheelStop();
+      shooter.flywheelIntakeStop();
 
-		// This makes sure that the autonomous stops running when
-		// teleop starts running. If you want the autonomous to
-		// continue until interrupted by another command, remove
-		// this line or comment it out.
-		if (this.autoCommand != null) {
-			this.autoCommand.cancel();
-		}
-	}
+      timer.stop();
+      timer = null;
+    }
+  }
 
-	/**
-	 * This function is called periodically during operator control.
-	 */
-	@Override
-	public void teleopPeriodic() {
-	}
+  @Override
+  public void teleopInit() {
+    setPIDF(
+      drive.getLeftPIDCont(),
+      DriveSystem.VELOCITY_P,
+      DriveSystem.VELOCITY_I,
+      DriveSystem.VELOCITY_D,
+      DriveSystem.VELOCITY_I_ZONE,
+      DriveSystem.VELOCITY_FEED_FORWARD,
+      Constants.VELOCITY_SLOT_ID
+    );
 
-	@Override
-	public void testInit() {
-		// Cancels all running commands at the start of test mode.
-		CommandScheduler.getInstance().cancelAll();
-	}
+    setPIDF(
+      drive.getRightPIDCont(),
+      DriveSystem.VELOCITY_P,
+      DriveSystem.VELOCITY_I,
+      DriveSystem.VELOCITY_D,
+      DriveSystem.VELOCITY_I_ZONE,
+      DriveSystem.VELOCITY_FEED_FORWARD,
+      Constants.VELOCITY_SLOT_ID
+    );
 
-	/**
-	 * This function is called periodically during test mode.
-	 */
-	@Override
-	public void testPeriodic() {
-	}
+    Robot.drive.resetAngle();
+    // Robot.drive.resetPosition();
 
-	@Override
-	public void startCompetition() {
-		super.startCompetition();
-	}
+    // This makes sure that the autonomous stops running when
+    // teleop starts running. If you want the autonomous to
+    // continue until interrupted by another command, remove
+    // this line or comment it out.
+    if (this.autoCommand != null) {
+      this.autoCommand.cancel();
+    }
+  }
+
+  /**
+   * This function is called periodically during operator control.
+   */
+  @Override
+  public void teleopPeriodic() {}
+
+  @Override
+  public void testInit() {
+    // Cancels all running commands at the start of test mode.
+    CommandScheduler.getInstance().cancelAll();
+  }
+
+  /**
+   * This function is called periodically during test mode.
+   */
+  @Override
+  public void testPeriodic() {}
+
+  @Override
+  public void startCompetition() {
+    super.startCompetition();
+  }
 }

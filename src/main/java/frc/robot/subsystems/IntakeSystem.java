@@ -1,37 +1,35 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 public class IntakeSystem extends SubsystemBase {
   private final double INTAKE_MOTOR_PERCENT = 0.65;
 
-	private WPI_TalonSRX intakeMotor;
+  private WPI_TalonSRX intakeMotor;
 
-	public IntakeSystem() {
-		this.intakeMotor = new WPI_TalonSRX(Constants.INTAKE_MOTOR);
+  public IntakeSystem() {
+    this.intakeMotor = new WPI_TalonSRX(Constants.INTAKE_MOTOR);
 
-		this.intakeMotor.setNeutralMode(NeutralMode.Brake);
+    this.intakeMotor.setNeutralMode(NeutralMode.Brake);
 
-		this.intakeMotor.setInverted(true);
+    this.intakeMotor.setInverted(true);
   }
 
   public void intakeIn() {
-		this.intakeMotor.set(ControlMode.PercentOutput, INTAKE_MOTOR_PERCENT);
-	}
+    this.intakeMotor.set(ControlMode.PercentOutput, INTAKE_MOTOR_PERCENT);
+  }
 
-	public void intakeOut() {
-		this.intakeMotor.set(ControlMode.PercentOutput, -INTAKE_MOTOR_PERCENT);
-	}
+  public void intakeOut() {
+    this.intakeMotor.set(ControlMode.PercentOutput, -INTAKE_MOTOR_PERCENT);
+  }
 
-	public void intakeStop(){
-		this.intakeMotor.set(ControlMode.PercentOutput, 0);
-	}
+  public void intakeStop() {
+    this.intakeMotor.set(ControlMode.PercentOutput, 0);
+  }
 
   @Override
   public void periodic() {
