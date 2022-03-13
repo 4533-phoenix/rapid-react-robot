@@ -24,7 +24,8 @@ import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.constants.MotorConstants;
+import frc.robot.constants.PIDConstants;
 import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 import java.lang.Math.*;
@@ -147,13 +148,13 @@ public class DriveSystem extends SubsystemBase {
   public DriveSystem() {
     // Initialize all of the drive systems motor controllers.
     this.leftMaster =
-      new CANSparkMax(Constants.LEFT_MASTER_MOTOR, MotorType.kBrushless);
+      new CANSparkMax(MotorConstants.LEFT_MASTER_MOTOR, MotorType.kBrushless);
     this.leftSlave =
-      new CANSparkMax(Constants.LEFT_SLAVE_MOTOR, MotorType.kBrushless);
+      new CANSparkMax(MotorConstants.LEFT_SLAVE_MOTOR, MotorType.kBrushless);
     this.rightMaster =
-      new CANSparkMax(Constants.RIGHT_MASTER_MOTOR, MotorType.kBrushless);
+      new CANSparkMax(MotorConstants.RIGHT_MASTER_MOTOR, MotorType.kBrushless);
     this.rightSlave =
-      new CANSparkMax(Constants.RIGHT_SLAVE_MOTOR, MotorType.kBrushless);
+      new CANSparkMax(MotorConstants.RIGHT_SLAVE_MOTOR, MotorType.kBrushless);
 
     this.leftEncoder = leftMaster.getEncoder();
     this.rightEncoder = rightMaster.getEncoder();
@@ -311,12 +312,12 @@ public class DriveSystem extends SubsystemBase {
     this.leftPIDCont.setReference(
         targetDist,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         targetDist,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
   }
 
@@ -337,12 +338,12 @@ public class DriveSystem extends SubsystemBase {
     this.leftPIDCont.setReference(
         oldTargetPosition,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         -oldTargetPosition,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
   }
 
@@ -378,12 +379,12 @@ public class DriveSystem extends SubsystemBase {
     this.leftPIDCont.setReference(
         leftDist,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         rightDist,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
   }
 
@@ -412,12 +413,12 @@ public class DriveSystem extends SubsystemBase {
     this.leftPIDCont.setReference(
         leftDist,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
     this.rightPIDCont.setReference(
         rightDist,
         CANSparkMax.ControlType.kPosition,
-        Constants.POSITION_SLOT_ID
+        PIDConstants.POSITION_SLOT_ID
       );
   }
 
@@ -513,12 +514,12 @@ public class DriveSystem extends SubsystemBase {
     this.leftPIDCont.setReference(
         -targetLeft,
         CANSparkMax.ControlType.kVelocity,
-        Constants.VELOCITY_SLOT_ID
+        PIDConstants.VELOCITY_SLOT_ID
       );
     this.rightPIDCont.setReference(
         targetRight,
         CANSparkMax.ControlType.kVelocity,
-        Constants.VELOCITY_SLOT_ID
+        PIDConstants.VELOCITY_SLOT_ID
       );
   }
 

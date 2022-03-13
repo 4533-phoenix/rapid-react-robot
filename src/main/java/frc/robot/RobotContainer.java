@@ -12,13 +12,14 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
+import frc.robot.constants.ControllerConstants;
 import java.util.Map;
 
 public class RobotContainer {
   // Initialize the driver controls
-  private Joystick controllerOne = new Joystick(Constants.DRIVER_CONTROLLER);
+  private Joystick controllerOne = new Joystick(ControllerConstants.DRIVER_CONTROLLER);
   private Joystick controllerTwo = new Joystick(
-    Constants.SECOND_DRIVER_CONTROLLER
+    ControllerConstants.SECOND_DRIVER_CONTROLLER
   );
 
   // The container for the robot. Contains subsystems, OI devices, and commands.
@@ -34,8 +35,8 @@ public class RobotContainer {
   private final Command defaultDriveCommand = new RunCommand(
     () ->
       Robot.drive.tank(
-        this.controllerOne.getRawAxis(Constants.LEFT_STICK_AXIS),
-        this.controllerOne.getRawAxis(Constants.RIGHT_STICK_AXIS)
+        this.controllerOne.getRawAxis(ControllerConstants.LEFT_STICK_AXIS),
+        this.controllerOne.getRawAxis(ControllerConstants.RIGHT_STICK_AXIS)
       ),
     Robot.drive
   );
@@ -57,60 +58,60 @@ public class RobotContainer {
   private void configureButtonBindings() {
     JoystickButton toggleTurboButton = new JoystickButton(
       controllerOne,
-      Constants.BUTTON_RB
+      ControllerConstants.BUTTON_RB
     );
     toggleTurboButton.whenPressed(DriveCommands.toggleTurbo());
 
     JoystickButton toggleOuttakeButton = new JoystickButton(
       controllerOne,
-      Constants.BUTTON_A
+      ControllerConstants.BUTTON_A
     );
     toggleOuttakeButton.whenPressed(IntakeCommands.intakeOutCommand());
     toggleOuttakeButton.whenReleased(IntakeCommands.intakeStopCommand());
 
     JoystickButton quarterVelocityButton = new JoystickButton(
       controllerOne,
-      Constants.BUTTON_LB
+      ControllerConstants.BUTTON_LB
     );
     quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
     toggleOuttakeButton.whenReleased(DriveCommands.quarterFalse());
 
     JoystickButton hoodUpButton = new JoystickButton(
       controllerTwo,
-      Constants.BUTTON_Y
+      ControllerConstants.BUTTON_Y
     );
     hoodUpButton.whenPressed(ShooterCommands.hoodUp());
     hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton hoodDownButton = new JoystickButton(
       controllerTwo,
-      Constants.BUTTON_A
+      ControllerConstants.BUTTON_A
     );
     hoodDownButton.whenPressed(ShooterCommands.hoodDown());
     hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton oldAutoFlywheel = new JoystickButton(
       controllerTwo,
-      Constants.BUTTON_B
+      ControllerConstants.BUTTON_B
     );
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
 
     JoystickButton setHoodShootButton = new JoystickButton(
       controllerTwo,
-      Constants.BUTTON_X
+      ControllerConstants.BUTTON_X
     );
     setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(17.9));
 
     JoystickButton climbUpButton = new JoystickButton(
       controllerOne,
-      Constants.BUTTON_BACK
+      ControllerConstants.BUTTON_BACK
     );
     climbUpButton.whenPressed(MidClimbCommands.climberUp());
     climbUpButton.whenReleased(MidClimbCommands.climberStop());
 
     JoystickButton climbDownButton = new JoystickButton(
       controllerOne,
-      Constants.BUTTON_START
+      ControllerConstants.BUTTON_START
     );
     climbDownButton.whenPressed(MidClimbCommands.climberDown());
     climbDownButton.whenReleased(MidClimbCommands.climberStop());
@@ -129,7 +130,7 @@ public class RobotContainer {
   }
 
   private void toggleIntake() {
-    if (controllerOne.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.3) {
+    if (controllerOne.getRawAxis(ControllerConstants.RIGHT_TRIGGER_AXIS) > 0.3) {
       Robot.intake.intakeIn();
     } else {
       Robot.intake.intakeStop();
@@ -137,7 +138,7 @@ public class RobotContainer {
   }
 
   private void toggleFlywheelIntake() {
-    if (controllerTwo.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.3) {
+    if (controllerTwo.getRawAxis(ControllerConstants.LEFT_TRIGGER_AXIS) > 0.3) {
       Robot.shooter.flywheelIntakeIn();
     } else {
       Robot.shooter.flywheelIntakeStop();
@@ -145,7 +146,7 @@ public class RobotContainer {
   }
 
   private void toggleFlywheel() {
-    if (controllerTwo.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.3) {
+    if (controllerTwo.getRawAxis(ControllerConstants.RIGHT_TRIGGER_AXIS) > 0.3) {
       Robot.shooter.flywheelOut();
     } else {
       Robot.shooter.flywheelStop();

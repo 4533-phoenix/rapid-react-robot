@@ -17,7 +17,9 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.constants.LimelightConstants;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.MotorConstants;
 import frc.robot.Robot;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,9 @@ public class ShooterSystem extends SubsystemBase {
   private double targetArea;
   private double targetSkew;
 
+  private double targetDistanceFromShooter;
+  private double targetDistanceFromRobot;
+
   private DigitalInput limitSwitch;
 
   // PhotonCamera visionCam;
@@ -73,12 +78,12 @@ public class ShooterSystem extends SubsystemBase {
   // List<TargetCorner> corners;
 
   public ShooterSystem() {
-    leftFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_LEFT);
-    rightFlywheelMotor = new WPI_TalonFX(Constants.FLYWHEEL_MOTOR_RIGHT);
+    leftFlywheelMotor = new WPI_TalonFX(MotorConstants.FLYWHEEL_MOTOR_LEFT);
+    rightFlywheelMotor = new WPI_TalonFX(MotorConstants.FLYWHEEL_MOTOR_RIGHT);
 
-    flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
+    flywheelIntakeMotor = new WPI_TalonSRX(MotorConstants.TURRET_WHEEL_MOTOR);
 
-    hoodMotor = new CANSparkMax(Constants.HOOD_MOTOR, MotorType.kBrushless);
+    hoodMotor = new CANSparkMax(MotorConstants.HOOD_MOTOR, MotorType.kBrushless);
 
     leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
     rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
@@ -101,6 +106,7 @@ public class ShooterSystem extends SubsystemBase {
     limitSwitch = new DigitalInput(0);
 
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
+
     // visionCam = new PhotonCamera("WARCam");
     // result = null;
     // target = null;
@@ -295,19 +301,27 @@ public class ShooterSystem extends SubsystemBase {
     );
   }
 
+  public void updateLimelight() {
+    this.targetOffsetAngle_Horizontal = this.limelight.getEntry("tx").getDouble(0);
+    this.targetOffsetAngle_Vertical = this.limelight.getEntry("ty").getDouble(0);
+    this.targetArea = this.limelight.getEntry("ta").getDouble(0);
+    this.targetSkew = this.limelight.getEntry("ts").getDouble(0);
+
+    double angleToGoalDegrees = LimelightConstants.LIMELIGHT_MOUNT_ROTATION_DEGREES + targetOffsetAngle_Vertical;
+    double angleToGoalRadians = angleToGoalDegrees * (Math.PI / 180.0);
+    double distanceFromLimelightToGoalInches = (FieldConstants.TARGET_HEIGHT_INCHES - LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES) / Math.tan(angleToGoalRadians);
+
+    this.targetDistanceFromShooter = 0;
+    this.targetDistanceFromRobot = 0;
+  }
+
   @Override
   public void periodic() {
-    targetOffsetAngle_Horizontal = limelight.getEntry("tx").getDouble(0);
-    targetOffsetAngle_Vertical = limelight.getEntry("ty").getDouble(0);
-    targetArea = limelight.getEntry("ta").getDouble(0);
-    targetSkew = limelight.getEntry("ts").getDouble(0);
+    updateLimelight();
 
     // System.out.println("Hood angle: " + getHoodAngle());
 
-    getHoodAngle();
-
     if (!limitSwitch.get()) {
-      // System.out.println("Limit Switch Pressed!");
       hoodEncoder.setPosition(0.0);
     }
     // result = visionCam.getLatestResult();

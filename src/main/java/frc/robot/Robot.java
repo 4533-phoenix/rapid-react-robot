@@ -13,11 +13,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.DriveCommands;
+import frc.robot.constants.MotorConstants;
+import frc.robot.constants.PIDConstants;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.subsystems.HighClimbSystem;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.MidClimbSystem;
 import frc.robot.subsystems.ShooterSystem;
+import frc.robot.constants.PIDConstants;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
@@ -129,7 +132,7 @@ public class Robot extends TimedRobot {
       DriveSystem.POSITION_D,
       DriveSystem.POSITION_I_ZONE,
       DriveSystem.POSITION_FEED_FORWARD,
-      Constants.POSITION_SLOT_ID
+      PIDConstants.POSITION_SLOT_ID
     );
 
     setPIDF(
@@ -139,7 +142,7 @@ public class Robot extends TimedRobot {
       DriveSystem.POSITION_D,
       DriveSystem.POSITION_I_ZONE,
       DriveSystem.POSITION_FEED_FORWARD,
-      Constants.POSITION_SLOT_ID
+      PIDConstants.POSITION_SLOT_ID
     );
 
     Robot.drive.resetAngle();
@@ -193,7 +196,7 @@ public class Robot extends TimedRobot {
       DriveSystem.VELOCITY_D,
       DriveSystem.VELOCITY_I_ZONE,
       DriveSystem.VELOCITY_FEED_FORWARD,
-      Constants.VELOCITY_SLOT_ID
+      PIDConstants.VELOCITY_SLOT_ID
     );
 
     setPIDF(
@@ -203,7 +206,7 @@ public class Robot extends TimedRobot {
       DriveSystem.VELOCITY_D,
       DriveSystem.VELOCITY_I_ZONE,
       DriveSystem.VELOCITY_FEED_FORWARD,
-      Constants.VELOCITY_SLOT_ID
+      PIDConstants.VELOCITY_SLOT_ID
     );
 
     Robot.drive.resetAngle();

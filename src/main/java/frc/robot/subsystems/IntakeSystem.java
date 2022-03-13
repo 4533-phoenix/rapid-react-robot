@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.constants.MotorConstants;
 
 public class IntakeSystem extends SubsystemBase {
   private final double INTAKE_MOTOR_PERCENT = 0.65;
@@ -12,7 +12,7 @@ public class IntakeSystem extends SubsystemBase {
   private WPI_TalonSRX intakeMotor;
 
   public IntakeSystem() {
-    this.intakeMotor = new WPI_TalonSRX(Constants.INTAKE_MOTOR);
+    this.intakeMotor = new WPI_TalonSRX(MotorConstants.INTAKE_MOTOR);
 
     this.intakeMotor.setNeutralMode(NeutralMode.Brake);
 
