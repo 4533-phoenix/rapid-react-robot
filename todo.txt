@@ -1,0 +1,3 @@
+1. Fix shooter hood and make it accurate
+2. Calculate math for auto aim (hood + rpm)
+3. Improve auto
