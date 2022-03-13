@@ -61,7 +61,7 @@ public class ShooterSystem extends SubsystemBase {
   private double targetSkew;
 
   private double targetDistanceFromShooter;
-  private double targetDistanceFromRobot;
+  private double baseDistanceFromShooter;
 
   private DigitalInput limitSwitch;
 
@@ -301,6 +301,10 @@ public class ShooterSystem extends SubsystemBase {
     );
   }
 
+  public void autoTurretHood() {
+
+  }
+
   public void updateLimelight() {
     this.targetOffsetAngle_Horizontal = this.limelight.getEntry("tx").getDouble(0);
     this.targetOffsetAngle_Vertical = this.limelight.getEntry("ty").getDouble(0);
@@ -309,10 +313,9 @@ public class ShooterSystem extends SubsystemBase {
 
     double angleToGoalDegrees = LimelightConstants.LIMELIGHT_MOUNT_ROTATION_DEGREES + targetOffsetAngle_Vertical;
     double angleToGoalRadians = angleToGoalDegrees * (Math.PI / 180.0);
-    double distanceFromLimelightToGoalInches = (FieldConstants.TARGET_HEIGHT_INCHES - LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES) / Math.tan(angleToGoalRadians);
 
-    this.targetDistanceFromShooter = 0;
-    this.targetDistanceFromRobot = 0;
+    this.targetDistanceFromShooter = (FieldConstants.TARGET_HEIGHT_INCHES - LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES) / Math.tan(angleToGoalRadians);
+    this.baseDistanceFromShooter = Math.sqrt(Math.pow(this.targetDistanceFromShooter, 2) - Math.pow(FieldConstants.TARGET_HEIGHT_INCHES - LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES, 2));
   }
 
   @Override
