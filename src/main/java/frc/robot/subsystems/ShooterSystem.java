@@ -235,11 +235,17 @@ public class ShooterSystem extends SubsystemBase {
   }
 
   public void hoodUp() {
-    this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, CANSparkMax.ControlType.kDutyCycle);
+    this.hoodPIDCont.setReference(
+        HOOD_MOTOR_PERCENT,
+        CANSparkMax.ControlType.kDutyCycle
+      );
   }
 
   public void hoodDown() {
-    this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, CANSparkMax.ControlType.kDutyCycle);
+    this.hoodPIDCont.setReference(
+        -HOOD_MOTOR_PERCENT,
+        CANSparkMax.ControlType.kDutyCycle
+      );
   }
 
   public void hoodStop() {
