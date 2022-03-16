@@ -25,6 +25,9 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 
 import java.util.List;
+
+import javax.swing.GroupLayout;
+
 import java.util.ArrayList;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -48,12 +51,30 @@ public class ShooterSystem extends SubsystemBase {
     private double targetAngle;
     private Direction targetDirection;
 
-    private static final double FLYWHEEL_MOTOR_PERCENT = 0.85;
+    // Motor Constants
+    private static final double FLYWHEEL_MOTOR_PERCENT = 1.0;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.40;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
+
+    // Projectile Constants
+    private static final double MAX_FLYWHEEL_RPM = 0.0; // TODO: Change this to the right value (RPM)
+    private static final double FLYWHEEL_RADIUS = 0.1; // TODO: Change this to the right value (feet)
+    private static final double TIME_TO_SHOOT = 2; // seconds 
+    private static final double GOAL_HEIGHT = 8.67; // feet
+    private static final double CAMERA_HEIGHT = 0.0; // TODO: Change this to the right value (feet)
+    private static final double CAMERA_MOUNTING_ANGLE = 0.0; // TODO: Change this to the right value (degrees)
+    private static double cameraTargetAngle;
+    private static double horizontalDistance;
+    private static final double GRAVITY_ACCELERATION = -32.1741; // feet/s^2
+    private static final double INITIAL_Y_VELOCITY = GOAL_HEIGHT - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT)); // feet/s
+    private static double initialXVelocity;
+    private static double initialVelocity;
+    private static double rotationalVelocity;
+    private static double shootHoodAngle;
+    private static double shootHoodPercent;
 
     private AHRS shooterNAVX;
 
@@ -330,12 +351,35 @@ public class ShooterSystem extends SubsystemBase {
 		targetArea = limelight.getEntry("ta").getDouble(0);
 		targetSkew = limelight.getEntry("ts").getDouble(0);
 
-        // System.out.println("Hood angle: " + getHoodAngle());
+        // Kinematic Equations:
+        // vf = v0 + at
+        // vf^2 = v0^2 + 2ad
+        // d = vagt (1/2(v0 + vf)t)
+        // d = v0t + 1/2at^2
+
+        // v0x will equal our distance from the goal divided by our time to shoot, which is 2 
+        // *this is technically calculating average velocity, but x velocity is constant
+        // since we now know v0x, we will calculate v0y by saying that it is:
+        // v0y = dy - 1/2at^2
+        // now we can use v0x and v0y to calculate v and 0 (theta), which gives us 
+        // the flywheel velocity and the hood angle
+        // v0x will vary, however v0y will not, but this will still lead to varying v's and 0's
+
+        cameraTargetAngle = CAMERA_MOUNTING_ANGLE + (-targetOffsetAngle_Vertical);
+        horizontalDistance = (GOAL_HEIGHT - CAMERA_HEIGHT) / Math.tan(cameraTargetAngle * (Math.PI / 180));
+
+        initialXVelocity = horizontalDistance / TIME_TO_SHOOT;
+        initialVelocity = Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(INITIAL_Y_VELOCITY, 2));
+        rotationalVelocity = (initialVelocity / FLYWHEEL_RADIUS) * 60; // multiplying by 60 changes from seconds to minutes (RPM)
+        
+        System.out.println(hoodEncoder.getVelocity()); // this will be to measure the max velocity of the hood motor
+
+        shootHoodAngle = Math.atan(INITIAL_Y_VELOCITY / initialXVelocity) * (180 / Math.PI);
+        shootHoodPercent = rotationalVelocity * (1 / MAX_FLYWHEEL_RPM);
 
         getHoodAngle();
 
         if (!limitSwitch.get()) {
-            // System.out.println("Limit Switch Pressed!");
             hoodEncoder.setPosition(0.0);
         }
 
