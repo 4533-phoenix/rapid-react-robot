@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.constants.DriveConstants;
+import frc.robot.constants.EncoderConstants;
 import frc.robot.subsystems.DriveSystem;
 
 public class AutoCommands {
@@ -208,12 +210,12 @@ public class AutoCommands {
       shootBallAutoCommand(1),
       intakeInAutoCommand(),
       driveToPosAutoCommand(
-        -25.91 / DriveSystem.INCHES_PER_METER,
-        -149.79 / DriveSystem.INCHES_PER_METER
+        -25.91 / DriveConstants.INCHES_PER_METER,
+        -149.79 / DriveConstants.INCHES_PER_METER
       ),
       driveToPosAutoCommand(
-        -124.95 / DriveSystem.INCHES_PER_METER,
-        -87.30 / DriveSystem.INCHES_PER_METER
+        -124.95 / DriveConstants.INCHES_PER_METER,
+        -87.30 / DriveConstants.INCHES_PER_METER
       ),
       intakeStopAutoCommand(),
       oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
@@ -226,12 +228,12 @@ public class AutoCommands {
       shootBallAutoCommand(1),
       intakeInAutoCommand(),
       driveToPosAutoCommand(
-        25.91 / DriveSystem.INCHES_PER_METER,
-        149.79 / DriveSystem.INCHES_PER_METER
+        25.91 / DriveConstants.INCHES_PER_METER,
+        149.79 / DriveConstants.INCHES_PER_METER
       ),
       driveToPosAutoCommand(
-        149.23 / DriveSystem.INCHES_PER_METER,
-        32.77 / DriveSystem.INCHES_PER_METER
+        149.23 / DriveConstants.INCHES_PER_METER,
+        32.77 / DriveConstants.INCHES_PER_METER
       ),
       intakeStopAutoCommand(),
       oldAngularTurnAutoCommand(0.2, 90, Direction.RIGHT),
@@ -244,8 +246,8 @@ public class AutoCommands {
       shootBallAutoCommand(1),
       intakeInAutoCommand(),
       driveToPosAutoCommand(
-        25.91 / DriveSystem.INCHES_PER_METER,
-        149.79 / DriveSystem.INCHES_PER_METER
+        25.91 / DriveConstants.INCHES_PER_METER,
+        149.79 / DriveConstants.INCHES_PER_METER
       ),
       intakeStopAutoCommand(),
       angularTurnAutoCommand(0.2, 180, Direction.LEFT),
@@ -258,8 +260,8 @@ public class AutoCommands {
       shootBallAutoCommand(1),
       intakeInAutoCommand(),
       driveToPosAutoCommand(
-        -25.91 / DriveSystem.INCHES_PER_METER,
-        -149.79 / DriveSystem.INCHES_PER_METER
+        -25.91 / DriveConstants.INCHES_PER_METER,
+        -149.79 / DriveConstants.INCHES_PER_METER
       ),
       intakeStopAutoCommand(),
       oldAngularTurnAutoCommand(0.2, 180, Direction.RIGHT),
@@ -272,8 +274,8 @@ public class AutoCommands {
       shootBallAutoCommand(1),
       intakeInAutoCommand(),
       driveToPosAutoCommand(
-        88.30 / DriveSystem.INCHES_PER_METER,
-        -125.95 / DriveSystem.INCHES_PER_METER
+        88.30 / DriveConstants.INCHES_PER_METER,
+        -125.95 / DriveConstants.INCHES_PER_METER
       ),
       intakeStopAutoCommand(),
       angularTurnAutoCommand(0.2, 180, Direction.LEFT),
@@ -286,8 +288,8 @@ public class AutoCommands {
       shootBallAutoCommand(1),
       intakeInAutoCommand(),
       driveToPosAutoCommand(
-        -129.40 / DriveSystem.INCHES_PER_METER,
-        82.69 / DriveSystem.INCHES_PER_METER
+        -129.40 / DriveConstants.INCHES_PER_METER,
+        82.69 / DriveConstants.INCHES_PER_METER
       ),
       intakeStopAutoCommand(),
       angularTurnAutoCommand(0.2, 180, Direction.LEFT),

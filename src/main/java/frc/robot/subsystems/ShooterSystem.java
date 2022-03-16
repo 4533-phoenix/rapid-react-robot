@@ -17,10 +17,12 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.LimelightConstants;
-import frc.robot.constants.FieldConstants;
-import frc.robot.constants.MotorConstants;
 import frc.robot.Robot;
+import frc.robot.constants.EncoderConstants;
+import frc.robot.constants.FieldConstants;
+import frc.robot.constants.LimelightConstants;
+import frc.robot.constants.MotorConstants;
+import frc.robot.constants.ShooterConstants;
 import java.util.ArrayList;
 import java.util.List;
 import org.photonvision.PhotonCamera;
@@ -37,17 +39,10 @@ public class ShooterSystem extends SubsystemBase {
   private SparkMaxPIDController hoodPIDCont;
   private RelativeEncoder hoodEncoder;
 
+  private double currentFlywheelPercent = ShooterConstants.FLYWHEEL_MOTOR_PERCENT;
+
   double initialAngle;
   double targetAngle;
-
-  private static final double FLYWHEEL_MOTOR_PERCENT = 0.90;
-  private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.25;
-  private static final double HOOD_MOTOR_PERCENT = 0.05;
-  private static final double DEGREES_PER_TICK =
-    360 / DriveSystem.TICKS_PER_ROTATION;
-  private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK / 80;
-  private static final double HOOD_DEGREES_PER_ROTATION =
-    HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
 
   private AHRS shooterNAVX;
 
@@ -83,7 +78,8 @@ public class ShooterSystem extends SubsystemBase {
 
     flywheelIntakeMotor = new WPI_TalonSRX(MotorConstants.TURRET_WHEEL_MOTOR);
 
-    hoodMotor = new CANSparkMax(MotorConstants.HOOD_MOTOR, MotorType.kBrushless);
+    hoodMotor =
+      new CANSparkMax(MotorConstants.HOOD_MOTOR, MotorType.kBrushless);
 
     leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
     rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
@@ -106,7 +102,6 @@ public class ShooterSystem extends SubsystemBase {
     limitSwitch = new DigitalInput(0);
 
     limelight = NetworkTableInstance.getDefault().getTable("limelight");
-
     // visionCam = new PhotonCamera("WARCam");
     // result = null;
     // target = null;
@@ -120,18 +115,18 @@ public class ShooterSystem extends SubsystemBase {
   }
 
   public void flywheelIn() {
-    leftFlywheelMotor.set(ControlMode.PercentOutput, -FLYWHEEL_MOTOR_PERCENT);
-    rightFlywheelMotor.set(ControlMode.PercentOutput, -FLYWHEEL_MOTOR_PERCENT);
+    leftFlywheelMotor.set(ControlMode.PercentOutput, -currentFlywheelPercent);
+    rightFlywheelMotor.set(ControlMode.PercentOutput, -currentFlywheelPercent);
   }
 
   public void flywheelOut() {
     this.leftFlywheelMotor.set(
         ControlMode.PercentOutput,
-        FLYWHEEL_MOTOR_PERCENT
+        currentFlywheelPercent
       );
     this.rightFlywheelMotor.set(
         ControlMode.PercentOutput,
-        FLYWHEEL_MOTOR_PERCENT
+        currentFlywheelPercent
       );
   }
 
@@ -143,14 +138,14 @@ public class ShooterSystem extends SubsystemBase {
   public void flywheelIntakeIn() {
     flywheelIntakeMotor.set(
       ControlMode.PercentOutput,
-      FLYWHEEL_INTAKE_MOTOR_PERCENT
+      ShooterConstants.FLYWHEEL_INTAKE_MOTOR_PERCENT
     );
   }
 
   public void flywheelIntakeOut() {
     flywheelIntakeMotor.set(
       ControlMode.PercentOutput,
-      -FLYWHEEL_INTAKE_MOTOR_PERCENT
+      -ShooterConstants.FLYWHEEL_INTAKE_MOTOR_PERCENT
     );
   }
 
@@ -159,20 +154,20 @@ public class ShooterSystem extends SubsystemBase {
   }
 
   public void flywheelAndFlywheelIntakeIn() {
-    leftFlywheelMotor.set(ControlMode.PercentOutput, -FLYWHEEL_MOTOR_PERCENT);
-    rightFlywheelMotor.set(ControlMode.PercentOutput, -FLYWHEEL_MOTOR_PERCENT);
+    leftFlywheelMotor.set(ControlMode.PercentOutput, -currentFlywheelPercent);
+    rightFlywheelMotor.set(ControlMode.PercentOutput, -currentFlywheelPercent);
     flywheelIntakeMotor.set(
       ControlMode.PercentOutput,
-      FLYWHEEL_INTAKE_MOTOR_PERCENT
+      ShooterConstants.FLYWHEEL_INTAKE_MOTOR_PERCENT
     );
   }
 
   public void flywheelAndFlywheelIntakeOut() {
-    leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
-    rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+    leftFlywheelMotor.set(ControlMode.PercentOutput, currentFlywheelPercent);
+    rightFlywheelMotor.set(ControlMode.PercentOutput, currentFlywheelPercent);
     flywheelIntakeMotor.set(
       ControlMode.PercentOutput,
-      -FLYWHEEL_INTAKE_MOTOR_PERCENT
+      -ShooterConstants.FLYWHEEL_INTAKE_MOTOR_PERCENT
     );
   }
 
@@ -199,14 +194,14 @@ public class ShooterSystem extends SubsystemBase {
     if (targetAngle < initialAngle) {
       while (hoodEncoder.getVelocity() == 0) {
         this.hoodPIDCont.setReference(
-            -HOOD_MOTOR_PERCENT,
+            -ShooterConstants.HOOD_MOTOR_PERCENT,
             CANSparkMax.ControlType.kDutyCycle
           );
       }
     } else {
       while (hoodEncoder.getVelocity() == 0) {
         this.hoodPIDCont.setReference(
-            HOOD_MOTOR_PERCENT,
+          ShooterConstants.HOOD_MOTOR_PERCENT,
             CANSparkMax.ControlType.kDutyCycle
           );
       }
@@ -231,7 +226,7 @@ public class ShooterSystem extends SubsystemBase {
 
   public double getHoodAngle() {
     hoodAngle =
-      (this.hoodEncoder.getPosition() * HOOD_DEGREES_PER_ROTATION) % 360;
+      (this.hoodEncoder.getPosition() * ShooterConstants.HOOD_DEGREES_PER_ROTATION) % 360;
     return hoodAngle;
   }
 
@@ -242,14 +237,14 @@ public class ShooterSystem extends SubsystemBase {
 
   public void hoodUp() {
     this.hoodPIDCont.setReference(
-        HOOD_MOTOR_PERCENT,
+      ShooterConstants.HOOD_MOTOR_PERCENT,
         CANSparkMax.ControlType.kDutyCycle
       );
   }
 
   public void hoodDown() {
     this.hoodPIDCont.setReference(
-        -HOOD_MOTOR_PERCENT,
+        -ShooterConstants.HOOD_MOTOR_PERCENT,
         CANSparkMax.ControlType.kDutyCycle
       );
   }
@@ -280,7 +275,7 @@ public class ShooterSystem extends SubsystemBase {
   }
 
   public boolean flywheelDoneShootBalls(int balls) {
-    double targetPosition = (balls * 30) * DriveSystem.TICKS_PER_ROTATION;
+    double targetPosition = (balls * 30) * EncoderConstants.TICKS_PER_ROTATION;
     return rightFlywheelMotor.getSelectedSensorPosition() >= targetPosition;
   }
 
@@ -295,27 +290,49 @@ public class ShooterSystem extends SubsystemBase {
     }
   }
 
+  public void autoTurretArch() {
+    
+  }
+
+  public void autoTurret() {
+    autoTurretSwivel();
+    autoTurretArch();
+  }
+
   public boolean turretReachedPosition() {
     return (
       targetOffsetAngle_Horizontal > -1.2 && targetOffsetAngle_Horizontal < 1.2
     );
   }
 
-  public void autoTurretHood() {
-
-  }
-
   public void updateLimelight() {
-    this.targetOffsetAngle_Horizontal = this.limelight.getEntry("tx").getDouble(0);
-    this.targetOffsetAngle_Vertical = this.limelight.getEntry("ty").getDouble(0);
+    this.targetOffsetAngle_Horizontal =
+      this.limelight.getEntry("tx").getDouble(0);
+    this.targetOffsetAngle_Vertical =
+      this.limelight.getEntry("ty").getDouble(0);
     this.targetArea = this.limelight.getEntry("ta").getDouble(0);
     this.targetSkew = this.limelight.getEntry("ts").getDouble(0);
 
-    double angleToGoalDegrees = LimelightConstants.LIMELIGHT_MOUNT_ROTATION_DEGREES + targetOffsetAngle_Vertical;
+    double angleToGoalDegrees =
+      LimelightConstants.LIMELIGHT_MOUNT_ROTATION_DEGREES +
+      targetOffsetAngle_Vertical;
     double angleToGoalRadians = angleToGoalDegrees * (Math.PI / 180.0);
 
-    this.targetDistanceFromShooter = (FieldConstants.TARGET_HEIGHT_INCHES - LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES) / Math.tan(angleToGoalRadians);
-    this.baseDistanceFromShooter = Math.sqrt(Math.pow(this.targetDistanceFromShooter, 2) - Math.pow(FieldConstants.TARGET_HEIGHT_INCHES - LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES, 2));
+    this.targetDistanceFromShooter =
+      (
+        FieldConstants.TARGET_HEIGHT_INCHES -
+        LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES
+      ) /
+      Math.tan(angleToGoalRadians);
+    this.baseDistanceFromShooter =
+      Math.sqrt(
+        Math.pow(this.targetDistanceFromShooter, 2) -
+        Math.pow(
+          FieldConstants.TARGET_HEIGHT_INCHES -
+          LimelightConstants.LIMELIGHT_MOUNT_HEIGHT_INCHES,
+          2
+        )
+      );
   }
 
   @Override

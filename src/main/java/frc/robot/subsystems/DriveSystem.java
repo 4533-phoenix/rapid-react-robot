@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.MotorConstants;
 import frc.robot.constants.PIDConstants;
+import frc.robot.constants.DriveConstants;
+import frc.robot.constants.EncoderConstants;
 import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 
@@ -36,58 +38,14 @@ public class DriveSystem extends SubsystemBase {
   // Onboard IMU.
   private AHRS navX;
 
-  private static final double MAX_VELOCITY = 4000;
-  private static final double TURBO_VELOCITY = 4500;
-  private static final double QUARTER_VELOCITY = 1000;
-  private static final double PEAK_OUTPUT = 1.0;
-  private boolean turbo = false;
-  private boolean quarter = false;
-
-  // Wheel specific constants.
-  public static final double TICKS_PER_ROTATION = 42.0;
-  private static final double WHEEL_DIAMETER = 6.0;
-  private static final double WHEEL_DIAMETER_M = 0.1524;
-  private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-  private static final double WHEEL_CIRCUMFERENCE_M =
-    WHEEL_DIAMETER_M * Math.PI;
-  private static final double TICKS_PER_INCH =
-    TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE;
-  private static final double TICKS_PER_METER =
-    TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE_M;
-  private static final double METERS_PER_TICK =
-    WHEEL_CIRCUMFERENCE_M / TICKS_PER_ROTATION;
-
-  // Unit specific constants.
-  public static final double INCHES_PER_METER = 39.3701;
-  public static final double METERS_PER_INCH = 1 / 39.3701;
-
-  // Velocity PIDF values
-  public static final double VELOCITY_P = 0.0003; // 0.3 / 1000 RPM Error
-  public static final double VELOCITY_I = 0.0;
-  public static final double VELOCITY_D = 0.003; // will tune
-  public static final double VELOCITY_I_ZONE = 0.0;
-  public static final double VELOCITY_FEED_FORWARD = 1.25E-4; // 0.5 / MAX_VELOCITY
-
-  // Position PIDF values
-  public static final double POSITION_P = 0.006;
-  public static final double POSITION_I = 0.0;
-  public static final double POSITION_D = 0.06; // 0.016677 will tune
-  public static final double POSITION_I_ZONE = 0.0;
-  public static final double POSITION_FEED_FORWARD = 0.0;
-
-  // Feed Forward Gains
-  // kS - the voltage needed to overcome the motor's static friction (V).
-  // kV - the voltage needed to maintain a given constant velocity (V * s/m).
-  // kA - the voltage needed to induce a given acceleration (V * s^2/m).
-  public static final double FEED_FORWARD_KS = 0.16203;
-  public static final double FEED_FORWARD_KV = 0.13098;
-  public static final double FEED_FORWARD_KA = 0.026747;
-
   public static final SimpleMotorFeedforward FEED_FORWARD = new SimpleMotorFeedforward(
-    FEED_FORWARD_KS,
-    FEED_FORWARD_KV,
-    FEED_FORWARD_KA
+    DriveConstants.FEED_FORWARD_KS,
+    DriveConstants.FEED_FORWARD_KV,
+    DriveConstants.FEED_FORWARD_KA
   );
+
+  public boolean turbo = false;
+  public boolean quarter = false;
 
   // TODO: These values were calculated as part of the robot characterization
   // process. We need to determine whether or not we want to keep them separate
@@ -291,9 +249,9 @@ public class DriveSystem extends SubsystemBase {
       Math.sin(targetPosition.getRotation().getRadians());
 
     if (driveDirection == Direction.FORWARD) {
-      targetDist *= INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+      targetDist *= DriveConstants.INCHES_PER_METER / DriveConstants.WHEEL_CIRCUMFERENCE;
     } else if (driveDirection == Direction.BACKWARD) {
-      targetDist *= -1 * INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+      targetDist *= -1 * DriveConstants.INCHES_PER_METER / DriveConstants.WHEEL_CIRCUMFERENCE;
     } else {
       targetDist = 0;
     }
@@ -314,9 +272,9 @@ public class DriveSystem extends SubsystemBase {
     targetDirection = direction;
 
     if (targetDirection == Direction.FORWARD) {
-      oldTargetPosition = (inches / WHEEL_CIRCUMFERENCE) * 42;
+      oldTargetPosition = (inches / DriveConstants.WHEEL_CIRCUMFERENCE) * 42;
     } else if (targetDirection == Direction.BACKWARD) {
-      oldTargetPosition = -1 * (inches / WHEEL_CIRCUMFERENCE) * 42;
+      oldTargetPosition = -1 * (inches / DriveConstants.WHEEL_CIRCUMFERENCE) * 42;
     } else {
       oldTargetPosition = 0;
     }
@@ -356,11 +314,11 @@ public class DriveSystem extends SubsystemBase {
   ) {
     targetDirection = direction;
     if (direction == Direction.FORWARD) {
-      leftDist = -1 * leftDist / WHEEL_CIRCUMFERENCE;
-      rightDist = -1 * rightDist / WHEEL_CIRCUMFERENCE;
+      leftDist = -1 * leftDist / DriveConstants.WHEEL_CIRCUMFERENCE;
+      rightDist = -1 * rightDist / DriveConstants.WHEEL_CIRCUMFERENCE;
     } else if (direction == Direction.BACKWARD) {
-      leftDist = leftDist / WHEEL_CIRCUMFERENCE;
-      rightDist = rightDist / WHEEL_CIRCUMFERENCE;
+      leftDist = leftDist / DriveConstants.WHEEL_CIRCUMFERENCE;
+      rightDist = rightDist / DriveConstants.WHEEL_CIRCUMFERENCE;
     } else {
       leftDist = 0;
       rightDist = 0;
@@ -389,11 +347,11 @@ public class DriveSystem extends SubsystemBase {
     double leftDist, rightDist;
 
     if (direction == Direction.LEFT) {
-      leftDist = innerCircumference / WHEEL_CIRCUMFERENCE;
-      rightDist = outerCircumference / WHEEL_CIRCUMFERENCE;
+      leftDist = innerCircumference / DriveConstants.WHEEL_CIRCUMFERENCE;
+      rightDist = outerCircumference / DriveConstants.WHEEL_CIRCUMFERENCE;
     } else if (direction == Direction.RIGHT) {
-      leftDist = outerCircumference / WHEEL_CIRCUMFERENCE;
-      rightDist = innerCircumference / WHEEL_CIRCUMFERENCE;
+      leftDist = outerCircumference / DriveConstants.WHEEL_CIRCUMFERENCE;
+      rightDist = innerCircumference / DriveConstants.WHEEL_CIRCUMFERENCE;
     } else {
       leftDist = 0;
       rightDist = 0;
@@ -422,15 +380,15 @@ public class DriveSystem extends SubsystemBase {
     double rightTarget, leftTarget;
 
     if (direction == Direction.LEFT) {
-      leftTarget = radius * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+      leftTarget = radius * 2 * Math.PI * (angle / 360) / DriveConstants.WHEEL_CIRCUMFERENCE;
       rightTarget =
-        (radius + 24) * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+        (radius + 24) * 2 * Math.PI * (angle / 360) / DriveConstants.WHEEL_CIRCUMFERENCE;
 
       return (leftPos >= leftTarget) && (rightPos >= rightTarget);
     } else if (direction == Direction.RIGHT) {
-      rightTarget = radius * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+      rightTarget = radius * 2 * Math.PI * (angle / 360) / DriveConstants.WHEEL_CIRCUMFERENCE;
       leftTarget =
-        (radius + 24) * 2 * Math.PI * (angle / 360) / WHEEL_CIRCUMFERENCE;
+        (radius + 24) * 2 * Math.PI * (angle / 360) / DriveConstants.WHEEL_CIRCUMFERENCE;
 
       return (leftPos >= leftTarget) && (rightPos >= rightTarget);
     } else {
@@ -444,15 +402,15 @@ public class DriveSystem extends SubsystemBase {
   }
 
   public double getPosition() {
-    return this.leftEncoder.getPosition() / TICKS_PER_INCH;
+    return this.leftEncoder.getPosition() / DriveConstants.TICKS_PER_INCH;
   }
 
   public double getLeftDistance() {
-    return this.leftEncoder.getPosition() / TICKS_PER_METER;
+    return this.leftEncoder.getPosition() / DriveConstants.TICKS_PER_METER;
   }
 
   public double getRightDistance() {
-    return this.rightEncoder.getPosition() / TICKS_PER_METER;
+    return this.rightEncoder.getPosition() / DriveConstants.TICKS_PER_METER;
   }
 
   public void toggleTurbo() {
@@ -481,14 +439,12 @@ public class DriveSystem extends SubsystemBase {
     double targetLeft;
     double targetRight;
 
-    double targetVelocity = MAX_VELOCITY;
+    double targetVelocity = DriveConstants.MAX_VELOCITY;
 
     if (this.turbo) {
-      targetVelocity = TURBO_VELOCITY;
-    }
-
-    if (this.quarter) {
-      targetVelocity = QUARTER_VELOCITY;
+      targetVelocity = DriveConstants.TURBO_VELOCITY;
+    } else if (this.quarter) {
+      targetVelocity = DriveConstants.QUARTER_VELOCITY;
     }
 
     targetLeft = left * targetVelocity;
@@ -606,9 +562,9 @@ public class DriveSystem extends SubsystemBase {
   @Override
   public void periodic() {
     double leftDist =
-      leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
+      leftEncoder.getPosition() * EncoderConstants.TICKS_PER_ROTATION / DriveConstants.TICKS_PER_METER;
     double rightDist =
-      rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
+      rightEncoder.getPosition() * EncoderConstants.TICKS_PER_ROTATION / DriveConstants.TICKS_PER_METER;
 
     robotPos = odometry.update(navX.getRotation2d(), leftDist, rightDist);
 

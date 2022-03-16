@@ -159,11 +159,8 @@ public class RobotContainer {
     scheduler.setDefaultCommand(Robot.drive, defaultDriveCommand);
 
     scheduler.addButton(() -> changeHoodAngle());
-
     scheduler.addButton(() -> toggleIntake());
-
     scheduler.addButton(() -> toggleFlywheelIntake());
-
     scheduler.addButton(() -> toggleFlywheel());
   }
 

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.DriveCommands;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.MotorConstants;
 import frc.robot.constants.PIDConstants;
 import frc.robot.subsystems.DriveSystem;
@@ -127,21 +128,21 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     setPIDF(
       drive.getLeftPIDCont(),
-      DriveSystem.POSITION_P,
-      DriveSystem.POSITION_I,
-      DriveSystem.POSITION_D,
-      DriveSystem.POSITION_I_ZONE,
-      DriveSystem.POSITION_FEED_FORWARD,
+      DriveConstants.POSITION_P,
+      DriveConstants.POSITION_I,
+      DriveConstants.POSITION_D,
+      DriveConstants.POSITION_I_ZONE,
+      DriveConstants.POSITION_FEED_FORWARD,
       PIDConstants.POSITION_SLOT_ID
     );
 
     setPIDF(
       drive.getRightPIDCont(),
-      DriveSystem.POSITION_P,
-      DriveSystem.POSITION_I,
-      DriveSystem.POSITION_D,
-      DriveSystem.POSITION_I_ZONE,
-      DriveSystem.POSITION_FEED_FORWARD,
+      DriveConstants.POSITION_P,
+      DriveConstants.POSITION_I,
+      DriveConstants.POSITION_D,
+      DriveConstants.POSITION_I_ZONE,
+      DriveConstants.POSITION_FEED_FORWARD,
       PIDConstants.POSITION_SLOT_ID
     );
 
@@ -191,21 +192,21 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     setPIDF(
       drive.getLeftPIDCont(),
-      DriveSystem.VELOCITY_P,
-      DriveSystem.VELOCITY_I,
-      DriveSystem.VELOCITY_D,
-      DriveSystem.VELOCITY_I_ZONE,
-      DriveSystem.VELOCITY_FEED_FORWARD,
+      DriveConstants.VELOCITY_P,
+      DriveConstants.VELOCITY_I,
+      DriveConstants.VELOCITY_D,
+      DriveConstants.VELOCITY_I_ZONE,
+      DriveConstants.VELOCITY_FEED_FORWARD,
       PIDConstants.VELOCITY_SLOT_ID
     );
 
     setPIDF(
       drive.getRightPIDCont(),
-      DriveSystem.VELOCITY_P,
-      DriveSystem.VELOCITY_I,
-      DriveSystem.VELOCITY_D,
-      DriveSystem.VELOCITY_I_ZONE,
-      DriveSystem.VELOCITY_FEED_FORWARD,
+      DriveConstants.VELOCITY_P,
+      DriveConstants.VELOCITY_I,
+      DriveConstants.VELOCITY_D,
+      DriveConstants.VELOCITY_I_ZONE,
+      DriveConstants.VELOCITY_FEED_FORWARD,
       PIDConstants.VELOCITY_SLOT_ID
     );
 
