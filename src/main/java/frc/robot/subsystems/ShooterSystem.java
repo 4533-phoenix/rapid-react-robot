@@ -59,7 +59,7 @@ public class ShooterSystem extends SubsystemBase {
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
 
-    // Projectile Constants
+    // Projectile Constants and Variables
     private static final double MAX_FLYWHEEL_RPM = 0.0; // TODO: Change this to the right value (RPM)
     private static final double FLYWHEEL_RADIUS = 0.1; // TODO: Change this to the right value (feet)
     private static final double TIME_TO_SHOOT = 2; // seconds 
@@ -69,7 +69,7 @@ public class ShooterSystem extends SubsystemBase {
     private static double cameraTargetAngle;
     private static double horizontalDistance;
     private static final double GRAVITY_ACCELERATION = -32.1741; // feet/s^2
-    private static final double INITIAL_Y_VELOCITY = GOAL_HEIGHT - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT)); // feet/s
+    private static final double INITIAL_Y_VELOCITY = (GOAL_HEIGHT - CAMERA_HEIGHT) - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT)); // feet/s
     private static double initialXVelocity;
     private static double initialVelocity;
     private static double rotationalVelocity;
@@ -370,7 +370,9 @@ public class ShooterSystem extends SubsystemBase {
 
         initialXVelocity = horizontalDistance / TIME_TO_SHOOT;
         initialVelocity = Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(INITIAL_Y_VELOCITY, 2));
-        rotationalVelocity = (initialVelocity / FLYWHEEL_RADIUS) * 60; // multiplying by 60 changes from seconds to minutes (RPM)
+        rotationalVelocity = ((initialVelocity / FLYWHEEL_RADIUS) * 60) / (2 * Math.PI); /* multiplying by 60 and dividing by 2pi  
+                                                                                            changes from radians per second to 
+                                                                                            revolutions per minute (RPM) */
         
         System.out.println(hoodEncoder.getVelocity()); // this will be to measure the max velocity of the hood motor
 
