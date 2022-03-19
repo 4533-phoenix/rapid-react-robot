@@ -73,7 +73,7 @@ public class ShooterSystem extends SubsystemBase {
     private static double initialXVelocity;
     private static double initialVelocity;
     private static double rotationalVelocity;
-    private static double shootHoodAngle;
+    public double shootHoodAngle;
     private static double shootHoodPercent;
 
     private AHRS shooterNAVX;
@@ -126,6 +126,7 @@ public class ShooterSystem extends SubsystemBase {
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
         hoodAngle = 0;
+        shootHoodAngle = 0;
 
         limitSwitch = new DigitalInput(0);
 
@@ -159,6 +160,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void flywheelIntakeIn() {
+        setHoodAngle(shootHoodAngle);
         flywheelIntakeMotor.set(ControlMode.PercentOutput, FLYWHEEL_INTAKE_MOTOR_PERCENT);
     }
 
@@ -221,6 +223,7 @@ public class ShooterSystem extends SubsystemBase {
             // if (!hoodReachedPosition()) {
             //     setHoodAngle(hoodAngle);
             // }
+            setHoodAngle(shootHoodAngle);
         }
 
         timer.stop();
@@ -257,24 +260,29 @@ public class ShooterSystem extends SubsystemBase {
             }
             while (hoodEncoder.getVelocity() <= 0);
         }
-
+        shootHoodAngle = getHoodAngle();
         return getHoodAngle();
     }
 
     public boolean hoodReachedPosition() {
         if (targetDirection == Direction.FORWARD) {
             if (initialAngle > targetAngle) { 
+                shootHoodAngle=getHoodAngle();
                 return true;
             }
+            shootHoodAngle=getHoodAngle();
             return false;
         } 
         else if (targetDirection == Direction.BACKWARD) {
             if (initialAngle < targetAngle + 2.8) { 
+                shootHoodAngle=getHoodAngle();
                 return true;
             }
+            shootHoodAngle=getHoodAngle();
             return false;
         }
         else {
+            shootHoodAngle=getHoodAngle();
             return true;
         }
     }
@@ -287,6 +295,7 @@ public class ShooterSystem extends SubsystemBase {
     public void resetHoodAngle(double angle) {
         hoodAngle = angle;
         hoodEncoder.setPosition(hoodAngle % 360);
+        shootHoodAngle = getHoodAngle();
     }
 
     public void hoodUp() {
@@ -299,6 +308,7 @@ public class ShooterSystem extends SubsystemBase {
 
     public void hoodStop() {
         this.hoodPIDCont.setReference(0.0, ControlType.kDutyCycle);
+        shootHoodAngle = getHoodAngle();
     }
 
     public void setFlywheelPos() {
@@ -346,6 +356,7 @@ public class ShooterSystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //setHoodAngle(getHoodAngle());
         targetOffsetAngle_Horizontal = limelight.getEntry("tx").getDouble(0);
 		targetOffsetAngle_Vertical = limelight.getEntry("ty").getDouble(0);
 		targetArea = limelight.getEntry("ta").getDouble(0);

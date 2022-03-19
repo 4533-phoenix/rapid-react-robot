@@ -56,7 +56,7 @@ public class RobotContainer {
     JoystickButton toggleTurboButton = new JoystickButton(controllerOne, Constants.BUTTON_RB);
     toggleTurboButton.whenPressed(DriveCommands.toggleTurbo());
 
-    JoystickButton toggleOuttakeButton = new JoystickButton(controllerOne, Constants.BUTTON_A);
+    JoystickButton toggleOuttakeButton = new JoystickButton(controllerOne, Constants.BUTTON_X);
     toggleOuttakeButton.whenPressed(IntakeCommands.intakeOutCommand());
     toggleOuttakeButton.whenReleased(IntakeCommands.intakeStopCommand());
 
@@ -64,13 +64,13 @@ public class RobotContainer {
     quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
     quarterVelocityButton.whenReleased(DriveCommands.quarterFalse());
 
-    // JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
-    // hoodUpButton.whenPressed(ShooterCommands.hoodUp());
-    // hoodUpButton.whenReleased(ShooterCommands.hoodStop());
+    JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
+    hoodUpButton.whenPressed(ShooterCommands.hoodUp());
+    hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
-    // JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
-    // hoodDownButton.whenPressed(ShooterCommands.hoodDown());
-    // hoodDownButton.whenReleased(ShooterCommands.hoodStop());
+    JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
+    hoodDownButton.whenPressed(ShooterCommands.hoodDown());
+    hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controllerTwo, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
