@@ -20,7 +20,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.SPI ;
-
+import edu.wpi.first.wpilibj.Servo;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
@@ -43,9 +43,7 @@ public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX rightFlywheelMotor;
 
     private WPI_TalonSRX flywheelIntakeMotor;
-    private CANSparkMax hoodMotor;
-    private SparkMaxPIDController hoodPIDCont;
-    private RelativeEncoder hoodEncoder;
+    private Servo hoodMotor;
 
     private double initialAngle;
     private double targetAngle;
@@ -107,21 +105,16 @@ public class ShooterSystem extends SubsystemBase {
 
         flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
 
-        hoodMotor = new CANSparkMax(Constants.HOOD_MOTOR, MotorType.kBrushless);
+        hoodMotor = new Servo(1);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
-
-        hoodMotor.setIdleMode(IdleMode.kBrake);
 
         flywheelIntakeMotor.setNeutralMode(NeutralMode.Brake);
 
         leftFlywheelMotor.setInverted(true);
 
         flywheelIntakeMotor.setInverted(true);
-
-        hoodEncoder = hoodMotor.getEncoder();
-        hoodPIDCont = hoodMotor.getPIDController();
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
@@ -236,69 +229,26 @@ public class ShooterSystem extends SubsystemBase {
         Robot.drive.resetPosition();
     }
 
-    public double setHoodAngle(double angle) {
-        initialAngle = getHoodAngle();
-        targetAngle = angle;
-        
-        if (targetAngle < initialAngle) {
-            targetDirection = Direction.BACKWARD;
-
-            do {
-                this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
-            }
-            while (hoodEncoder.getVelocity() <= 0);
-        }
-        else {
-            targetDirection = Direction.FORWARD;
-
-            do {
-                this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
-
-            }
-            while (hoodEncoder.getVelocity() <= 0);
-        }
-
-        return getHoodAngle();
-    }
-
-    public boolean hoodReachedPosition() {
-        if (targetDirection == Direction.FORWARD) {
-            if (initialAngle > targetAngle) { 
-                return true;
-            }
-            return false;
-        } 
-        else if (targetDirection == Direction.BACKWARD) {
-            if (initialAngle < targetAngle + 2.8) { 
-                return true;
-            }
-            return false;
-        }
-        else {
-            return true;
-        }
+    public void setHoodAngle(double angle) {
+        hoodMotor.setAngle(angle);
     }
 
     public double getHoodAngle() {
-        hoodAngle = (this.hoodEncoder.getPosition()*HOOD_DEGREES_PER_ROTATION) % 360;
+        hoodAngle = this.hoodMotor.getPosition();
         return hoodAngle;
     }
 
-    public void resetHoodAngle(double angle) {
-        hoodAngle = angle;
-        hoodEncoder.setPosition(hoodAngle % 360);
-    }
 
     public void hoodUp() {
-        this.hoodPIDCont.setReference(HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+        this.hoodMotor.setSpeed(1);
     }
 
     public void hoodDown() {
-        this.hoodPIDCont.setReference(-HOOD_MOTOR_PERCENT, ControlType.kDutyCycle);
+        this.hoodMotor.setSpeed(-1);
     }
 
     public void hoodStop() {
-        this.hoodPIDCont.setReference(0.0, ControlType.kDutyCycle);
+        this.hoodMotor.setSpeed(0);
     }
 
     public void setFlywheelPos() {
@@ -374,15 +324,13 @@ public class ShooterSystem extends SubsystemBase {
                                                                                             changes from radians per second to 
                                                                                             revolutions per minute (RPM) */
         
-        System.out.println(hoodEncoder.getVelocity()); // this will be to measure the max velocity of the hood motor
-
         shootHoodAngle = Math.atan(INITIAL_Y_VELOCITY / initialXVelocity) * (180 / Math.PI);
         shootHoodPercent = rotationalVelocity * (1 / MAX_FLYWHEEL_RPM);
 
         getHoodAngle();
 
         if (!limitSwitch.get()) {
-            hoodEncoder.setPosition(0.0);
+            hoodMotor.setPosition(0.0);
         }
 
         // result = visionCam.getLatestResult();
