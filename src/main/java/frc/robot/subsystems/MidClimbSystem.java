@@ -32,7 +32,7 @@ public class MidClimbSystem extends SubsystemBase {
   
   private CANSparkMax climbMotor;
 
-  public static final double CLIMB_MOTOR_PERCENT = 0.5;
+  public static final double CLIMB_MOTOR_PERCENT = 0.75;
   
   public MidClimbSystem() {
     this.climbMotor = new CANSparkMax(Constants.ELEVATOR_MOTOR,MotorType.kBrushless);
