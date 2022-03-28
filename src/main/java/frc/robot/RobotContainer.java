@@ -68,16 +68,16 @@ public class RobotContainer {
     highClimbUp.whenPressed(HighClimbCommands.highClimberUp());
     highClimbUp.whenReleased(HighClimbCommands.highClimberStop());
 
-    JoystickButton highClimbDown = new JoystickButton(controllerTwo, Constants.BUTTON_RB);
+    JoystickButton highClimbDown = new JoystickButton(controllerTwo, Constants.BUTTON_BACK);
     highClimbDown.whenPressed(HighClimbCommands.highClimberDown());
     highClimbDown.whenReleased(HighClimbCommands.highClimberStop());
 
     JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
-    hoodUpButton.whenPressed(ShooterCommands.hoodUp());
+    hoodUpButton.whenPressed(ShooterCommands.setHoodAngleCommand(20));
     // hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
-    hoodDownButton.whenPressed(ShooterCommands.hoodDown());
+    hoodDownButton.whenPressed(ShooterCommands.setHoodAngleCommand(0));
     // hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controllerTwo, Constants.BUTTON_B);
@@ -86,9 +86,9 @@ public class RobotContainer {
     JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
     setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(Robot.shooter.getShootHoodAngle()));
 
-    JoystickButton reverseFlywheelIntakeButton = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
-    reverseFlywheelIntakeButton.whenPressed(ShooterCommands.flywheelIntakeOutCommand());
-    reverseFlywheelIntakeButton.whenReleased(ShooterCommands.flywheelIntakeStopCommand());
+    // JoystickButton reverseFlywheelIntakeButton = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
+    // reverseFlywheelIntakeButton.whenPressed(ShooterCommands.flywheelIntakeOutCommand());
+    // reverseFlywheelIntakeButton.whenReleased(ShooterCommands.flywheelIntakeStopCommand());
     
     JoystickButton climbUpButton = new JoystickButton(controllerOne, Constants.BUTTON_BACK);
     climbUpButton.whenPressed(MidClimbCommands.climberUp());

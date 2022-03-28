@@ -126,7 +126,8 @@ public class ShooterCommands {
 
     public static Command autoShoot(double hoodAngle, int balls, boolean flywheelRunning) {
         return new SequentialCommandGroup(
-            setHoodAngleCommand(hoodAngle).withTimeout(1.5),
+            setHoodAngleCommand(hoodAngle),
+            // oldAutoFlywheelPos(),
             flywheelAndIntakeRunCommand(hoodAngle, balls, flywheelRunning),
             flywheelAndIntakeStopCommand()
         );

@@ -39,12 +39,12 @@ public class AutoCommands {
     }
     public static Command shootAndDriveOffTarmac() {
         return  new SequentialCommandGroup(
-            ShooterCommands.autoShoot(20.0, 1, false),
-            // oldDriveDistanceAutoCommand(20, Direction.BACKWARD),
-            oldAngularTurnAutoCommand(0.2, 150, Direction.LEFT).withTimeout(2.5),
-            oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(3),
-            oldAngularTurnAutoCommand(0.2, 20, Direction.RIGHT).withTimeout(2.5),
-            ShooterCommands.autoShoot(35.0, 1, false)
+            ShooterCommands.autoShoot(29.0, 1, false),
+            oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
+            oldAngularTurnAutoCommand(0.20, 150, Direction.LEFT).withTimeout(2.5),
+            oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
+            oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
+            ShooterCommands.autoShoot(38.0, 1, false)
         );
     }
 

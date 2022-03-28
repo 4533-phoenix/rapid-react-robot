@@ -32,7 +32,7 @@ public class HighClimbSystem extends SubsystemBase {
 
   private WPI_TalonSRX highClimbMotor;
 
-  public static final double HIGH_CLIMB_MOTOR_PERCENT = 0.75;
+  public static final double HIGH_CLIMB_MOTOR_PERCENT = 0.25;
 
   public HighClimbSystem() {
     this.highClimbMotor = new WPI_TalonSRX(Constants.HIGH_CLIMB_MOTOR);

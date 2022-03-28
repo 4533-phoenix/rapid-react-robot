@@ -195,15 +195,15 @@ public class ShooterSystem extends SubsystemBase {
         timer.reset();
         timer.start();
 
-        int time, flywheelIntakeTime;
+        double time, flywheelIntakeTime;
 
         if (flywheelRunning) {
             time = 1 + (2 * balls);
             flywheelIntakeTime = 0;
         }
         else {
-            time = 5 + (2 * balls);
-            flywheelIntakeTime = 4;
+            time = 2 + (2 * balls);
+            flywheelIntakeTime = 1.5;
         }
         
         initialAngle = getHoodAngle();
@@ -239,7 +239,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle) {
-        hoodMotor.setAngle(140 - angle);
+        this.hoodMotor.setAngle(100 - angle);
     }
 
     public double getHoodAngle() {
@@ -323,6 +323,8 @@ public class ShooterSystem extends SubsystemBase {
         // now we can use v0x and v0y to calculate v and 0 (theta), which gives us 
         // the flywheel velocity and the hood angle
         // v0x will vary, however v0y will not, but this will still lead to varying v's and 0's
+
+        System.out.println(hoodMotor.getAngle());
 
         cameraTargetAngle = CAMERA_MOUNTING_ANGLE + targetOffsetAngle_Vertical;
         horizontalDistance = (GOAL_HEIGHT - CAMERA_HEIGHT) / Math.tan(cameraTargetAngle * (Math.PI / 180));
