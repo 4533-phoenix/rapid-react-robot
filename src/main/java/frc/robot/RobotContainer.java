@@ -64,19 +64,19 @@ public class RobotContainer {
     quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
     quarterVelocityButton.whenReleased(DriveCommands.quarterFalse());
 
-    // JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
-    // hoodUpButton.whenPressed(ShooterCommands.hoodUp());
+    JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
+    hoodUpButton.whenPressed(ShooterCommands.hoodUp());
     // hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
-    // JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
-    // hoodDownButton.whenPressed(ShooterCommands.hoodDown());
+    JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
+    hoodDownButton.whenPressed(ShooterCommands.hoodDown());
     // hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controllerTwo, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
 
-    // JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
-    // setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(17.9));
+    JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
+    setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(Robot.shooter.getShootHoodAngle()));
 
     JoystickButton reverseFlywheelIntakeButton = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
     reverseFlywheelIntakeButton.whenPressed(ShooterCommands.flywheelIntakeOutCommand());
@@ -94,11 +94,14 @@ public class RobotContainer {
   private void changeHoodAngle() {
     if (controllerTwo.getPOV() == 0) {
       ShooterCommands.setHoodAngleCommand(0);
-    } else if (controllerTwo.getPOV() == 90) {
+    } 
+    else if (controllerTwo.getPOV() == 90) {
       ShooterCommands.setHoodAngleCommand(15);
-    } else if (controllerTwo.getPOV() == 180) {
+    } 
+    else if (controllerTwo.getPOV() == 180) {
       ShooterCommands.setHoodAngleCommand(30);
-    } else if (controllerTwo.getPOV() == 270) {
+    } 
+    else if (controllerTwo.getPOV() == 270) {
       ShooterCommands.setHoodAngleCommand(45);
     }
   }

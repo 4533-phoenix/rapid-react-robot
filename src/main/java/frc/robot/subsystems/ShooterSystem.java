@@ -58,21 +58,21 @@ public class ShooterSystem extends SubsystemBase {
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
 
     // Projectile Constants and Variables
-    private static final double MAX_FLYWHEEL_RPM = 0.0; // TODO: Change this to the right value (RPM)
-    private static final double FLYWHEEL_RADIUS = 0.1; // TODO: Change this to the right value (feet)
+    private static final double MAX_FLYWHEEL_RPM = 3065.0; // TODO: Change this to the right value (RPM)
+    private static final double FLYWHEEL_RADIUS = 1.0 / 6.0; // TODO: Change this to the right value (feet)
     private static final double TIME_TO_SHOOT = 2; // seconds 
     private static final double GOAL_HEIGHT = 8.67; // feet
-    private static final double CAMERA_HEIGHT = 0.0; // TODO: Change this to the right value (feet)
-    private static final double CAMERA_MOUNTING_ANGLE = 0.0; // TODO: Change this to the right value (degrees)
-    private static double cameraTargetAngle;
-    private static double horizontalDistance;
+    private static final double CAMERA_HEIGHT = 24.8 / 12.0; // TODO: Change this to the right value (feet)
+    private static final double CAMERA_MOUNTING_ANGLE = 37.0; // TODO: Change this to the right value (degrees)
+    private static double cameraTargetAngle = 0.0;
+    private static double horizontalDistance = 0.0;
     private static final double GRAVITY_ACCELERATION = -32.1741; // feet/s^2
     private static final double INITIAL_Y_VELOCITY = (GOAL_HEIGHT - CAMERA_HEIGHT) - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT)); // feet/s
-    private static double initialXVelocity;
-    private static double initialVelocity;
-    private static double rotationalVelocity;
-    private static double shootHoodAngle;
-    private static double shootHoodPercent;
+    private static double initialXVelocity = 0.0;
+    private static double initialVelocity = 0.0;
+    private static double rotationalVelocity = 0.0;
+    private static double shootHoodAngle = 0.0;
+    private static double shootHoodPercent = 0.0;
 
     private AHRS shooterNAVX;
 
@@ -105,7 +105,7 @@ public class ShooterSystem extends SubsystemBase {
 
         flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
 
-        hoodMotor = new Servo(1);
+        hoodMotor = new Servo(9);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
@@ -146,6 +146,11 @@ public class ShooterSystem extends SubsystemBase {
         this.rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
     }
 
+    public void flywheelAutoShoot() {
+        this.leftFlywheelMotor.set(ControlMode.PercentOutput, shootHoodPercent);
+        this.rightFlywheelMotor.set(ControlMode.PercentOutput, shootHoodPercent);
+    }
+
     public void flywheelStop() {
         leftFlywheelMotor.set(ControlMode.PercentOutput, 0.0);
         rightFlywheelMotor.set(ControlMode.PercentOutput, 0.0);
@@ -161,6 +166,10 @@ public class ShooterSystem extends SubsystemBase {
 
     public void flywheelIntakeStop() {
         flywheelIntakeMotor.set(ControlMode.PercentOutput, 0.0);
+    }
+
+    public double getShootHoodAngle() {
+        return shootHoodAngle;
     }
 
     public void flywheelAndFlywheelIntakeIn() {
@@ -230,7 +239,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle) {
-        hoodMotor.setAngle(angle);
+        hoodMotor.setAngle(140 - angle);
     }
 
     public double getHoodAngle() {
@@ -240,15 +249,15 @@ public class ShooterSystem extends SubsystemBase {
 
 
     public void hoodUp() {
-        this.hoodMotor.setSpeed(1);
+        this.hoodMotor.setAngle(140);
     }
 
     public void hoodDown() {
-        this.hoodMotor.setSpeed(-1);
+        this.hoodMotor.setAngle(141.5);
     }
 
     public void hoodStop() {
-        this.hoodMotor.setSpeed(0);
+        this.hoodMotor.setPosition(0);
     }
 
     public void setFlywheelPos() {
@@ -315,7 +324,7 @@ public class ShooterSystem extends SubsystemBase {
         // the flywheel velocity and the hood angle
         // v0x will vary, however v0y will not, but this will still lead to varying v's and 0's
 
-        cameraTargetAngle = CAMERA_MOUNTING_ANGLE + (-targetOffsetAngle_Vertical);
+        cameraTargetAngle = CAMERA_MOUNTING_ANGLE + targetOffsetAngle_Vertical;
         horizontalDistance = (GOAL_HEIGHT - CAMERA_HEIGHT) / Math.tan(cameraTargetAngle * (Math.PI / 180));
 
         initialXVelocity = horizontalDistance / TIME_TO_SHOOT;
@@ -327,10 +336,10 @@ public class ShooterSystem extends SubsystemBase {
         shootHoodAngle = Math.atan(INITIAL_Y_VELOCITY / initialXVelocity) * (180 / Math.PI);
         shootHoodPercent = rotationalVelocity * (1 / MAX_FLYWHEEL_RPM);
 
-        getHoodAngle();
+        initialAngle = getHoodAngle();
 
         if (!limitSwitch.get()) {
-            hoodMotor.setPosition(0.0);
+            // hoodMotor.setPosition(0.0);
         }
 
         // result = visionCam.getLatestResult();

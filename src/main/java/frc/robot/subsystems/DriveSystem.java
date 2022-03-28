@@ -79,9 +79,9 @@ public class DriveSystem extends SubsystemBase {
 	public static final double VELOCITY_FEED_FORWARD = 8.75E-5; // 0.35 / MAX_VELOCITY
 
 	// Position PIDF values
-	public static final double POSITION_P = 0.015; // 0.3 / 20 Rotation Error
+	public static final double POSITION_P = 0.3 / 50; // 0.3 / 20 Rotation Error
 	public static final double POSITION_I = 0.0;
-	public static final double POSITION_D = 0.15; // will tune
+	public static final double POSITION_D = POSITION_P * 10; // will tune
 	public static final double POSITION_I_ZONE = 0.0;
 	public static final double POSITION_FEED_FORWARD = 0.0;
 
@@ -134,6 +134,13 @@ public class DriveSystem extends SubsystemBase {
 	private Pose2d robotPos;
 	private Rotation2d robotAngle;
 
+	private double targetX; 
+	private double targetY;
+	private double initRobotX;
+	private double initRobotY;
+	private double target;
+	private double initRobot;
+
 	private static int navXCount = 0;
 
 	private double prevLeft, prevRight;
@@ -159,23 +166,23 @@ public class DriveSystem extends SubsystemBase {
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
 		
-		this.rightMaster.setIdleMode(IdleMode.kCoast);
-		this.rightSlave.setIdleMode(IdleMode.kCoast);
-		this.leftMaster.setIdleMode(IdleMode.kCoast);
-		this.leftSlave.setIdleMode(IdleMode.kCoast);
+		this.rightMaster.setIdleMode(IdleMode.kBrake);
+		this.rightSlave.setIdleMode(IdleMode.kBrake);
+		this.leftMaster.setIdleMode(IdleMode.kBrake);
+		this.leftSlave.setIdleMode(IdleMode.kBrake);
 
-		this.rightMaster.setClosedLoopRampRate(0.25);
-		this.rightSlave.setClosedLoopRampRate(0.25);
-		this.leftMaster.setClosedLoopRampRate(0.25);
-		this.leftSlave.setClosedLoopRampRate(0.25);
+		this.rightMaster.setClosedLoopRampRate(0.75);
+		this.rightSlave.setClosedLoopRampRate(0.75);
+		this.leftMaster.setClosedLoopRampRate(0.75);
+		this.leftSlave.setClosedLoopRampRate(0.75);
 
 		// Initialize the NavX IMU sensor.
 		this.navX = new AHRS(SPI.Port.kMXP);
 
-		this.robotPos = new Pose2d(5, 5, new Rotation2d());
-		this.odometry = new Odometry(navX.getRotation2d(), robotPos);
+		this.robotPos = new Pose2d(0, 0, new Rotation2d());
+		this.odometry = new Odometry(Rotation2d.fromDegrees(-navX.getAngle()), robotPos);
 
-		this.targetPosition = null;
+		targetPosition = null;
 	}
 
 	public SparkMaxPIDController getLeftPIDCont() {
@@ -184,6 +191,10 @@ public class DriveSystem extends SubsystemBase {
 
 	public SparkMaxPIDController getRightPIDCont() {
 		return rightPIDCont;
+	}
+
+	public AHRS getNavX() {
+		return navX;
 	}
 
 	public void quarterTrue() {
@@ -207,7 +218,21 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public boolean reachedPosition() {
-		return Math.abs(robotPos.getX()) >= Math.abs(targetPosition.getX()) && Math.abs(robotPos.getY()) >= Math.abs(targetPosition.getY());
+		double robotX = Math.abs(robotPos.getX());
+		double robotY = Math.abs(robotPos.getY());
+
+		double robot = Math.sqrt(Math.pow(robotX, 2) + Math.pow(robotY, 2));
+
+		// System.out.println("Robot Pos: " + robot);
+		// System.out.println("Target Pos: " + target);
+
+		if (target > initRobot) {
+			return robot > target;
+		}
+		else if (target <= initRobot) {
+			return robot <= initRobot;
+		}
+		return false;
 	}
 
 	public boolean reachedCurve(double targetL, double targetR) {
@@ -227,20 +252,21 @@ public class DriveSystem extends SubsystemBase {
 		Translation2d translation = new Translation2d(xMeters, yMeters);
 		Rotation2d angle = Rotation2d.fromDegrees(Math.atan(yMeters / xMeters) * (180 / Math.PI));
 
-		if (angle.getDegrees() < 0) {
-			angle = Rotation2d.fromDegrees(360 + angle.getDegrees());
+		if ((xMeters < 0 && yMeters > 0) || (xMeters < 0 && yMeters < 0)) {
+			angle = Rotation2d.fromDegrees(angle.getDegrees() + 180);
 		}
-
-		System.out.println("Angle: " + angle.getDegrees());
+		else if (xMeters > 0 && yMeters < 0) {
+			angle = Rotation2d.fromDegrees(angle.getDegrees() + 360);
+		}
 
 		targetPosition = new Pose2d(translation, angle);
 
 		if (targetPosition.getRotation().getDegrees() > robotAngle.getDegrees()) {
 			if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() > 180) {
-				turnDirection = Direction.LEFT;
+				turnDirection = Direction.RIGHT;
 			}
 			else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() <= 180) {
-				turnDirection = Direction.RIGHT;
+				turnDirection = Direction.LEFT;
 			}
 		}
 		else if (targetPosition.getRotation().getDegrees() <= robotAngle.getDegrees()) {
@@ -255,8 +281,6 @@ public class DriveSystem extends SubsystemBase {
 			turnDirection = Direction.LEFT;
 		}
 
-		System.out.println(turnDirection);
-
 		// if (targetPosition.getY() >= 0) {
 		// 	driveDirection = Direction.FORWARD;
 		// }
@@ -269,25 +293,33 @@ public class DriveSystem extends SubsystemBase {
 
 		driveDirection = Direction.FORWARD;
 
+		targetX = Math.abs(targetPosition.getX());
+		targetY = Math.abs(targetPosition.getY());
+		initRobotX = Math.abs(robotPos.getX());
+		initRobotY = Math.abs(robotPos.getY());
+
+		target = Math.sqrt(Math.pow(targetX, 2) + Math.pow(targetY, 2));
+		initRobot = Math.sqrt(Math.pow(initRobotX, 2) + Math.pow(initRobotY, 2));
+
 		return targetPosition;
 	}
 
 	// TODONE: Add back old drive distance code in a different method for use of non-odometry autonomous commands 
 	public void driveDistance() {
-		double targetDist = Math.abs(targetPosition.getY() / Math.sin(targetPosition.getRotation().getRadians()));
+		double targetDist = target;
 		
 		if (driveDirection == Direction.FORWARD) {
-			targetDist *= INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+			targetDist = (targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
 			targetDist *= 42;
 		} else if (driveDirection == Direction.BACKWARD) {
-			targetDist *= -1 * INCHES_PER_METER / WHEEL_CIRCUMFERENCE;
+			targetDist = (-1 * targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
 			targetDist *= 42;
 		} else {
 			targetDist = 0;
 		}
 
 		this.leftPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
-		this.rightPIDCont.setReference(-targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	public void oldDriveDistance(double inches, Direction direction) {
@@ -381,9 +413,6 @@ public class DriveSystem extends SubsystemBase {
 
 			return true;
 		}
-
-		// System.out.println("Position: " + leftPos + "    " + rightPos);
-		// System.out.println("Target: " + leftTarget + "    " + rightTarget);
 	}
 
 	public double getPosition() {
@@ -455,8 +484,8 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	public void percent(double left, double right) {
-		this.leftMaster.set(left);
-		this.rightMaster.set(right);
+		this.leftPIDCont.setReference(left, ControlType.kDutyCycle);
+		this.rightPIDCont.setReference(right, ControlType.kDutyCycle);
 	}
 
 	public double getAngle() {
@@ -491,33 +520,31 @@ public class DriveSystem extends SubsystemBase {
 	public void oldTurn(double speed, Direction direction) {
 		switch (direction) {
 		case LEFT:
-			this.voltage(speed, speed);
+			this.percent(-speed, -speed);
 			break;
 		case RIGHT:
-			this.voltage(-speed, -speed);
+			this.percent(speed, speed);
 			break;
 		default:
-			this.voltage(0, 0);
+			this.percent(0, 0);
 		}
 	}
 
 	public boolean oldReachedTurn(double angle) {
-		if (angle + 1 > 360) {
-			return 360 - robotAngle.getDegrees() <= (angle + 1) % 360 && robotAngle.getDegrees() >= angle - 1;
-		}
-		else if (angle - 1 < 0) {
-			return robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
-		}
-		else {
-			return robotAngle.getDegrees() <= angle + 1 && robotAngle.getDegrees() >= angle - 1;
-		}
+		// if (angle + 2 > 360) {
+		// 	return 360 - robotAngle.getDegrees() <= (angle + 2) % 360 && robotAngle.getDegrees() >= angle - 1;
+		// }
+		// if (angle - 2 < 0) {
+		// 	return robotAngle.getDegrees() <= angle + 2 && -robotAngle.getDegrees() >= angle - 2;
+		// }
+		return robotAngle.getDegrees() <= angle + 2 && robotAngle.getDegrees() >= angle - 2;
 	}
 
 	public boolean reachedTurn() {
 		double angle = targetPosition.getRotation().getDegrees();
 
-		System.out.println("Robot Angle: " + robotAngle);
-		System.out.println("Target Angle: " + angle);
+		// System.out.println("Robot Angle: " + robotAngle.getDegrees());
+		// System.out.println("Target Angle: " + angle);
 		
 		if (angle + 1 > 360) {
 			return 360 - robotAngle.getDegrees() <= (angle + 1) % 360 && robotAngle.getDegrees() >= angle - 1;
@@ -532,8 +559,11 @@ public class DriveSystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		double leftDist = leftEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
-		double rightDist = rightEncoder.getPosition() * TICKS_PER_ROTATION / TICKS_PER_METER;
+		double leftDist = leftEncoder.getPosition() * WHEEL_CIRCUMFERENCE_M;
+		double rightDist = -(rightEncoder.getPosition() * WHEEL_CIRCUMFERENCE_M);
+
+		// System.out.println("Left Dist: " + leftDist);
+		// System.out.println("Right Dist: " + rightDist);
 
 		Rotation2d navXAngle = Rotation2d.fromDegrees(-navX.getAngle());
 

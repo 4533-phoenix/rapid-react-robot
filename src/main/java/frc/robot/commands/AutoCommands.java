@@ -40,11 +40,11 @@ public class AutoCommands {
     public static Command shootAndDriveOffTarmac() {
         return  new SequentialCommandGroup(
             ShooterCommands.autoShoot(20.0, 1, false),
-            oldDriveDistanceAutoCommand(20, Direction.BACKWARD).withTimeout(3)
-            // oldAngularTurnAutoCommand(0.2, 180, Direction.LEFT),
-            // oldGetBallAutoCommand(20, Direction.FORWARD),
-            // oldAngularTurnAutoCommand(0.2, 180, Direction.RIGHT),
-            // ShooterCommands.autoShoot(35.0, 1, true),
+            // oldDriveDistanceAutoCommand(20, Direction.BACKWARD),
+            oldAngularTurnAutoCommand(0.2, 150, Direction.LEFT).withTimeout(2.5),
+            oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(3),
+            oldAngularTurnAutoCommand(0.2, 20, Direction.RIGHT).withTimeout(2.5),
+            ShooterCommands.autoShoot(35.0, 1, false)
         );
     }
 
@@ -53,7 +53,7 @@ public class AutoCommands {
         return new FunctionalCommand(
             () -> Robot.drive.getAngle(),
             () -> Robot.drive.driveDistance(),
-            (interrupt) -> Robot.drive.tank(0, 0),
+            (interrupt) -> Robot.drive.percent(0.0, 0.0),
             () -> Robot.drive.reachedPosition(),
             Robot.drive
         );
@@ -63,7 +63,7 @@ public class AutoCommands {
         return new FunctionalCommand(
             () -> Robot.drive.getAngle(),
             () -> Robot.drive.turn(0.1),
-            (interrupt) -> Robot.drive.tank(0, 0),
+            (interrupt) -> Robot.drive.percent(0.0, 0.0),
             () -> Robot.drive.reachedTurn(),
             Robot.drive
         );
@@ -104,7 +104,7 @@ public class AutoCommands {
         return new FunctionalCommand(
             () -> Robot.drive.resetAngle(),
             () -> Robot.drive.turn(speed),
-            (interrupt) -> Robot.drive.tank(0, 0),
+            (interrupt) -> Robot.drive.percent(0.0, 0.0),
             () -> Robot.drive.getAngle() >= angle,
             Robot.drive
         );
@@ -163,7 +163,7 @@ public class AutoCommands {
 		return new FunctionalCommand(
 			() -> Robot.drive.resetPosition(),
 			() -> Robot.drive.oldDriveDistance(distance, direction),
-			(interrupt) -> Robot.drive.tank(0, 0),
+			(interrupt) -> Robot.drive.percent(0.0, 0.0),
 			() -> Robot.drive.oldReachedPosition(),
 			Robot.drive
 		);
@@ -171,9 +171,9 @@ public class AutoCommands {
 
 	public static Command oldAngularTurnAutoCommand(double speed, double angle, Direction direction) {
 		return new FunctionalCommand(
-			() -> Robot.drive.resetAngle(),
+			() -> Robot.drive.getAngle(),
 			() -> Robot.drive.oldTurn(speed, direction),
-			(interrupt) -> Robot.drive.tank(0, 0),
+			(interrupt) -> Robot.drive.percent(0.0, 0.0),
 			() -> Robot.drive.oldReachedTurn(angle),
 			Robot.drive
 		);

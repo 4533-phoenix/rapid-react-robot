@@ -60,7 +60,7 @@ public class ShooterCommands {
             () -> Robot.shooter.flywheelIntakeStop(),
             Robot.shooter
         );
-    } 
+    }
 
     public static Command flywheelAndIntakeRunCommand(double hoodAngle, int balls, boolean flywheelRunning) {
         return new InstantCommand(
@@ -126,7 +126,7 @@ public class ShooterCommands {
 
     public static Command autoShoot(double hoodAngle, int balls, boolean flywheelRunning) {
         return new SequentialCommandGroup(
-            // setHoodAngleCommand(hoodAngle),
+            setHoodAngleCommand(hoodAngle).withTimeout(1.5),
             flywheelAndIntakeRunCommand(hoodAngle, balls, flywheelRunning),
             flywheelAndIntakeStopCommand()
         );
