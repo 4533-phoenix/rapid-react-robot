@@ -11,5 +11,24 @@ import frc.robot.Robot;
 public class HighClimbCommands {
     public HighClimbCommands() {}
 
+    public static Command highClimberDown() {
+        return new InstantCommand(
+            () -> Robot.highClimber.highClimberDown(),
+            Robot.highClimber
+        );
+    }
+
+    public static Command highClimberUp() {
+        return new InstantCommand(
+            () -> Robot.highClimber.highClimberUp(),
+            Robot.highClimber
+        );
+    } 
     
+    public static Command highClimberStop() {
+        return new InstantCommand(
+            () -> Robot.highClimber.highClimberStop(),
+            Robot.highClimber
+        );
+    }
 }
