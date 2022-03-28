@@ -64,6 +64,14 @@ public class RobotContainer {
     quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
     quarterVelocityButton.whenReleased(DriveCommands.quarterFalse());
 
+    JoystickButton highClimbUp = new JoystickButton(controllerOne, Constants.BUTTON_B);
+    highClimbUp.whenPressed(HighClimbCommands.highClimberUp());
+    highClimbUp.whenPressed(HighClimbCommands.highClimberStop());
+
+    JoystickButton highClimbDown = new JoystickButton(controllerOne, Constants.BUTTON_B);
+    highClimbDown.whenPressed(HighClimbCommands.highClimberDown());
+    highClimbDown.whenPressed(HighClimbCommands.highClimberStop());
+
     // JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
     // hoodUpButton.whenPressed(ShooterCommands.hoodUp());
     // hoodUpButton.whenReleased(ShooterCommands.hoodStop());
