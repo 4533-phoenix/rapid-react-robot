@@ -38,12 +38,27 @@ public class AutoCommands {
         );
     }
     public static Command shootAndDriveOffTarmac() {
-        return  new SequentialCommandGroup(
+        return new SequentialCommandGroup(
             ShooterCommands.autoShoot(29.0, 1, false),
             oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
             oldAngularTurnAutoCommand(0.20, 150, Direction.LEFT).withTimeout(2.5),
             oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
             oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
+            ShooterCommands.autoShoot(38.0, 1, false)
+        );
+    }
+
+    public static Command threeBallTest() {
+        return new SequentialCommandGroup(
+            oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
+            oldAngularTurnAutoCommand(0.20, 150, Direction.LEFT).withTimeout(2.5),
+            oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
+            oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
+            ShooterCommands.autoShoot(38.0, 2, false),
+            oldAngularTurnAutoCommand(0.2, 80, Direction.RIGHT).withTimeout(2.5),
+            oldDriveDistanceAutoCommand(1000, Direction.FORWARD).withTimeout(0.1),
+            oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
+            oldAngularTurnAutoCommand(0.2, 80, Direction.LEFT),
             ShooterCommands.autoShoot(38.0, 1, false)
         );
     }
