@@ -72,18 +72,22 @@ public class RobotContainer {
     highClimbDown.whenPressed(HighClimbCommands.highClimberDown());
     highClimbDown.whenReleased(HighClimbCommands.highClimberStop());
 
-    JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
-    hoodUpButton.whenPressed(ShooterCommands.setHoodAngleCommand(20));
+    JoystickButton hoodSetButton = new JoystickButton(controllerTwo, Constants.BUTTON_Y);
+    hoodSetButton.whenPressed(ShooterCommands.setHoodAngleCommand(35));
+    // hoodSetButton.whenReleased(ShooterCommands.hoodStop());
+
+    JoystickButton hoodUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
+    hoodUpButton.whenPressed(ShooterCommands.setHoodAngleCommand(Robot.shooter.getHoodAngle() + 0.2));
     // hoodUpButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton hoodDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_A);
-    hoodDownButton.whenPressed(ShooterCommands.setHoodAngleCommand(0));
+    hoodDownButton.whenPressed(ShooterCommands.setHoodAngleCommand(Robot.shooter.getHoodAngle() - 0.2));
     // hoodDownButton.whenReleased(ShooterCommands.hoodStop());
 
     JoystickButton oldAutoFlywheel = new JoystickButton(controllerTwo, Constants.BUTTON_B);
     oldAutoFlywheel.whenPressed(ShooterCommands.oldAutoFlywheelPos());
 
-    JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_X);
+    JoystickButton setHoodShootButton = new JoystickButton(controllerTwo, Constants.BUTTON_START);
     setHoodShootButton.whenPressed(ShooterCommands.setHoodAngleCommand(Robot.shooter.getShootHoodAngle()));
 
     // JoystickButton reverseFlywheelIntakeButton = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
