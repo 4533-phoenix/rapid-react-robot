@@ -64,6 +64,10 @@ public class RobotContainer {
     quarterVelocityButton.whenPressed(DriveCommands.quarterTrue());
     quarterVelocityButton.whenReleased(DriveCommands.quarterFalse());
 
+    JoystickButton flywheelOut = new JoystickButton(controllerTwo, Constants.BUTTON_RB);
+    flywheelOut.whenPressed(ShooterCommands.flywheelRunCommand());
+    flywheelOut.whenReleased(ShooterCommands.flywheelStopCommand());
+
     JoystickButton highClimbUp = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
     highClimbUp.whenPressed(HighClimbCommands.highClimberUp());
     highClimbUp.whenReleased(HighClimbCommands.highClimberStop());
@@ -128,20 +132,11 @@ public class RobotContainer {
   }
 
   private void toggleFlywheelIntake() {
-    if (controllerTwo.getRawAxis(Constants.LEFT_TRIGGER_AXIS) > 0.3) {
+    if (controllerTwo.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.3) {
       Robot.shooter.flywheelIntakeIn();
     }
     else {
       Robot.shooter.flywheelIntakeStop();
-    }
-  }
-
-  private void toggleFlywheel() {
-    if (controllerTwo.getRawAxis(Constants.RIGHT_TRIGGER_AXIS) > 0.3) {
-      Robot.shooter.flywheelOut();
-    }
-    else {
-      Robot.shooter.flywheelStop();
     }
   }
 
@@ -160,10 +155,6 @@ public class RobotContainer {
 
     scheduler.addButton(
       () -> toggleFlywheelIntake()
-    );
-
-    scheduler.addButton(
-      () -> toggleFlywheel()
     );
 	}
 
