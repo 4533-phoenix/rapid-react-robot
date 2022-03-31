@@ -77,6 +77,8 @@ public class ShooterSystem extends SubsystemBase {
     private AHRS shooterNAVX;
 
     public double hoodAngle;
+    
+    private double currHoodAngle;
 
     private NetworkTable limelight;
 
@@ -119,6 +121,8 @@ public class ShooterSystem extends SubsystemBase {
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
         hoodAngle = 0;
+
+        currHoodAngle = 0;
 
         limitSwitch = new DigitalInput(0);
 
@@ -239,7 +243,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle) {
-        this.hoodMotor.setAngle(75 - angle);
+        this.hoodMotor.setAngle(angle);
     }
 
     public double getHoodAngle() {
@@ -249,15 +253,15 @@ public class ShooterSystem extends SubsystemBase {
 
 
     public void hoodUp() {
-        this.hoodMotor.setAngle(140);
+        setHoodAngle(80);
     }
 
     public void hoodDown() {
-        this.hoodMotor.setAngle(141.5);
+        setHoodAngle(100);
     }
 
     public void hoodStop() {
-        this.hoodMotor.setPosition(0);
+        setHoodAngle(0);
     }
 
     public void setFlywheelPos() {
@@ -310,6 +314,10 @@ public class ShooterSystem extends SubsystemBase {
 		targetArea = limelight.getEntry("ta").getDouble(0);
 		targetSkew = limelight.getEntry("ts").getDouble(0);
 
+        currHoodAngle = hoodMotor.getAngle();
+
+        System.out.println(currHoodAngle);
+
         // Kinematic Equations:
         // vf = v0 + at
         // vf^2 = v0^2 + 2ad
@@ -323,9 +331,6 @@ public class ShooterSystem extends SubsystemBase {
         // now we can use v0x and v0y to calculate v and 0 (theta), which gives us 
         // the flywheel velocity and the hood angle
         // v0x will vary, however v0y will not, but this will still lead to varying v's and 0's
-
-        System.out.println(hoodMotor.getAngle());
-
         cameraTargetAngle = CAMERA_MOUNTING_ANGLE + targetOffsetAngle_Vertical;
         horizontalDistance = (GOAL_HEIGHT - CAMERA_HEIGHT) / Math.tan(cameraTargetAngle * (Math.PI / 180));
 
