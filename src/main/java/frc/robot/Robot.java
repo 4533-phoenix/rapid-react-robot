@@ -85,8 +85,6 @@ public class Robot extends TimedRobot {
 		// Instantiate our RobotContainer.  This will perform all our button
 		// bindings, and put our autonomous chooser on the dashboard.
 		this.container = new RobotContainer();
-
-		drive.getNavX().reset();
 	}
 
 	public static void setPIDF(SparkMaxPIDController controller, double p, double i, double d, double iz, double ff, int slotID) {

@@ -239,7 +239,7 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle) {
-        this.hoodMotor.setAngle(100 - angle);
+        this.hoodMotor.setAngle(75 - angle);
     }
 
     public double getHoodAngle() {
