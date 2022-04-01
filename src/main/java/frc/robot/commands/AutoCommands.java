@@ -37,13 +37,16 @@ public class AutoCommands {
             stopDriveCommand()
         );
     }
+
     public static Command shootAndDriveOffTarmac() {
         return new SequentialCommandGroup(
-            ShooterCommands.autoShoot(29.0, 1, false),
+            // ShooterCommands.autoFlywheelPos(),
+            ShooterCommands.autoShoot(32.0, 1, false),
             oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
             oldAngularTurnAutoCommand(0.20, 150, Direction.LEFT).withTimeout(2.5),
             oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
             oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
+            // ShooterCommands.oldAutoFlywheelPos(),
             ShooterCommands.autoShoot(40.0, 1, false)
         );
     }

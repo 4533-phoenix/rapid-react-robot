@@ -77,14 +77,14 @@ public class ShooterCommands {
     }
 
     public static Command hoodUp() {
-        return new InstantCommand(
+        return new RunCommand(
             () -> Robot.shooter.hoodUp(),
             Robot.shooter
         );
     }
 
     public static Command hoodDown() {
-        return new InstantCommand(
+        return new RunCommand(
             () -> Robot.shooter.hoodDown(),
             Robot.shooter
         );

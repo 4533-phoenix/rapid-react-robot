@@ -50,12 +50,13 @@ public class ShooterSystem extends SubsystemBase {
     private Direction targetDirection;
 
     // Motor Constants
-    private static final double FLYWHEEL_MOTOR_PERCENT = 1.0;
+    private static final double FLYWHEEL_MOTOR_PERCENT = 0.6;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.40;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
+    private static final double SERVO_OFFSET = 128.7;
 
     // Projectile Constants and Variables
     private static final double MAX_FLYWHEEL_RPM = 3065.0; // TODO: Change this to the right value (RPM)
@@ -108,6 +109,8 @@ public class ShooterSystem extends SubsystemBase {
         flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
 
         hoodMotor = new Servo(9);
+
+        hoodMotor.setAngle(SERVO_OFFSET);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
@@ -243,25 +246,24 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     public void setHoodAngle(double angle) {
-        this.hoodMotor.setAngle(angle);
+        this.hoodMotor.setAngle(SERVO_OFFSET - angle);
     }
 
     public double getHoodAngle() {
-        hoodAngle = this.hoodMotor.getPosition();
+        hoodAngle = this.hoodMotor.getAngle();
         return hoodAngle;
     }
 
-
     public void hoodUp() {
-        setHoodAngle(80);
+        setHoodAngle((SERVO_OFFSET - currHoodAngle) + 0.5);
     }
 
     public void hoodDown() {
-        setHoodAngle(100);
+        setHoodAngle((SERVO_OFFSET - currHoodAngle) - 0.5);
     }
 
     public void hoodStop() {
-        setHoodAngle(0);
+        setHoodAngle(SERVO_OFFSET - currHoodAngle);
     }
 
     public void setFlywheelPos() {
@@ -316,7 +318,9 @@ public class ShooterSystem extends SubsystemBase {
 
         currHoodAngle = hoodMotor.getAngle();
 
-        System.out.println(currHoodAngle);
+        System.out.println("Hood Angle: " + currHoodAngle);
+
+        // System.out.println(currHoodAngle);
 
         // Kinematic Equations:
         // vf = v0 + at

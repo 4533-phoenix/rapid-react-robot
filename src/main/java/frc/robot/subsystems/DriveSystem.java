@@ -193,6 +193,22 @@ public class DriveSystem extends SubsystemBase {
 		return rightPIDCont;
 	}
 
+	public CANSparkMax getLeftSlave() {
+		return this.leftSlave;
+	}
+
+	public CANSparkMax getRightSlave() {
+		return this.rightSlave;
+	}
+
+	public CANSparkMax getLeftMaster() {
+		return this.leftMaster;
+	}
+
+	public CANSparkMax getRightMaster() {
+		return this.rightMaster;
+	}
+
 	public AHRS getNavX() {
 		return navX;
 	}
