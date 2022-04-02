@@ -51,7 +51,7 @@ public class DriveSystem extends SubsystemBase {
 	private AHRS navX;
 
 	private static final double MAX_VELOCITY = 4000;
-	private static final double TURBO_VELOCITY = 4500;
+	private static final double TURBO_VELOCITY = 8000;
 	private static final double QUARTER_VELOCITY = 1000;
 	private static final double PEAK_OUTPUT = 1.0;
 	private boolean turbo = false;
@@ -443,8 +443,12 @@ public class DriveSystem extends SubsystemBase {
 		return this.rightEncoder.getPosition() / TICKS_PER_METER;
 	}
 
-	public void toggleTurbo() {
-		this.turbo = !this.turbo;
+	public void setTurboTrue() {
+		this.turbo = true;
+	}
+
+	public void setTurboFalse() {
+		this.turbo = false;
 	}
 
 	public void setTurbo(boolean isTriggerPressed) {

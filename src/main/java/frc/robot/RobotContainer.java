@@ -54,7 +54,8 @@ public class RobotContainer {
   // Defines button bindings for commands
   private void configureButtonBindings() {
     JoystickButton toggleTurboButton = new JoystickButton(controllerOne, Constants.BUTTON_RB);
-    toggleTurboButton.whenPressed(DriveCommands.toggleTurbo());
+    toggleTurboButton.whenPressed(DriveCommands.setTurboTrue());
+    toggleTurboButton.whenReleased(DriveCommands.setTurboFalse());
 
     JoystickButton toggleOuttakeButton = new JoystickButton(controllerOne, Constants.BUTTON_A);
     toggleOuttakeButton.whenPressed(IntakeCommands.intakeOutCommand());
@@ -67,6 +68,14 @@ public class RobotContainer {
     JoystickButton highClimbUp = new JoystickButton(controllerTwo, Constants.BUTTON_LB);
     highClimbUp.whenPressed(HighClimbCommands.highClimberUp());
     highClimbUp.whenReleased(HighClimbCommands.highClimberStop());
+
+    JoystickButton intakeLiftUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_RB);
+    intakeLiftUpButton.whenPressed(IntakeCommands.intakeLiftUpCommand());
+    intakeLiftUpButton.whenReleased(IntakeCommands.intakeLiftStopCommand());
+
+    JoystickButton intakeLiftDownButton = new JoystickButton(controllerTwo, Constants.BUTTON_START);
+    intakeLiftDownButton.whenPressed(IntakeCommands.intakeLiftDownCommand());
+    intakeLiftDownButton.whenReleased(IntakeCommands.intakeLiftStopCommand());
 
     JoystickButton highClimbDown = new JoystickButton(controllerTwo, Constants.BUTTON_BACK);
     highClimbDown.whenPressed(HighClimbCommands.highClimberDown());

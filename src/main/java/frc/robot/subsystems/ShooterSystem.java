@@ -50,13 +50,13 @@ public class ShooterSystem extends SubsystemBase {
     private Direction targetDirection;
 
     // Motor Constants
-    private static final double FLYWHEEL_MOTOR_PERCENT = 0.6;
+    private static final double FLYWHEEL_MOTOR_PERCENT = 0.7;
     private static final double FLYWHEEL_INTAKE_MOTOR_PERCENT = 0.40;
     private static final double HOOD_MOTOR_PERCENT = 0.05;
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
-    private static final double SERVO_OFFSET = 128.7;
+    private static final double SERVO_OFFSET = 95.4;
 
     // Projectile Constants and Variables
     private static final double MAX_FLYWHEEL_RPM = 3065.0; // TODO: Change this to the right value (RPM)
@@ -350,7 +350,7 @@ public class ShooterSystem extends SubsystemBase {
         initialAngle = getHoodAngle();
 
         if (!limitSwitch.get()) {
-            // hoodMotor.setPosition(0.0);
+            System.out.println("True");
         }
 
         // result = visionCam.getLatestResult();

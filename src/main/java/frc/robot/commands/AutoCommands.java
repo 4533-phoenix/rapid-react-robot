@@ -47,7 +47,7 @@ public class AutoCommands {
             oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
             oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
             // ShooterCommands.oldAutoFlywheelPos(),
-            ShooterCommands.autoShoot(40.0, 1, false)
+            ShooterCommands.autoShoot(37.0, 1, false)
         );
     }
 

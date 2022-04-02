@@ -22,6 +22,7 @@ public final class Constants {
 	public static final int ELEVATOR_MOTOR = 9;
 	public static final int HOOD_MOTOR = 8;
 	public static final int HIGH_CLIMB_MOTOR = 15;
+	public static final int INTAKE_LIFT_MOTOR = 16;
 
 	// logitech controller buttons and ports
 	public static final int DRIVER_CONTROLLER = 0;

@@ -39,4 +39,24 @@ public class IntakeCommands {
 		);
 	}
 
+	public static Command intakeLiftUpCommand() {
+		return new InstantCommand(
+			() -> Robot.intake.intakeLiftUp(),
+			Robot.intake
+		);
+	}
+
+	public static Command intakeLiftDownCommand() {
+		return new InstantCommand(
+			() -> Robot.intake.intakeLiftDown(),
+			Robot.intake
+		);
+	}
+
+	public static Command intakeLiftStopCommand() {
+		return new InstantCommand(
+			() -> Robot.intake.intakeLiftStop(),
+			Robot.intake
+		);
+	}
 }
