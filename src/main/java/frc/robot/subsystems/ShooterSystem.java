@@ -108,7 +108,7 @@ public class ShooterSystem extends SubsystemBase {
 
         flywheelIntakeMotor = new WPI_TalonSRX(Constants.TURRET_WHEEL_MOTOR);
 
-        hoodMotor = new Servo(9);
+        hoodMotor = new Servo(Constants.HOOD_SERVO_MOTOR);
 
         hoodMotor.setAngle(SERVO_OFFSET);
 
@@ -127,7 +127,7 @@ public class ShooterSystem extends SubsystemBase {
 
         currHoodAngle = 0;
 
-        limitSwitch = new DigitalInput(0);
+        limitSwitch = new DigitalInput(Constants.LIMIT_SWITCH);
 
         limelight = NetworkTableInstance.getDefault().getTable("limelight");
 

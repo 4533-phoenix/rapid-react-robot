@@ -20,9 +20,12 @@ public final class Constants {
 	//TODO Winch needs new motor id
 	public static final int WINCH_MOTOR = 7;
 	public static final int ELEVATOR_MOTOR = 9;
-	public static final int HOOD_MOTOR = 8;
 	public static final int HIGH_CLIMB_MOTOR = 15;
 	public static final int INTAKE_LIFT_MOTOR = 16;
+
+	// Correspond to the DIO and PWM channels on the RoboRio
+	public static final int HOOD_SERVO_MOTOR = 9;
+	public static final int LIMIT_SWITCH = 0;
 
 	// logitech controller buttons and ports
 	public static final int DRIVER_CONTROLLER = 0;
