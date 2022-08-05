@@ -56,7 +56,7 @@ public class ShooterSystem extends SubsystemBase {
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
-    private static final double SERVO_OFFSET = 95.4;
+    private static final double SERVO_OFFSET = 97.39;
 
     // Projectile Constants and Variables
     private static final double MAX_FLYWHEEL_RPM = 3065.0; // TODO: Change this to the right value (RPM)
@@ -68,7 +68,7 @@ public class ShooterSystem extends SubsystemBase {
     private static double cameraTargetAngle = 0.0;
     private static double horizontalDistance = 0.0;
     private static final double GRAVITY_ACCELERATION = -32.1741; // feet/s^2
-    private static final double INITIAL_Y_VELOCITY = (GOAL_HEIGHT - CAMERA_HEIGHT) - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT)); // feet/s
+    private static final double INITIAL_Y_VELOCITY = ((GOAL_HEIGHT - CAMERA_HEIGHT) - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT))) / TIME_TO_SHOOT; // feet/s
     private static double initialXVelocity = 0.0;
     private static double initialVelocity = 0.0;
     private static double rotationalVelocity = 0.0;
@@ -209,7 +209,7 @@ public class ShooterSystem extends SubsystemBase {
             flywheelIntakeTime = 0;
         }
         else {
-            time = 2 + (2 * balls);
+            time = 2.5 + (2 * balls);
             flywheelIntakeTime = 1.5;
         }
         
@@ -223,7 +223,7 @@ public class ShooterSystem extends SubsystemBase {
                 rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
             }
             
-            if (timer.get() > flywheelIntakeTime && timer.get() < time) {
+            if (timer.get() > flywheelIntakeTime) {
                 flywheelIntakeMotor.set(ControlMode.PercentOutput, FLYWHEEL_INTAKE_MOTOR_PERCENT);
             }
 
@@ -331,7 +331,7 @@ public class ShooterSystem extends SubsystemBase {
         // v0x will equal our distance from the goal divided by our time to shoot, which is 2 
         // *this is technically calculating average velocity, but x velocity is constant
         // since we now know v0x, we will calculate v0y by saying that it is:
-        // v0y = dy - 1/2at^2
+        // v0y = (dy - 1/2at^2) / t
         // now we can use v0x and v0y to calculate v and 0 (theta), which gives us 
         // the flywheel velocity and the hood angle
         // v0x will vary, however v0y will not, but this will still lead to varying v's and 0's
