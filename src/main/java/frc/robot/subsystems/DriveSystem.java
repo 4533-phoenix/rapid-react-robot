@@ -33,7 +33,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import java.lang.Math.*;
 
 public class DriveSystem extends SubsystemBase {
-    
 	// Drive train motor controllers
 	private CANSparkMax rightMaster;
 	private CANSparkMax rightSlave;

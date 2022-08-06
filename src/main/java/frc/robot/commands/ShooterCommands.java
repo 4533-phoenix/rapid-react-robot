@@ -62,9 +62,9 @@ public class ShooterCommands {
         );
     }
 
-    public static Command flywheelAndIntakeRunCommand(double hoodAngle, int balls, boolean flywheelRunning) {
+    public static Command flywheelAndIntakeRunCommand(int balls, boolean flywheelRunning) {
         return new InstantCommand(
-            () -> Robot.shooter.flywheelAndFlywheelIntakeRun(hoodAngle, balls, flywheelRunning),
+            () -> Robot.shooter.flywheelAndFlywheelIntakeRun(balls, flywheelRunning),
             Robot.shooter
         );
     }
@@ -128,7 +128,7 @@ public class ShooterCommands {
         return new SequentialCommandGroup(
             setHoodAngleCommand(hoodAngle),
             // oldAutoFlywheelPos(),
-            flywheelAndIntakeRunCommand(hoodAngle, balls, flywheelRunning),
+            flywheelAndIntakeRunCommand(balls, flywheelRunning),
             flywheelAndIntakeStopCommand()
         );
     }

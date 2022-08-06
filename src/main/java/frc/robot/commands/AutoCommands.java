@@ -148,16 +148,6 @@ public class AutoCommands {
         );
     }
 
-    public static Command ballExitCommand(int balls) {
-        return new FunctionalCommand(
-            () -> Robot.shooter.setFlywheelReset(),
-            () -> Robot.shooter.flywheelAndFlywheelIntakeOut(),
-            (interrupt) -> Robot.shooter.flywheelAndFlywheelIntakeStop(),
-            () -> Robot.shooter.flywheelDoneShootBalls(balls),
-            Robot.shooter
-        );
-    }
-
     public static Command flywheelWait(int seconds) {
         return new WaitCommand(seconds);
     }
@@ -166,14 +156,6 @@ public class AutoCommands {
         return new InstantCommand(
             () -> Robot.shooter.flywheelOut(), 
             Robot.shooter
-        );
-    }
-
-    public static Command shootBallAutoCommand(int balls) {
-        return new SequentialCommandGroup(
-            activateFlywheel(),
-            flywheelWait(3),
-            ballExitCommand(balls)
         );
     }
 
