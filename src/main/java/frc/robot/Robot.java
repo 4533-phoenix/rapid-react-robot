@@ -138,7 +138,6 @@ public class Robot extends TimedRobot {
 		);
 
 		Robot.drive.resetAngle();
-		this.robotLogger.info("reset drive system angle: {}", Robot.drive.getAngle());
 
 		// Robot.drive.resetPosition();
 

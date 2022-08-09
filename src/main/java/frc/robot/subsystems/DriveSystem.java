@@ -32,6 +32,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import java.lang.Math.*;
 
+/**
+ * Class for the drive system.
+ */
 public class DriveSystem extends SubsystemBase {
 	// Drive train motor controllers
 	private CANSparkMax rightMaster;
@@ -133,19 +136,17 @@ public class DriveSystem extends SubsystemBase {
 	private Pose2d robotPos;
 	private Rotation2d robotAngle;
 
-	private double targetX; 
-	private double targetY;
-	private double initRobotX;
-	private double initRobotY;
 	private double target;
-	private double initRobot;
 
 	private static int navXCount = 0;
 
 	private double prevLeft, prevRight;
 
+	/**
+	 * Constructor for the drive system.
+	 */
 	public DriveSystem() {
-		// Initialize all of the drive systems motor controllers.
+		// Initialize all of the drive system's motor controllers.
 		this.leftMaster = new CANSparkMax(Constants.LEFT_MASTER_MOTOR,MotorType.kBrushless);
 		this.leftSlave = new CANSparkMax(Constants.LEFT_SLAVE_MOTOR,MotorType.kBrushless);
 		this.rightMaster = new CANSparkMax(Constants.RIGHT_MASTER_MOTOR,MotorType.kBrushless);
@@ -184,47 +185,89 @@ public class DriveSystem extends SubsystemBase {
 		targetPosition = null;
 	}
 
+	/**
+	 * Returns the PID controller object for our left motor ({@link #leftPidCont}).
+	 * 
+	 * @return Left motor PID controller object.
+	 */
 	public SparkMaxPIDController getLeftPIDCont() {
 		return leftPIDCont;
 	}
 
+	/**
+	 * Return the PID controller object for our right motor ({@link #rightPIDCont}).
+	 * 
+	 * @return Right motor PID controller object.
+	 */
 	public SparkMaxPIDController getRightPIDCont() {
 		return rightPIDCont;
 	}
 
+	/**
+	 * Returns the motor object for our left follower motor ({@link #leftSlave}).
+	 * 
+	 * @return Left follower motor object.
+	 */
 	public CANSparkMax getLeftSlave() {
 		return this.leftSlave;
 	}
 
+	/**
+	 * Returns the motor object for our right follower motor ({@link #rightSlave}).
+	 * 
+	 * @return Right follower motor object.
+	 */
 	public CANSparkMax getRightSlave() {
 		return this.rightSlave;
 	}
 
+	/**
+	 * Returns the motor object for our left main motor ({@link #leftMaster}).
+	 * 
+	 * @return Left main motor object.
+	 */
 	public CANSparkMax getLeftMaster() {
 		return this.leftMaster;
 	}
 
+	/**
+	 * Returns the motor object for our right main motor ({@link #rightMaster}).
+	 * 
+	 * @return Right main motor object.
+	 */
 	public CANSparkMax getRightMaster() {
 		return this.rightMaster;
 	}
 
+	/**
+	 * Returns the object for our NavX gyroscope.
+	 * 
+	 * @return NavX gyroscope.
+	 */
 	public AHRS getNavX() {
 		return navX;
 	}
 
+	/**
+	 * Sets quarter velocity ({@link #quarter}) for our drivetrain state to true.
+	 */
 	public void quarterTrue() {
 		quarter = true;
 	}
 
+	/**
+	 * Sets quarter velocity ({@link #quarter}) for our drivetrain state to false.
+	 */
 	public void quarterFalse() {
 		quarter = false;
 	}
 
-	public void setDriveMode(DriveMode mode) {
-		this.driveMode = mode;
-	}
-
+	/**
+	 * Toggles drive mode ({@link #driveMode}) of our drive train between normal and inverted state.
+	 */
 	public void toggleDriveMode() {
+		System.out.println("test");
+
 		if (this.driveMode == DriveMode.Normal) {
 			this.driveMode = DriveMode.Inverted;
 		} else {
@@ -232,24 +275,33 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * Returns whether the robot has reached its current set position.
+	 * 
+	 * @return Whether or not the robot has reached the target.
+	 */
 	public boolean reachedPosition() {
-		double robotX = Math.abs(robotPos.getX());
-		double robotY = Math.abs(robotPos.getY());
+		double robotX = robotPos.getX();
+		double robotY = robotPos.getY();
 
-		double robot = Math.sqrt(Math.pow(robotX, 2) + Math.pow(robotY, 2));
+		double targetX = targetPosition.getX();
+		double targetY = targetPosition.getY();
 
-		// System.out.println("Robot Pos: " + robot);
-		// System.out.println("Target Pos: " + target);
-
-		if (target > initRobot) {
-			return robot > target;
-		}
-		else if (target <= initRobot) {
-			return robot <= initRobot;
-		}
-		return false;
+		return
+		(robotX >= (targetX - 0.5) && robotX <= (targetX + 0.5)) 
+		&& 
+		(robotY >= (targetY - 0.5) && robotY <= (targetY + 0.5));
 	}
 
+	/**
+	 * @deprecated Old reached curve code, to be replaced by odometry.
+	 * <p>
+	 * Returns whether the robot has reached a set curve based on its targets.
+	 * 
+	 * @param targetL Target for the left side of the drive train (inches).
+	 * @param targetR Target for the right side of the drive train (inches).
+	 * @return Whether or not the robot has reached the curve.
+	 */
 	public boolean reachedCurve(double targetL, double targetR) {
 		double leftPos = this.leftEncoder.getPosition();
 		double rightPos = this.rightEncoder.getPosition();
@@ -258,24 +310,56 @@ public class DriveSystem extends SubsystemBase {
 			return (leftPos >= targetL) && (rightPos >= targetR);
 		} else if (targetDirection == Direction.BACKWARD) {
 			return (leftPos <= targetL) && (rightPos <= targetR);
-		} else {
-			return true;
 		}
+		return true;
 	}
 
+	/**
+	 * Calculates the distance and angle at the robot has to drive to reach
+	 * the passed in Cartesian coordinates.
+	 * 
+	 * @param xMeters Horizontal distance to travel in meters.
+	 * @param yMeters Vertical distance to travel in meters.
+	 * @return The target position ({@link #targetPosition}).
+	 */
 	public Pose2d driveToPosition(double xMeters, double yMeters) {
+		// Creating translation for target position based on x and y params.
 		Translation2d translation = new Translation2d(xMeters, yMeters);
-		Rotation2d angle = Rotation2d.fromDegrees(Math.atan(yMeters / xMeters) * (180 / Math.PI));
 
-		if ((xMeters < 0 && yMeters > 0) || (xMeters < 0 && yMeters < 0)) {
+		// Variables to calculate distance from robot to target and angle from robot to target.
+		double targetX = translation.getX();
+		double targetY = translation.getY();
+		double initRobotX = robotPos.getX();
+		double initRobotY = robotPos.getY();
+		double offsetX = targetX - initRobotX;
+		double offsetY = targetY - initRobotY;
+
+		/* 
+		 * Creating angle for target position based on the target position 
+		 * and the robot's current position by calculating the angle from 
+		 * the robot's current position to the robot's target position.
+		 */
+		Rotation2d angle = Rotation2d.fromDegrees(Math.atan(offsetY / offsetX) * (180 / Math.PI));
+
+		// Used to change angle due to atan()'s limited range.
+		if ((offsetX < 0 && offsetY > 0) || (offsetX < 0 && offsetY < 0)) {
 			angle = Rotation2d.fromDegrees(angle.getDegrees() + 180);
 		}
-		else if (xMeters > 0 && yMeters < 0) {
+		else if (offsetX > 0 && offsetY < 0) {
 			angle = Rotation2d.fromDegrees(angle.getDegrees() + 360);
 		}
 
+		// Target position stored for later use.
 		targetPosition = new Pose2d(translation, angle);
 
+		// Distance from robot to target.
+		target = Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2));
+
+		/* 
+		 * Determines what direction is the shortest turn direction
+		 * for the robot during turn commands based on the target angle
+		 * and the robot's current angle.
+		 */
 		if (targetPosition.getRotation().getDegrees() > robotAngle.getDegrees()) {
 			if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() > 180) {
 				turnDirection = Direction.RIGHT;
@@ -285,10 +369,10 @@ public class DriveSystem extends SubsystemBase {
 			}
 		}
 		else if (targetPosition.getRotation().getDegrees() <= robotAngle.getDegrees()) {
-			if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() < -180) {
+			if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() > -180) {
 				turnDirection = Direction.LEFT;
 			}
-			else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() >= -180) {
+			else if (targetPosition.getRotation().getDegrees() - robotAngle.getDegrees() <= -180) {
 				turnDirection = Direction.RIGHT;
 			}
 		}	
@@ -296,39 +380,25 @@ public class DriveSystem extends SubsystemBase {
 			turnDirection = Direction.LEFT;
 		}
 
-		// if (targetPosition.getY() >= 0) {
-		// 	driveDirection = Direction.FORWARD;
-		// }
-		// else if (targetPosition.getY() < 0) {
-		// 	driveDirection = Direction.BACKWARD;
-		// }
-		// else {
-		// 	driveDirection = Direction.FORWARD;
-		// }
-
+		// Sets drive direction to forward, as robot will have already turned to the set angle.
 		driveDirection = Direction.FORWARD;
-
-		targetX = Math.abs(targetPosition.getX());
-		targetY = Math.abs(targetPosition.getY());
-		initRobotX = Math.abs(robotPos.getX());
-		initRobotY = Math.abs(robotPos.getY());
-
-		target = Math.sqrt(Math.pow(targetX, 2) + Math.pow(targetY, 2));
-		initRobot = Math.sqrt(Math.pow(initRobotX, 2) + Math.pow(initRobotY, 2));
 
 		return targetPosition;
 	}
-
-	// TODONE: Add back old drive distance code in a different method for use of non-odometry autonomous commands 
+	
+	/**
+	 * Makes the robot drive the distance calculated in 
+	 * {@link #driveToPosition(double, double)} ({@link #target})
+	 */
 	public void driveDistance() {
 		double targetDist = target;
 		
 		if (driveDirection == Direction.FORWARD) {
 			targetDist = (targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
-			targetDist *= 42;
+			targetDist *= TICKS_PER_ROTATION;
 		} else if (driveDirection == Direction.BACKWARD) {
 			targetDist = (-1 * targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
-			targetDist *= 42;
+			targetDist *= TICKS_PER_ROTATION;
 		} else {
 			targetDist = 0;
 		}
@@ -337,6 +407,15 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
+	/**
+	 * @deprecated Old drive distance code, replaced by {@link #driveDistance()}.
+	 * <p>
+	 * Makes the robot drive the specified distance in inches in the 
+	 * specified direction.
+	 * 
+	 * @param inches The number of inches for the robot to drive.
+	 * @param direction The direction for the robot to drive in.
+	 */
 	public void oldDriveDistance(double inches, Direction direction) {
 		targetDirection = direction;
 
@@ -352,6 +431,13 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont.setReference(-oldTargetPosition, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
+	/**
+	 * @deprecated Old reached position code, replaced by {@link #reachedPosition()}.
+	 * <p>
+	 * Returns whether the robot has reached the target position.
+	 * 
+	 * @return Whether or not the robot has reached the target.
+	 */
 	public boolean oldReachedPosition() {
 		double leftPos = leftEncoder.getPosition();
 		double rightPos = rightEncoder.getPosition();
@@ -360,13 +446,23 @@ public class DriveSystem extends SubsystemBase {
 			return (leftPos >= oldTargetPosition) && (rightPos >= oldTargetPosition);
 		} else if (targetDirection == Direction.BACKWARD) {
 			return (leftPos <= oldTargetPosition) && (rightPos <= oldTargetPosition);
-		} else {
-			return true;
-		}
+		} 
+		return true;
 	}
 
+	/**
+	 * @deprecated Old drive curve code, to be replaced by odometry.
+	 * <p>
+	 * Makes the robot drive in a curve in the specified direction by setting the 
+	 * left and right sides of the drive train to drive different distances.
+	 * 
+	 * @param leftDist Target for the left side of the drive train (inches).
+	 * @param rightDist Target for the right side of the drive train (inches).
+	 * @param direction The direction for the robot to drive in.
+	 */
 	public void driveCurve(double leftDist, double rightDist, Direction direction) {
 		targetDirection = direction;
+
 		if (direction == Direction.FORWARD) {
 			leftDist = -1 * leftDist / WHEEL_CIRCUMFERENCE;
 			rightDist = -1 * rightDist / WHEEL_CIRCUMFERENCE;
@@ -377,11 +473,23 @@ public class DriveSystem extends SubsystemBase {
 			leftDist = 0;
 			rightDist = 0;
 		}
+
 		this.leftPIDCont.setReference(leftDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 		this.rightPIDCont.setReference(rightDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
-	public void driveCircle(double speed, double angle, Direction direction, double radius) {
+	/**
+	 * @deprecated Old drive circle code, to be replaced by odometry.
+	 * <p>
+	 * Makes the robot drive in a circle that has a radius of the radius passed in
+	 * for the amount of degrees specified by the passed in angle that goes in 
+	 * the passed in direction. 
+	 * 
+	 * @param angle The degrees to be traveled.
+	 * @param direction The direction to travel in.
+	 * @param radius The radius of the circle.
+	 */
+	public void driveCircle(double angle, Direction direction, double radius) {
 		double innerCircumference = radius * 2 * Math.PI * (angle / 360);
 		double outerCircumference = (radius + 24) * 2 * Math.PI * (angle / 360);
 
@@ -404,6 +512,18 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont.setReference(rightDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
+	/**
+	 * @deprecated Old reached circle code, to be replaced by odometry.
+	 * <p>
+	 * Checks whether the robot has reached the end of the target circle based
+	 * on the degrees to be traveled from the passed in angle, the radius of
+	 * the circle, and the direction to be traveled in.
+	 * 
+	 * @param angle The degrees to be traveled.
+	 * @param radius The radius of the circle.
+	 * @param direction The direction to travel in.
+	 * @return Whether or not the robot has reached the end of the target circle.
+	 */
 	public boolean reachedCircle(double angle, double radius, Direction direction) {
 		double leftPos = this.leftEncoder.getPosition();
 		double rightPos = this.rightEncoder.getPosition();
@@ -422,46 +542,32 @@ public class DriveSystem extends SubsystemBase {
 
 			return (leftPos >= leftTarget) && (rightPos >= rightTarget);
 		}
-		else {
-			rightTarget = 0;
-			leftTarget = 0;
-
-			return true;
-		}
+		return true;
 	}
 
-	public double getPosition() {
-		return this.leftEncoder.getPosition() / TICKS_PER_INCH;
-	}
-
-	public double getLeftDistance() {
-		return this.leftEncoder.getPosition() / TICKS_PER_METER;
-	}
-
-	public double getRightDistance() {
-		return this.rightEncoder.getPosition() / TICKS_PER_METER;
-	}
-
+	/**
+	 * Sets the turbo drive mode state to true.
+	 */
 	public void setTurboTrue() {
 		this.turbo = true;
 	}
 
+	/**
+	 * Sets the turbo drive mode state to false.
+	 */
 	public void setTurboFalse() {
 		this.turbo = false;
 	}
-
-	public void setTurbo(boolean isTriggerPressed) {
-		if (isTriggerPressed) {
-			this.turbo = true;
-		}
-		else if (!isTriggerPressed) {
-			this.turbo = false;
-		}
-		else {
-			this.turbo = false;
-		}
-	}
 	
+	/**
+	 * The main drive function for our tele-op drive code. The velocity for
+	 * the left and right sides of the drive train is a percentage of 
+	 * the max velocity defined, with the percentages being the values 
+	 * passed in.
+	 * 
+	 * @param left The percentage of max velocity for the left side.
+	 * @param right The percentage of max velocity for the right side.
+	 */
 	public void tank(double left, double right) {
 		if (left > -0.05 && left < 0.05) {
 			left = 0.0;
@@ -497,31 +603,56 @@ public class DriveSystem extends SubsystemBase {
 		this.rightPIDCont.setReference(targetRight, ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 	}
 
+	/**
+	 * Makes the robot's left and right sides of the drive train
+	 * drive percentages of the max voltage defined.
+	 * 
+	 * @param left The percentage of max voltage for the left side.
+	 * @param right The percentage of max voltage for the right side.
+	 */
 	public void voltage(double left, double right) {
 		leftMaster.setVoltage(left * 12.0);
 		rightMaster.setVoltage(right * 12.0);
 	}
 
+	/**
+	 * Makes the robot's left and right sides of the drive train
+	 * drive at their respective percentages of max throttle 
+	 * passed in.
+	 * 
+	 * @param left The percentage of max throttle for the left side.
+	 * @param right The percentage of max throttle for the right side.
+	 */
 	public void percent(double left, double right) {
 		this.leftPIDCont.setReference(left, ControlType.kDutyCycle);
 		this.rightPIDCont.setReference(right, ControlType.kDutyCycle);
 	}
 
-	public double getAngle() {
-		double angle = Math.abs(navX.getAngle());
-		return angle;
-	}
-
+	/**
+	 * Resets the angle of the NavX to zero.
+	 */
 	public void resetAngle() {
 		navX.reset();
 	}
 
+	/**
+	 * @deprecated Not needed after odometry code.
+	 * <p>
+	 * Resets the position of the left and right motor encoders
+	 * to zero.
+	 */
 	public void resetPosition() {
 		this.leftEncoder.setPosition(0);
 		this.rightEncoder.setPosition(0);
 	}
 
-	// TODONE: Add back old turn code in a different method for use of non-odometry autonomous commands
+	/**
+	 * Turns the robot in the set direction ({@link #turnDirection})
+	 * calculated via {@link #driveToPosition(double, double)} at the 
+	 * passed in speed.
+	 * 
+	 * @param speed Percentage of voltage to set the robot to using {@link #voltage(double, double)}.
+	 */
 	public void turn(double speed) {
 		switch (turnDirection) {
 		case LEFT:
@@ -536,6 +667,12 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * Turns the robot in the passed in direction at the passed in speed.
+	 * 
+	 * @param speed Percentage of voltage to set the robot to using {@link #voltage(double, double)}.
+	 * @param direction The direction to turn in.
+	 */
 	public void oldTurn(double speed, Direction direction) {
 		switch (direction) {
 		case LEFT:
@@ -549,33 +686,35 @@ public class DriveSystem extends SubsystemBase {
 		}
 	}
 
+	/**
+	 * Returns whether the robot has reached the passed in angle.
+	 * This method is for use with the {@link #oldTurn(double, Direction)} method.
+	 * 
+	 * @param angle The angle to check.
+	 * @return Whether or not the robot has reached the angle.
+	 */
 	public boolean oldReachedTurn(double angle) {
-		// if (angle + 2 > 360) {
-		// 	return 360 - robotAngle.getDegrees() <= (angle + 2) % 360 && robotAngle.getDegrees() >= angle - 1;
-		// }
-		// if (angle - 2 < 0) {
-		// 	return robotAngle.getDegrees() <= angle + 2 && -robotAngle.getDegrees() >= angle - 2;
-		// }
 		return robotAngle.getDegrees() <= angle + 2 && robotAngle.getDegrees() >= angle - 2;
 	}
 
+	/**
+	 * Returns whether the robot has reached the target angle calculated in
+	 * {@link #driveToPosition(double, double)}.
+	 * This method is for use with the {@link #turn(double)} method.
+	 * 
+	 * @return Whether or not the robot has reached the angle.
+	 */
 	public boolean reachedTurn() {
 		double angle = targetPosition.getRotation().getDegrees();
-
-		// System.out.println("Robot Angle: " + robotAngle.getDegrees());
-		// System.out.println("Target Angle: " + angle);
 		
-		if (angle + 1 > 360) {
-			return 360 - robotAngle.getDegrees() <= (angle + 1) % 360 && robotAngle.getDegrees() >= angle - 1;
-		}
-		else if (angle - 1 < 0) {
-			return robotAngle.getDegrees() <= angle + 1 && -(360 - robotAngle.getDegrees()) >= angle - 1;
-		}
-		else {
-			return robotAngle.getDegrees() <= angle + 1 && robotAngle.getDegrees() >= angle - 1;
-		}
+		return robotAngle.getDegrees() <= angle + 2 && robotAngle.getDegrees() >= angle - 2;
 	}
 
+	/**
+	 * Runs the code within it every 20ms.
+	 * <p>
+	 * Used for calculating the robot's position via odometry.
+	 */
 	@Override
 	public void periodic() {
 		double leftDist = leftEncoder.getPosition() * WHEEL_CIRCUMFERENCE_M;

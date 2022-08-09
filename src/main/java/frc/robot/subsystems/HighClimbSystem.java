@@ -29,34 +29,49 @@ import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 
 public class HighClimbSystem extends SubsystemBase {
-
   private WPI_TalonSRX highClimbMotor;
 
   public static final double HIGH_CLIMB_MOTOR_PERCENT = 0.25;
 
+  /**
+   * Constructor for the high climb system.
+   */
   public HighClimbSystem() {
     this.highClimbMotor = new WPI_TalonSRX(Constants.HIGH_CLIMB_MOTOR);
   }
 
+  /**
+   * Sets the high climb motor to lift up the high climb hook.
+   */
   public void highClimberUp() {
     highClimbMotor.set(ControlMode.PercentOutput, HIGH_CLIMB_MOTOR_PERCENT);
   }
 
+  /**
+   * Sets the high climb motor to lower down the high climb hook.
+   */
   public void highClimberDown() {
     highClimbMotor.set(ControlMode.PercentOutput, -HIGH_CLIMB_MOTOR_PERCENT);
   }
   
+  /**
+   * Stops the high climb motor from running.
+   */
   public void highClimberStop() {
     highClimbMotor.set(ControlMode.PercentOutput, 0.0);
   }
 
+  /**
+   * Runs the code within it every 20ms.
+   */
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
   }
 
+  /**
+   * Runs the code within it every 20ms only in simulation mode.
+   */
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   }
 }

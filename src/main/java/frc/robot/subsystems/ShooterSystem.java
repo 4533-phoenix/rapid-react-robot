@@ -38,6 +38,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.commands.Direction;
+
+/**
+ * The class for the shooter system.
+ */
 public class ShooterSystem extends SubsystemBase {
     private WPI_TalonFX leftFlywheelMotor;
     private WPI_TalonFX rightFlywheelMotor;
@@ -56,7 +60,7 @@ public class ShooterSystem extends SubsystemBase {
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
-    private static final double SERVO_OFFSET = 97.39;
+    private static final double SERVO_OFFSET = 179;
 
     // Projectile Constants and Variables
     private static final double MAX_FLYWHEEL_RPM = 3065.0; // RPM
@@ -77,8 +81,6 @@ public class ShooterSystem extends SubsystemBase {
     private static final double TRAJECTORY_CONSTANT = 2.0; // changes location of max height of trajectory
 
     private AHRS shooterNAVX;
-
-    public double hoodAngle;
     
     private double currHoodAngle;
 
@@ -128,8 +130,6 @@ public class ShooterSystem extends SubsystemBase {
 
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
-        hoodAngle = 0;
-
         currHoodAngle = 0;
 
         limitSwitch = new DigitalInput(Constants.LIMIT_SWITCH);
@@ -168,9 +168,8 @@ public class ShooterSystem extends SubsystemBase {
 
     /**
      * Runs the flywheel motors forwards at the percentage calculated
-     * by the auto shoot code to shoot balls out of the main shooter. 
-     * 
-     * @see #periodic()
+     * by the auto shoot code in {@link #periodic()} to shoot balls out 
+     * of the main shooter. 
      */
     public void flywheelAutoShoot() {
         this.leftFlywheelMotor.set(ControlMode.PercentOutput, shootHoodPercent);
@@ -242,8 +241,8 @@ public class ShooterSystem extends SubsystemBase {
             flywheelIntakeTime = 1.5;
         }
         
-        initialAngle = getHoodAngle();
-        targetAngle = hoodAngle;
+        initialAngle = currHoodAngle;
+        targetAngle = currHoodAngle;
         targetDirection = Direction.FORWARD;
 
         while (timer.get() < time) {
@@ -272,9 +271,7 @@ public class ShooterSystem extends SubsystemBase {
 
     /**
      * Resets the encoder positions of the drive system left 
-     * and right motors.
-     * 
-     * @see DriveSystem#resetPosition()
+     * and right motors using {@link DriveSystem#resetPosition()}
      */
     public void setFlywheelReset() {
         Robot.drive.resetPosition();
@@ -292,48 +289,41 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     /**
-     * Sets the field hoodAngle to the hood motor's current
-     * commanded position and returns the field hoodAngle.
+     * Returns the hood motor's current commanded position 
      * 
      * @return The hood motor's current commanded position.
-     * @see #hoodAngle
      */
     public double getHoodAngle() {
-        hoodAngle = this.hoodMotor.getAngle();
-        return hoodAngle;
+        return this.hoodMotor.getAngle();
     }
 
     /**
-     * Moves the hood up by a value of 0.5 degrees.
-     * 
-     * @see #setHoodAngle(double)
+     * Moves the hood up by a value of 0.5 degrees using
+     * {@link #setHoodAngle(double)}.
      */
     public void hoodUp() {
         setHoodAngle((SERVO_OFFSET - currHoodAngle) + 0.5);
     }
 
     /** 
-     * Moves the hood down by a value of 0.5 degrees.
-     * 
-     * @see #setHoodAngle(double)
+     * Moves the hood down by a value of 0.5 degrees using
+     * {@link #setHoodAngle(double)}.
      */
     public void hoodDown() {
         setHoodAngle((SERVO_OFFSET - currHoodAngle) - 0.5);
     }
 
     /** 
-     * Sets the hood to its current angle.
-     * 
-     * @see #setHoodAngle(double)
+     * Sets the hood to its current angle using 
+     * {@link #setHoodAngle(double)}.
      */
     public void hoodStop() {
         setHoodAngle(SERVO_OFFSET - currHoodAngle);
     }
 
     /**
-     * Turns the robot to be facing towards the hub.
-     * 
-     * @see DriveSystem#percent(double, double)
+     * Turns the robot to be facing towards the hub using
+     * {@link DriveSystem#percent(double, double)}.
      */
     public void setFlywheelPos() {
         // if (yaw >= 1) {
@@ -348,9 +338,8 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     /**
-     * Stops the robot from turning to face towards the hub.
-     * 
-     * @see DriveSystem#percent(double, double)
+     * Stops the robot from turning to face towards the hub using
+     * {@link DriveSystem#percent(double, double)}.
      */
     public void stopFlywheelPos() {
         Robot.drive.percent(0.0, 0.0);
@@ -367,9 +356,10 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     /**
-     * @deprecated Replaced by setFlywheelPos()
-     * 
-     * @see #setFlywheelPos()
+     * @deprecated Old auto turret swivel code, replaced by 
+     * {@link #setFlywheelPos()}.
+     * <p>
+     * Turns the robot to face the hub.
      */
     public void autoTurretSwivel() {
 		// System.out.println("test");
@@ -385,9 +375,12 @@ public class ShooterSystem extends SubsystemBase {
 	}
 
     /**
-     * @deprecated Replaced by flywheelReachedPosition()
+     * @deprecated Old turret reached position code, replaced by 
+     * {@link #flywheelReachedPosition()}.
+     * <p>
+     * Returns whether the robot is facing the hub.
      * 
-     * @see #flywheelReachedPosition()
+     * @return Whether or not the robot is facing the hub.
      */
 	public boolean turretReachedPosition() {
 		return targetOffsetAngle_Horizontal > -1.2 && targetOffsetAngle_Horizontal < 1.2;

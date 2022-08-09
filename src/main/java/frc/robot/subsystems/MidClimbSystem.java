@@ -29,34 +29,49 @@ import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 
 public class MidClimbSystem extends SubsystemBase {
-  
   private CANSparkMax climbMotor;
 
   public static final double CLIMB_MOTOR_PERCENT = 0.75;
   
+  /**
+   * Constructor for the mid climb system.
+   */
   public MidClimbSystem() {
     this.climbMotor = new CANSparkMax(Constants.ELEVATOR_MOTOR,MotorType.kBrushless);
   }
 
+  /**
+   * Sets the climb motor to pull robot up (go down).
+   */
   public void climberUp() {
     climbMotor.set(CLIMB_MOTOR_PERCENT);
   }
 
+  /**
+   * Sets the climb motor to lower robot down (go up).
+   */
   public void climberDown() {
     climbMotor.set(-CLIMB_MOTOR_PERCENT);
   }
   
+  /**
+   * Stops the climb motor from running.
+   */
   public void climberStop() {
     climbMotor.set(0.0);
   }
 
+  /**
+   * Runs the code within it every 20ms.
+   */
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
   }
 
+  /**
+   * Runs the code within it every 20ms only in simulation mode.
+   */
   @Override
   public void simulationPeriodic() {
-    // This method will be called once per scheduler run during simulation
   }
 }

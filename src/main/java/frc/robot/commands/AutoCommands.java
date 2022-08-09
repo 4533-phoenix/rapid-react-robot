@@ -69,7 +69,7 @@ public class AutoCommands {
     // Normal Commands:    
     public static Command driveDistanceAutoCommand() {
         return new FunctionalCommand(
-            () -> Robot.drive.getAngle(),
+            () -> {},
             () -> Robot.drive.driveDistance(),
             (interrupt) -> Robot.drive.percent(0.0, 0.0),
             () -> Robot.drive.reachedPosition(),
@@ -79,7 +79,7 @@ public class AutoCommands {
 
     public static Command turnCommand() {
         return new FunctionalCommand(
-            () -> Robot.drive.getAngle(),
+            () -> {},
             () -> Robot.drive.turn(0.1),
             (interrupt) -> Robot.drive.percent(0.0, 0.0),
             () -> Robot.drive.reachedTurn(),
@@ -118,16 +118,6 @@ public class AutoCommands {
         );
     }
 
-    public static Command angularTurnAutoCommand(double speed, double angle, Direction direction) {
-        return new FunctionalCommand(
-            () -> Robot.drive.resetAngle(),
-            () -> Robot.drive.turn(speed),
-            (interrupt) -> Robot.drive.percent(0.0, 0.0),
-            () -> Robot.drive.getAngle() >= angle,
-            Robot.drive
-        );
-    }
-
     public static Command curveTurnAutoCommand(double left, double right, Direction direction) {
         return new FunctionalCommand(
             () -> Robot.drive.resetPosition(), 
@@ -138,10 +128,10 @@ public class AutoCommands {
         );
     }
 
-    public static Command circleTurnAutoCommand(double speed, double angle, Direction direction, double radius) {
+    public static Command circleTurnAutoCommand(double angle, Direction direction, double radius) {
         return new FunctionalCommand(
             () -> Robot.drive.resetPosition(),
-            () -> Robot.drive.driveCircle(speed, angle, direction, radius), 
+            () -> Robot.drive.driveCircle(angle, direction, radius), 
             (interrupted) -> Robot.drive.tank(0,0), 
             () -> Robot.drive.reachedCircle(angle, radius, direction), 
             Robot.drive
@@ -171,7 +161,7 @@ public class AutoCommands {
 
 	public static Command oldAngularTurnAutoCommand(double speed, double angle, Direction direction) {
 		return new FunctionalCommand(
-			() -> Robot.drive.getAngle(),
+			() -> {},
 			() -> Robot.drive.oldTurn(speed, direction),
 			(interrupt) -> Robot.drive.percent(0.0, 0.0),
 			() -> Robot.drive.oldReachedTurn(angle),
