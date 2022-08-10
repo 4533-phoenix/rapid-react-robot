@@ -266,8 +266,6 @@ public class DriveSystem extends SubsystemBase {
 	 * Toggles drive mode ({@link #driveMode}) of our drive train between normal and inverted state.
 	 */
 	public void toggleDriveMode() {
-		System.out.println("test");
-
 		if (this.driveMode == DriveMode.Normal) {
 			this.driveMode = DriveMode.Inverted;
 		} else {
@@ -288,9 +286,9 @@ public class DriveSystem extends SubsystemBase {
 		double targetY = targetPosition.getY();
 
 		return
-		(robotX >= (targetX - 0.5) && robotX <= (targetX + 0.5)) 
+		(robotX >= (targetX - 0.25) && robotX <= (targetX + 0.25)) 
 		&& 
-		(robotY >= (targetY - 0.5) && robotY <= (targetY + 0.5));
+		(robotY >= (targetY - 0.25) && robotY <= (targetY + 0.25));
 	}
 
 	/**
