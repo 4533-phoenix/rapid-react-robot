@@ -395,10 +395,8 @@ public class DriveSystem extends SubsystemBase {
 		
 		if (driveDirection == Direction.FORWARD) {
 			targetDist = (targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
-			targetDist *= TICKS_PER_ROTATION;
 		} else if (driveDirection == Direction.BACKWARD) {
 			targetDist = (-1 * targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
-			targetDist *= TICKS_PER_ROTATION;
 		} else {
 			targetDist = 0;
 		}
@@ -420,9 +418,9 @@ public class DriveSystem extends SubsystemBase {
 		targetDirection = direction;
 
 		if (targetDirection == Direction.FORWARD) {
-			oldTargetPosition = (inches / WHEEL_CIRCUMFERENCE) * 42;
+			oldTargetPosition = (inches / WHEEL_CIRCUMFERENCE);
 		} else if (targetDirection == Direction.BACKWARD) {
-			oldTargetPosition = -1 * (inches / WHEEL_CIRCUMFERENCE) * 42;
+			oldTargetPosition = -1 * (inches / WHEEL_CIRCUMFERENCE);
 		} else {
 			oldTargetPosition = 0;
 		}
@@ -727,13 +725,6 @@ public class DriveSystem extends SubsystemBase {
 
 		robotPos = odometry.update(navXAngle, leftDist, rightDist);
 
-		// ensures there is never a negative angle value
-		// this is useful for turning, as we don't have to worry about the robot making unecessarily long turns
-		if (-navX.getAngle() < 0) {
-			robotAngle = Rotation2d.fromDegrees(360 - (navX.getAngle() % 360));
-		}
-		else {
-			robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
-		}
+		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
 	}
 }
