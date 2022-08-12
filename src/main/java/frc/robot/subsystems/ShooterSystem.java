@@ -60,7 +60,7 @@ public class ShooterSystem extends SubsystemBase {
     private static final double DEGREES_PER_TICK = 360/DriveSystem.TICKS_PER_ROTATION;
     private static final double HOOD_DEGREES_PER_TICK = DEGREES_PER_TICK/80;
     private static final double HOOD_DEGREES_PER_ROTATION = HOOD_DEGREES_PER_TICK * DriveSystem.TICKS_PER_ROTATION;
-    private static final double SERVO_OFFSET = 179;
+    private static double servoOffset = 179;
 
     // Projectile Constants and Variables
     private static final double MAX_FLYWHEEL_RPM = 3065.0; // RPM
@@ -78,7 +78,7 @@ public class ShooterSystem extends SubsystemBase {
     private static double rotationalVelocity = 0.0;
     private static double shootHoodAngle = 0.0;
     private static double shootHoodPercent = 0.0;
-    private static final double TRAJECTORY_CONSTANT = 2.0; // changes location of max height of trajectory
+    private static double trajectoryConstant = 2.0; // changes location of max height of trajectory
 
     private AHRS shooterNAVX;
     
@@ -117,7 +117,7 @@ public class ShooterSystem extends SubsystemBase {
 
         hoodMotor = new Servo(Constants.HOOD_SERVO_MOTOR);
 
-        hoodMotor.setAngle(SERVO_OFFSET);
+        hoodMotor.setAngle(servoOffset);
 
         leftFlywheelMotor.setNeutralMode(NeutralMode.Brake);
         rightFlywheelMotor.setNeutralMode(NeutralMode.Brake);
@@ -135,6 +135,8 @@ public class ShooterSystem extends SubsystemBase {
         limitSwitch = new DigitalInput(Constants.LIMIT_SWITCH);
 
         limelight = NetworkTableInstance.getDefault().getTable("limelight");
+
+        shootHoodPercent = FLYWHEEL_MOTOR_PERCENT;
 
         // visionCam = new PhotonCamera("WARCam");
         // result = null;
@@ -162,8 +164,8 @@ public class ShooterSystem extends SubsystemBase {
      * shoot balls out of the main shooter.
      */
     public void flywheelOut() {
-        this.leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
-        this.rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+        this.leftFlywheelMotor.set(ControlMode.PercentOutput, shootHoodPercent);
+        this.rightFlywheelMotor.set(ControlMode.PercentOutput, shootHoodPercent);
     }
 
     /**
@@ -208,16 +210,6 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     /**
-     * Returns the current hood angle calculated by the 
-     * auto shoot code.
-     * 
-     * @return The current calculated hood angle
-     */
-    public double getShootHoodAngle() {
-        return shootHoodAngle;
-    }
-
-    /**
      * Runs the flywheel motors and then the flywheel intake motor to shoot
      * balls, with timing based on the number of balls and whether the 
      * flywheel is currently running.
@@ -247,12 +239,11 @@ public class ShooterSystem extends SubsystemBase {
 
         while (timer.get() < time) {
             if (!flywheelRunning) {
-                leftFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
-                rightFlywheelMotor.set(ControlMode.PercentOutput, FLYWHEEL_MOTOR_PERCENT);
+                this.flywheelOut();
             }
             
             if (timer.get() > flywheelIntakeTime) {
-                flywheelIntakeMotor.set(ControlMode.PercentOutput, FLYWHEEL_INTAKE_MOTOR_PERCENT);
+                this.flywheelIntakeIn();
             }
         }
 
@@ -270,14 +261,6 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     /**
-     * Resets the encoder positions of the drive system left 
-     * and right motors using {@link DriveSystem#resetPosition()}
-     */
-    public void setFlywheelReset() {
-        Robot.drive.resetPosition();
-    }
-
-    /**
      * Sets the servo motor to the specified angle by subtracting
      * said angle from the servo offset, which is the real position 
      * of the servo.
@@ -285,11 +268,11 @@ public class ShooterSystem extends SubsystemBase {
      * @param angle The angle to set the servo motor to.
      */
     public void setHoodAngle(double angle) {
-        this.hoodMotor.setAngle(SERVO_OFFSET - angle);
+        this.hoodMotor.setAngle(servoOffset - angle);
     }
 
     /**
-     * Returns the hood motor's current commanded position 
+     * Returns the hood motor's current commanded position.
      * 
      * @return The hood motor's current commanded position.
      */
@@ -298,11 +281,49 @@ public class ShooterSystem extends SubsystemBase {
     }
 
     /**
+     * Sets the hood motor's servo offset to the 
+     * passed in offset.
+     * 
+     * @param offset Offset to set servo offset to (degrees).
+     */
+    public void setServoOffset(double offset) {
+        this.servoOffset = offset;
+    }
+    /**
+     * Returns the hood motor's current servo offset.
+     * 
+     * @return The hood motor's current servo offset.
+     */
+    public double getServoOffset() {
+        return this.servoOffset;
+    }
+
+    /**
+     * Sets the auto shoot math's trajectory constant
+     * to the passed in constant.
+     * 
+     * @param constant Constant to set trajectory constant to.
+     */
+    public void setTrajectoryConstant(double constant) {
+        this.trajectoryConstant = constant;
+    }
+
+    /**
+     * Returns the auto shoot math's current 
+     * trajectory constant.
+     * 
+     * @return The auto shoot math's current trajectory constant.
+     */
+    public double getTrajectoryConstant() {
+        return this.trajectoryConstant;
+    }
+
+    /**
      * Moves the hood up by a value of 0.5 degrees using
      * {@link #setHoodAngle(double)}.
      */
     public void hoodUp() {
-        setHoodAngle((SERVO_OFFSET - currHoodAngle) + 0.5);
+        setHoodAngle((servoOffset - currHoodAngle) + 0.5);
     }
 
     /** 
@@ -310,7 +331,7 @@ public class ShooterSystem extends SubsystemBase {
      * {@link #setHoodAngle(double)}.
      */
     public void hoodDown() {
-        setHoodAngle((SERVO_OFFSET - currHoodAngle) - 0.5);
+        setHoodAngle((servoOffset - currHoodAngle) - 0.5);
     }
 
     /** 
@@ -318,7 +339,7 @@ public class ShooterSystem extends SubsystemBase {
      * {@link #setHoodAngle(double)}.
      */
     public void hoodStop() {
-        setHoodAngle(SERVO_OFFSET - currHoodAngle);
+        setHoodAngle(servoOffset - currHoodAngle);
     }
 
     /**
@@ -387,6 +408,26 @@ public class ShooterSystem extends SubsystemBase {
 	}
 
     /**
+     * Returns the rotational velocity currently calculated
+     * by the auto shoot code.
+     * 
+     * @return The currently calculated rotation velocity (RPM).
+     */
+    public double getFlywheelRPM() {
+        return this.rotationalVelocity;
+    }
+
+    /**
+     * Returns the hood angle currently calculated by the 
+     * auto shoot code.
+     * 
+     * @return The currently calculated hood angle
+     */
+    public double getShootHoodAngle() {
+        return this.shootHoodAngle;
+    }
+
+    /**
      * Runs the code within it every 20ms.
      * <p>
      * Used for calculating limelight data, hood angle data, and 
@@ -433,7 +474,7 @@ public class ShooterSystem extends SubsystemBase {
          * when it goes into the goal
          * TODO: Consider using a different trajectory constant for different distances from the goal?
          */
-        horizontalDistance = ((GOAL_HEIGHT - CAMERA_HEIGHT) / Math.tan(cameraTargetAngle * (Math.PI / 180))) * TRAJECTORY_CONSTANT;
+        horizontalDistance = ((GOAL_HEIGHT - CAMERA_HEIGHT) / Math.tan(cameraTargetAngle * (Math.PI / 180))) * trajectoryConstant;
 
         initialXVelocity = horizontalDistance / TIME_TO_SHOOT;
         initialVelocity = Math.sqrt(Math.pow(initialXVelocity, 2) + Math.pow(INITIAL_Y_VELOCITY, 2));
@@ -446,7 +487,9 @@ public class ShooterSystem extends SubsystemBase {
         rotationalVelocity = ((initialVelocity / FLYWHEEL_RADIUS) * 60) / (2 * Math.PI); 
         
         shootHoodAngle = Math.atan(INITIAL_Y_VELOCITY / initialXVelocity) * (180 / Math.PI);
-        shootHoodPercent = rotationalVelocity * (1 / MAX_FLYWHEEL_RPM);
+        
+        // shootHoodPercent = rotationalVelocity * (1 / MAX_FLYWHEEL_RPM);
+        shootHoodPercent = FLYWHEEL_MOTOR_PERCENT;
 
         initialAngle = getHoodAngle();
 

@@ -99,7 +99,7 @@ public class ShooterCommands {
 
     public static Command autoFlywheelPos() {
         return new FunctionalCommand(
-            () -> Robot.shooter.setFlywheelReset(), 
+            () -> {}, 
             () -> Robot.shooter.setFlywheelPos(), 
             (interrupt) -> Robot.shooter.stopFlywheelPos(), 
             () -> Robot.shooter.flywheelReachedPosition(), 
@@ -116,7 +116,7 @@ public class ShooterCommands {
 
     public static Command oldAutoFlywheelPos() {
         return new FunctionalCommand(
-            () -> Robot.shooter.setFlywheelReset(),
+            () -> {},
             () -> Robot.shooter.autoTurretSwivel(),
             (interrupt) -> Robot.shooter.stopFlywheelPos(),
             () -> Robot.shooter.turretReachedPosition(),
@@ -127,7 +127,7 @@ public class ShooterCommands {
     public static Command autoShoot(double hoodAngle, int balls, boolean flywheelRunning) {
         return new SequentialCommandGroup(
             setHoodAngleCommand(hoodAngle),
-            // oldAutoFlywheelPos(),
+            oldAutoFlywheelPos(),
             flywheelAndIntakeRunCommand(balls, flywheelRunning),
             flywheelAndIntakeStopCommand()
         );

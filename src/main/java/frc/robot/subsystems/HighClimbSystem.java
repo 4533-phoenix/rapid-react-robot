@@ -28,6 +28,9 @@ import frc.robot.Constants;
 import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 
+/**
+ * The class for the high climb system.
+ */
 public class HighClimbSystem extends SubsystemBase {
   private WPI_TalonSRX highClimbMotor;
 

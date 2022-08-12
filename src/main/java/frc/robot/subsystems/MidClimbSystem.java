@@ -28,6 +28,9 @@ import frc.robot.Constants;
 import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
 
+/**
+ * The class for the mid climb system.
+ */
 public class MidClimbSystem extends SubsystemBase {
   private CANSparkMax climbMotor;
 

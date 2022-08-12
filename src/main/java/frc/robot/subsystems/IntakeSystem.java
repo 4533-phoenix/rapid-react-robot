@@ -11,6 +11,9 @@ import frc.robot.Constants;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+/**
+ * The class for the intake system.
+ */
 public class IntakeSystem extends SubsystemBase {
   private final double INTAKE_MOTOR_PERCENT = 0.65;
   private final double INTAKE_LIFT_MOTOR_PERCENT = 0.4;

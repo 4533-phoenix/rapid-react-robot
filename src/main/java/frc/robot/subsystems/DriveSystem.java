@@ -33,7 +33,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import java.lang.Math.*;
 
 /**
- * Class for the drive system.
+ * The class for the drive system.
  */
 public class DriveSystem extends SubsystemBase {
 	// Drive train motor controllers
@@ -47,12 +47,14 @@ public class DriveSystem extends SubsystemBase {
 	private SparkMaxPIDController leftPIDCont;
 	private SparkMaxPIDController rightPIDCont;
 
-	private PIDController dashboardCont;
+    public enum Mode {
+        AUTONOMOUS, TELEOP
+    }
 
 	// Onboard IMU.
 	private AHRS navX;
 
-	private static final double MAX_VELOCITY = 4000;
+	private static final double MAX_VELOCITY = 5500;
 	private static final double TURBO_VELOCITY = 8000;
 	private static final double QUARTER_VELOCITY = 1000;
 	private static final double PEAK_OUTPUT = 1.0;
@@ -61,13 +63,13 @@ public class DriveSystem extends SubsystemBase {
 
 	// Wheel specific constants.
 	public static final double TICKS_PER_ROTATION = 42.0;
-	private static final double WHEEL_DIAMETER = 6.0;
-	private static final double WHEEL_DIAMETER_M = 0.1524;
-	private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
-	private static final double WHEEL_CIRCUMFERENCE_M = WHEEL_DIAMETER_M * Math.PI;
-	private static final double TICKS_PER_INCH = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE;
-	private static final double TICKS_PER_METER = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE_M;
-	private static final double METERS_PER_TICK = WHEEL_CIRCUMFERENCE_M / TICKS_PER_ROTATION;
+	public static final double WHEEL_DIAMETER = 6.0;
+	public static final double WHEEL_DIAMETER_M = 0.1524;
+	public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
+	public static final double WHEEL_CIRCUMFERENCE_M = WHEEL_DIAMETER_M * Math.PI;
+	public static final double TICKS_PER_INCH = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE;
+	public static final double TICKS_PER_METER = TICKS_PER_ROTATION / WHEEL_CIRCUMFERENCE_M;
+	public static final double METERS_PER_TICK = WHEEL_CIRCUMFERENCE_M / TICKS_PER_ROTATION;
 
 	// Unit specific constants.
 	public static final double INCHES_PER_METER = 39.3701;
@@ -160,8 +162,6 @@ public class DriveSystem extends SubsystemBase {
 
 		this.rightPIDCont = rightMaster.getPIDController();
 		rightPIDCont.setFeedbackDevice(rightEncoder);
-
-		this.dashboardCont = new PIDController(leftPIDCont.getP(1), leftPIDCont.getI(1), leftPIDCont.getD(1));
 
 		this.leftSlave.follow(leftMaster);
 		this.rightSlave.follow(rightMaster);
@@ -271,6 +271,77 @@ public class DriveSystem extends SubsystemBase {
 		} else {
 			this.driveMode = DriveMode.Normal;
 		}
+	}
+
+	/**
+	 * Sets the PIDF values of the passed in PID 
+	 * controller depending on the drive mode ({@link Mode}).
+	 * 
+	 * @param controller The controller to have its PIDF values set.
+	 * @param mode The drive mode.
+	 */
+	public void setPIDF(SparkMaxPIDController controller, Mode mode) {
+		if (mode == Mode.AUTONOMOUS) {
+			controller.setP(POSITION_P, Constants.POSITION_SLOT_ID);
+			controller.setI(POSITION_I, Constants.POSITION_SLOT_ID);
+			controller.setD(POSITION_D, Constants.POSITION_SLOT_ID);
+			controller.setIZone(POSITION_I_ZONE, Constants.POSITION_SLOT_ID);
+			controller.setFF(POSITION_FEED_FORWARD, Constants.POSITION_SLOT_ID);
+		}
+		else if (mode == Mode.TELEOP) {
+			controller.setP(VELOCITY_P, Constants.VELOCITY_SLOT_ID);
+			controller.setI(VELOCITY_I, Constants.VELOCITY_SLOT_ID);
+			controller.setD(VELOCITY_D, Constants.VELOCITY_SLOT_ID);
+			controller.setIZone(VELOCITY_I_ZONE, Constants.VELOCITY_SLOT_ID);
+			controller.setFF(VELOCITY_FEED_FORWARD, Constants.VELOCITY_SLOT_ID);
+		}
+	}
+
+	/**
+	 * Sets the PIDF values of the passed in PID controller
+	 * depending on the passed in values.
+	 * 
+	 * @param controller The controller to have its PIDF values set.
+	 * @param p The p value.
+	 * @param i The i value.
+	 * @param d The d value.
+	 * @param iz The i zone value.
+	 * @param ff The feed forward value.
+	 * @param slotID The id for the slot that these values will be stored at.
+	 */
+	public void setPIDF(SparkMaxPIDController controller, double p, double i, double d, double iz, double ff, int slotID) {
+		controller.setP(p, slotID);
+		controller.setI(i, slotID);
+		controller.setD(d, slotID);
+		controller.setIZone(iz, slotID);
+		controller.setFF(ff, slotID);
+	}
+
+	/**
+	 * Returns the robot's current position.
+	 * 
+	 * @return Robot's position.
+	 */
+	public Pose2d getRobotPos() {
+		return robotPos;
+	}
+
+	/**
+	 * Returns the robot's current angle.
+	 * 
+	 * @return Robot's angle.
+	 */
+	public double getRobotAngle() {
+		return robotAngle.getDegrees();
+	}
+
+	/**
+	 * Returns the current target position.
+	 * 
+	 * @return Target position.
+	 */
+	public Pose2d getTargetPos() {
+		return targetPosition;
 	}
 
 	/**
@@ -632,8 +703,6 @@ public class DriveSystem extends SubsystemBase {
 	}
 
 	/**
-	 * @deprecated Not needed after odometry code.
-	 * <p>
 	 * Resets the position of the left and right motor encoders
 	 * to zero.
 	 */

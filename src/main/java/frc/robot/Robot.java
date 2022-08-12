@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.can.SlotConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Timer;
@@ -27,6 +29,13 @@ import frc.robot.subsystems.HighClimbSystem;
 import frc.robot.subsystems.IntakeSystem;
 import frc.robot.subsystems.MidClimbSystem;
 import frc.robot.subsystems.ShooterSystem;
+
+import frc.robot.tests.Test;
+import frc.robot.tests.DrivePIDTest;
+import frc.robot.tests.DriveOdometryTest;
+import frc.robot.tests.ShooterHoodTest;
+import frc.robot.tests.ShooterVisionTest;
+import frc.robot.tests.ShooterAutoShootTest;
 
 public class Robot extends TimedRobot {
   	private Logger stateLogger = LogManager.getLogger("robot_state");
@@ -76,6 +85,12 @@ public class Robot extends TimedRobot {
 	public final static ShooterSystem shooter = new ShooterSystem();
 
 	/**
+	 * The array that stores all of the tests to 
+	 * run in Test mode.
+	 */
+	private static ArrayList<Test> tests = new ArrayList<Test>();
+
+	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
@@ -85,14 +100,9 @@ public class Robot extends TimedRobot {
 		// Instantiate our RobotContainer.  This will perform all our button
 		// bindings, and put our autonomous chooser on the dashboard.
 		this.container = new RobotContainer();
-	}
 
-	public static void setPIDF(SparkMaxPIDController controller, double p, double i, double d, double iz, double ff, int slotID) {
-		controller.setP(p,slotID);
-		controller.setI(i,slotID);
-		controller.setD(d,slotID);
-		controller.setIZone(iz,slotID);
-		controller.setFF(ff,slotID);
+		drive.resetAngle();
+		drive.resetPosition();
 	}
 
 	@Override
@@ -117,29 +127,8 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
-		setPIDF(
-			drive.getLeftPIDCont(), 
-			DriveSystem.POSITION_P, 
-			DriveSystem.POSITION_I, 
-			DriveSystem.POSITION_D, 
-			DriveSystem.POSITION_I_ZONE, 
-			DriveSystem.POSITION_FEED_FORWARD,
-			Constants.POSITION_SLOT_ID
-		);
-
-		setPIDF(
-			drive.getRightPIDCont(), 
-			DriveSystem.POSITION_P, 
-			DriveSystem.POSITION_I, 
-			DriveSystem.POSITION_D, 
-			DriveSystem.POSITION_I_ZONE, 
-			DriveSystem.POSITION_FEED_FORWARD,
-			Constants.POSITION_SLOT_ID
-		);
-
-		Robot.drive.resetAngle();
-
-		// Robot.drive.resetPosition();
+		drive.setPIDF(drive.getLeftPIDCont(), DriveSystem.Mode.AUTONOMOUS);
+		drive.setPIDF(drive.getRightPIDCont(), DriveSystem.Mode.AUTONOMOUS);
 
 		this.autoCommand = this.container.getAutonomousCommand("shootAndDriveOffTarmac");
 
@@ -158,30 +147,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		setPIDF(
-			drive.getLeftPIDCont(), 
-			DriveSystem.VELOCITY_P, 
-			DriveSystem.VELOCITY_I, 
-			DriveSystem.VELOCITY_D, 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
-
-		setPIDF(
-			drive.getRightPIDCont(), 
-			DriveSystem.VELOCITY_P, 
-			DriveSystem.VELOCITY_I, 
-			DriveSystem.VELOCITY_D, 
-			DriveSystem.VELOCITY_I_ZONE, 
-			DriveSystem.VELOCITY_FEED_FORWARD,
-			Constants.VELOCITY_SLOT_ID
-		);
-
-		
-
-		Robot.drive.resetAngle();
-		// Robot.drive.resetPosition();
+		drive.setPIDF(drive.getLeftPIDCont(), DriveSystem.Mode.TELEOP);
+		drive.setPIDF(drive.getRightPIDCont(), DriveSystem.Mode.TELEOP);
 
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
@@ -203,6 +170,12 @@ public class Robot extends TimedRobot {
 	public void testInit() {
 		// Cancels all running commands at the start of test mode.
 		CommandScheduler.getInstance().cancelAll();
+
+		tests.add(new DrivePIDTest(DriveSystem.Mode.AUTONOMOUS));
+		tests.add(new DriveOdometryTest());
+		tests.add(new ShooterHoodTest());
+		tests.add(new ShooterVisionTest());
+		tests.add(new ShooterAutoShootTest());
 	}
 
 	/**
@@ -210,6 +183,9 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+		for (Test t : tests) {
+			t.run();
+		}
 	}
 
 	@Override

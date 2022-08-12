@@ -44,7 +44,7 @@ public class AutoCommands {
             ShooterCommands.autoShoot(32.0, 1, false),
             oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
             oldAngularTurnAutoCommand(0.20, 150, Direction.LEFT).withTimeout(2.5),
-            oldGetBallAutoCommand(20, Direction.FORWARD).withTimeout(2.25),
+            oldGetBallAutoCommand(60, Direction.FORWARD).withTimeout(2.25),
             oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
             // ShooterCommands.oldAutoFlywheelPos(),
             ShooterCommands.autoShoot(37.0, 1, false)
@@ -98,8 +98,7 @@ public class AutoCommands {
         return new SequentialCommandGroup(
             driveToPosition(xMeters, yMeters),
             turnCommand(),
-            driveDistanceAutoCommand(),
-            oldAngularTurnAutoCommand(0.1, 0.0, Direction.RIGHT)
+            driveDistanceAutoCommand()
         );
     }
 
@@ -120,7 +119,7 @@ public class AutoCommands {
 
     public static Command curveTurnAutoCommand(double left, double right, Direction direction) {
         return new FunctionalCommand(
-            () -> Robot.drive.resetPosition(), 
+            () -> {}, 
             () -> Robot.drive.driveCurve(left, right, direction), 
             (interrupt) -> Robot.drive.tank(0,0), 
             () -> Robot.drive.reachedCurve(left, right), 
@@ -130,7 +129,7 @@ public class AutoCommands {
 
     public static Command circleTurnAutoCommand(double angle, Direction direction, double radius) {
         return new FunctionalCommand(
-            () -> Robot.drive.resetPosition(),
+            () -> {},
             () -> Robot.drive.driveCircle(angle, direction, radius), 
             (interrupted) -> Robot.drive.tank(0,0), 
             () -> Robot.drive.reachedCircle(angle, radius, direction), 
