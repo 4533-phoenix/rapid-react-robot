@@ -12,5 +12,7 @@ public class CompShuffleboard {
 
     private NetworkTableEntry field; 
 
-    //this.field = compTab.add("Field", Robot.drive.getField()).withWidget(BuiltInWidgets.kField).getEntry();
+    //public void CompetitionShuffleboard() {
+    //    this.field = compTab.add("Field", Robot.drive.getField()).withWidget(BuiltInWidgets.kField).getEntry();
+    //}
 }
