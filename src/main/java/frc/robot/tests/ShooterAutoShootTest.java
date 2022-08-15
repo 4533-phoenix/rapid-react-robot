@@ -119,7 +119,6 @@ public class ShooterAutoShootTest extends Test {
             // Sets the currently specified trajectory constant.
             Robot.shooter.setTrajectoryConstant(this.trajectoryConstant.getDouble(2.0));
 
-<<<<<<< HEAD
             /* 
              * Sets the auto shoot command.
              * 
@@ -128,10 +127,6 @@ public class ShooterAutoShootTest extends Test {
              * the Shuffleboard.
              */
             this.command = ShooterCommands.autoShoot(Robot.shooter.getShootHoodAngle(), 2, false);
-=======
-            // Sets the auto shoot command.
-            this.command = ShooterCommands.autoShoot(this.shootHoodAngle.getDouble(90.0), 2, false);
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
 
             /*
              * Schedules the auto shoot command if the auto shoot
@@ -149,12 +144,9 @@ public class ShooterAutoShootTest extends Test {
                 CommandScheduler.getInstance().cancel(this.command);
             }
         }
-<<<<<<< HEAD
         // If not enabled, cancel the current test.
         else {
             CommandScheduler.getInstance().cancel(this.command);
         }
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
     }
 }
