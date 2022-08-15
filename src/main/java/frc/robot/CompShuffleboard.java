@@ -10,9 +10,11 @@ import edu.wpi.first.networktables.*;
 public class CompShuffleboard {
     private ShuffleboardTab compTab;
 
+    //Shuffleboard Elements
     private ComplexWidget field;
     private NetworkTableEntry gyro; 
 
+    //Shuffleboard Elements being constructed.
     public CompShuffleboard() {
         this.compTab = Shuffleboard.getTab("Competition");
         this.field = compTab.add("Field", Robot.drive.getField()).withWidget(BuiltInWidgets.kField);

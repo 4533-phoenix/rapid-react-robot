@@ -778,6 +778,11 @@ public class DriveSystem extends SubsystemBase {
 		return robotAngle.getDegrees() <= angle + 2 && robotAngle.getDegrees() >= angle - 2;
 	}
 
+	/**
+	 * Returns the Robots current position relative to the field.
+	 * 
+	 * @return Robots curretn position relative to the field.
+	 */
 	public Field2d getField(){
 		return this.field;
 	}
