@@ -57,6 +57,7 @@ public class ShooterHoodTest extends Test {
         this.tab = Shuffleboard.getTab("Test");
         this.layout = tab.getLayout("Shooter Hood Testing").withPosition(4, 0).withSize(2, 4);
 
+<<<<<<< HEAD
         /*
          * Set the commanded hood angle to the current commanded
          * hood angle by extracting said commanded hood angle
@@ -68,6 +69,9 @@ public class ShooterHoodTest extends Test {
          * other than the one it's already at.
          */
         this.setHoodAngle = layout.add("Commanded Hood Angle", Robot.shooter.getServoOffset() - Robot.shooter.getHoodAngle()).getEntry();
+=======
+        this.setHoodAngle = layout.add("Commanded Hood Angle", 0.0).getEntry();
+>>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
         this.actualHoodAngle = layout.add("Actual Hood Angle", Robot.shooter.getHoodAngle()).getEntry();
         this.currServoOffset = layout.add("Current Servo Offset", Robot.shooter.getServoOffset()).getEntry();
 
@@ -95,11 +99,16 @@ public class ShooterHoodTest extends Test {
             /* 
              * Sets the hood angle to the commanded hood 
              * angle in the Shuffleboard.
+<<<<<<< HEAD
              * 
              * Use Robot.shooter.getServoOffset(), as servo 
              * offset might be different in Shuffleboard.
              */
             Robot.shooter.setHoodAngle(setHoodAngle.getDouble(Robot.shooter.getServoOffset()));
+=======
+             */
+            Robot.shooter.setHoodAngle(setHoodAngle.getDouble(currServoOffset.getDouble(90.0)));
+>>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
 
             /* 
              * Sets the actual hood angle in the Shuffleboard 
@@ -107,6 +116,7 @@ public class ShooterHoodTest extends Test {
              */
             this.actualHoodAngle.setDouble(Robot.shooter.getHoodAngle());
         }
+<<<<<<< HEAD
         // If not enabled, cancel the current test.
         else {
             /* 
@@ -115,5 +125,7 @@ public class ShooterHoodTest extends Test {
              */
             Robot.shooter.setHoodAngle(Robot.shooter.getServoOffset());
         }
+=======
+>>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
     }
 }
