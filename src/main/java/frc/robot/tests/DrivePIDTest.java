@@ -1,10 +1,7 @@
 package frc.robot.tests;
 
-<<<<<<< HEAD
 import java.util.Map;
 
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.networktables.*;
@@ -54,14 +51,11 @@ public class DrivePIDTest extends Test {
      * The setpoint value for PID testing.
      */
     private NetworkTableEntry setpoint;
-<<<<<<< HEAD
 
     /**
      * The actual value of the robot (Position/Velocity).
      */
     private NetworkTableEntry actualValue;
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
     
     /**
      * The value for whether or not PID testing is enabled.
@@ -105,7 +99,6 @@ public class DrivePIDTest extends Test {
         this.enablePID = layout.add("Enable PID Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
 
         if (mode == DriveSystem.Mode.AUTONOMOUS) {
-<<<<<<< HEAD
             this.actualValue = layout.add("Actual Value", Robot.drive.getPosition()).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Visible time", 15)).getEntry();
 
             this.driveMode = layout.add("Autonomous <---> Teleop", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
@@ -113,11 +106,6 @@ public class DrivePIDTest extends Test {
         else if (mode == DriveSystem.Mode.TELEOP) {
             this.actualValue = layout.add("Actual Value", Robot.drive.getVelocity()).withWidget(BuiltInWidgets.kGraph).withProperties(Map.of("Visible time", 15)).getEntry();
 
-=======
-            this.driveMode = layout.add("Autonomous <---> Teleop", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-        }
-        else if (mode == DriveSystem.Mode.TELEOP) {
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
             this.driveMode = layout.add("Autonomous <---> Teleop", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
         }
 
@@ -196,12 +184,9 @@ public class DrivePIDTest extends Test {
 
             // Starts PID testing for the selected drive mode.
             if (currMode == DriveSystem.Mode.AUTONOMOUS) {
-<<<<<<< HEAD
                 // Update current robot position (rotations).
                 this.actualValue.setDouble(Robot.drive.getPosition());
 
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
                 setPIDFVals(pValue.getDouble(0.0), iValue.getDouble(0.0), dValue.getDouble(0.0), 0.0, fValue.getDouble(0.0), Constants.POSITION_SLOT_ID);
 
                 // Divide by wheel circumference (in.) to go from inches to rotations
@@ -209,24 +194,18 @@ public class DrivePIDTest extends Test {
                 Robot.drive.getRightPIDCont().setReference(setpoint.getDouble(0.0) / DriveSystem.WHEEL_CIRCUMFERENCE, ControlType.kPosition, Constants.POSITION_SLOT_ID);
             }
             else if (currMode == DriveSystem.Mode.TELEOP) {
-<<<<<<< HEAD
                 // Update current robot velocity (RPM).
                 this.actualValue.setDouble(Robot.drive.getVelocity());
                 
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
                 setPIDFVals(pValue.getDouble(0.0), iValue.getDouble(0.0), dValue.getDouble(0.0), 0.0, fValue.getDouble(0.0), Constants.VELOCITY_SLOT_ID);
 
                 Robot.drive.getLeftPIDCont().setReference(setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
                 Robot.drive.getRightPIDCont().setReference(setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
             }
         }
-<<<<<<< HEAD
         // If not enabled, cancel the current test.
         else {
             Robot.drive.percent(0.0, 0.0);
         }
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
     }
 }

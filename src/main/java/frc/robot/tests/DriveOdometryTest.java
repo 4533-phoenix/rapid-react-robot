@@ -65,7 +65,6 @@ public class DriveOdometryTest extends Test {
 
         this.robotPosition = layout.add("Robot Pos", new double[]{robotPos.getX(), robotPos.getY()}).getEntry();
         this.robotAngle = layout.add("Robot Angle", Robot.drive.getRobotAngle()).getEntry();
-<<<<<<< HEAD
 
         /*
          * Set the initial target position of the robot to the 
@@ -74,9 +73,6 @@ public class DriveOdometryTest extends Test {
          * location.
          */
         this.targetPosition = layout.add("Target Pos", new double[]{robotPos.getX(), robotPos.getY()}).getEntry();
-=======
-        this.targetPosition = layout.add("Target Pos", new double[]{0.0, 0.0}).getEntry();
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
 
         this.enableOdometry = layout.add("Enable Odometry Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     }
@@ -116,12 +112,9 @@ public class DriveOdometryTest extends Test {
                 CommandScheduler.getInstance().schedule(this.command);
             }
         }
-<<<<<<< HEAD
         // If not enabled, cancel the current test.
         else {
             CommandScheduler.getInstance().cancel(this.command);
         }
-=======
->>>>>>> dfa063f975e1accada913951c28c8155de24cc4b
     }
 }
