@@ -10,9 +10,10 @@ import edu.wpi.first.networktables.*;
 public class CompShuffleboard {
     private ShuffleboardTab compTab;
 
-    private NetworkTableEntry field; 
+    private ComplexWidget field; 
 
-    //public void CompetitionShuffleboard() {
-    //    this.field = compTab.add("Field", Robot.drive.getField()).withWidget(BuiltInWidgets.kField).getEntry();
-    //}
+    public CompShuffleboard() {
+        this.compTab = Shuffleboard.getTab("Competition");
+        this.field = compTab.add("Field", Robot.drive.getField()).withWidget(BuiltInWidgets.kField);
+    }
 }

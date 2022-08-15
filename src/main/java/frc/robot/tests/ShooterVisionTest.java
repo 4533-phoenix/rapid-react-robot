@@ -67,5 +67,9 @@ public class ShooterVisionTest extends Test {
                 CommandScheduler.getInstance().schedule(this.command);
             }
         }
+        // If not enabled, cancel the current test.
+        else {
+            CommandScheduler.getInstance().cancel(this.command);
+        }
     }
 }

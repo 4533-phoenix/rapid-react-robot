@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
@@ -137,6 +138,8 @@ public class DriveSystem extends SubsystemBase {
 	private Odometry odometry;
 	private Pose2d robotPos;
 	private Rotation2d robotAngle;
+
+	private final Field2d field = new Field2d();
 
 	private double target;
 
@@ -775,6 +778,10 @@ public class DriveSystem extends SubsystemBase {
 		return robotAngle.getDegrees() <= angle + 2 && robotAngle.getDegrees() >= angle - 2;
 	}
 
+	public Field2d getField(){
+		return this.field;
+	}
+
 	/**
 	 * Runs the code within it every 20ms.
 	 * <p>
@@ -793,5 +800,7 @@ public class DriveSystem extends SubsystemBase {
 		robotPos = odometry.update(navXAngle, leftDist, rightDist);
 
 		robotAngle = Rotation2d.fromDegrees(-navX.getAngle() % 360);
+
+		field.setRobotPose(robotPos);
 	}
 }

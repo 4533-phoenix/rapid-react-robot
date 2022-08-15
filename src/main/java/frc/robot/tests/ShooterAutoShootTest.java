@@ -119,8 +119,14 @@ public class ShooterAutoShootTest extends Test {
             // Sets the currently specified trajectory constant.
             Robot.shooter.setTrajectoryConstant(this.trajectoryConstant.getDouble(2.0));
 
-            // Sets the auto shoot command.
-            this.command = ShooterCommands.autoShoot(this.shootHoodAngle.getDouble(90.0), 2, false);
+            /* 
+             * Sets the auto shoot command.
+             * 
+             * Use Robot.shooter.getShootHoodAngle(), as 
+             * the shoot hood angle might not be set in
+             * the Shuffleboard.
+             */
+            this.command = ShooterCommands.autoShoot(Robot.shooter.getShootHoodAngle(), 2, false);
 
             /*
              * Schedules the auto shoot command if the auto shoot
@@ -137,6 +143,10 @@ public class ShooterAutoShootTest extends Test {
             if (percent != 0.0) {
                 CommandScheduler.getInstance().cancel(this.command);
             }
+        }
+        // If not enabled, cancel the current test.
+        else {
+            CommandScheduler.getInstance().cancel(this.command);
         }
     }
 }
