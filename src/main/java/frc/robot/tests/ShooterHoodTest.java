@@ -55,7 +55,7 @@ public class ShooterHoodTest extends Test {
      */
     public ShooterHoodTest() {
         this.tab = Shuffleboard.getTab("Test");
-        this.layout = tab.getLayout("Shooter Hood Testing").withPosition(4, 0).withSize(2, 4);
+        this.layout = tab.getLayout("Shooter Hood Testing", BuiltInLayouts.kList).withPosition(4, 0).withSize(2, 4);
 
         /*
          * Set the commanded hood angle to the current commanded

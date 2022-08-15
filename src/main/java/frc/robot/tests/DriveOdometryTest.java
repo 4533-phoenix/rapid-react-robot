@@ -59,7 +59,7 @@ public class DriveOdometryTest extends Test {
      */
     public DriveOdometryTest() {
         this.tab = Shuffleboard.getTab("Test");
-        this.layout = tab.getLayout("Drive Odometry Testing").withPosition(2, 0).withSize(2, 4);
+        this.layout = tab.getLayout("Drive Odometry Testing", BuiltInLayouts.kList).withPosition(2, 0).withSize(2, 4);
 
         Pose2d robotPos = Robot.drive.getRobotPos();
 

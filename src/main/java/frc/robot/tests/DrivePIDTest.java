@@ -88,7 +88,7 @@ public class DrivePIDTest extends Test {
      */
     public DrivePIDTest(DriveSystem.Mode mode) {
         this.tab = Shuffleboard.getTab("Test");
-        this.layout = tab.getLayout("Drive PID Testing").withPosition(0, 0).withSize(2, 4);
+        this.layout = tab.getLayout("Drive PID Testing", BuiltInLayouts.kList).withPosition(0, 0).withSize(2, 4);
 
         this.pValue = layout.add("P", 0.0).getEntry();
         this.iValue = layout.add("I", 0.0).getEntry();

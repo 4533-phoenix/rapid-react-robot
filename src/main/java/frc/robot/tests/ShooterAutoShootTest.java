@@ -70,7 +70,7 @@ public class ShooterAutoShootTest extends Test {
      */
     public ShooterAutoShootTest() {
         this.tab = Shuffleboard.getTab("Test");
-        this.layout = tab.getLayout("Shooter Auto Shoot Testing").withPosition(8, 0).withSize(2, 4);
+        this.layout = tab.getLayout("Shooter Auto Shoot Testing", BuiltInLayouts.kList).withPosition(8, 0).withSize(2, 4);
 
         this.drivePercent = layout.add("Drive Percent Slider", 0).withWidget(BuiltInWidgets.kNumberSlider).getEntry();
 

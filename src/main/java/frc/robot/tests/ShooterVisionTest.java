@@ -44,7 +44,7 @@ public class ShooterVisionTest extends Test {
      */
     public ShooterVisionTest() {
         this.tab = Shuffleboard.getTab("Test");
-        this.layout = tab.getLayout("Shooter Vision Testing").withPosition(6, 0).withSize(2, 2);
+        this.layout = tab.getLayout("Shooter Vision Testing", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 2);
 
         this.enableVision = layout.add("Test/Enable Vision Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     }

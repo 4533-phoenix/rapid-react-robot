@@ -442,8 +442,6 @@ public class ShooterSystem extends SubsystemBase {
 
         currHoodAngle = hoodMotor.getAngle();
 
-        System.out.println("Hood Angle: " + currHoodAngle);
-
         // System.out.println(currHoodAngle);
 
         /*

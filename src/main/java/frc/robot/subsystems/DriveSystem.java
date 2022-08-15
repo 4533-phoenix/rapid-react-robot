@@ -83,7 +83,7 @@ public class DriveSystem extends SubsystemBase {
 	public static final double VELOCITY_FEED_FORWARD = 8.75E-5; // 0.35 / MAX_VELOCITY
 
 	// Position PIDF values
-	public static final double POSITION_P = 0.3 / 50; // 0.3 / 20 Rotation Error
+	public static final double POSITION_P = 0.3 / 50; // 0.3 / 50 Rotation Error
 	public static final double POSITION_I = 0.0;
 	public static final double POSITION_D = POSITION_P * 10; // will tune
 	public static final double POSITION_I_ZONE = 0.0;
