@@ -78,7 +78,7 @@ public class ShooterAutoShootTest extends Test {
         this.shootHoodAngle = layout.add("Calculated Hood Angle", Robot.shooter.getShootHoodAngle()).getEntry();
         this.trajectoryConstant = layout.add("Trajectory Constant", Robot.shooter.getTrajectoryConstant()).getEntry();
 
-        this.enableAutoShoot = layout.add("Enable Auto Shoot Test", false).getEntry();
+        this.enableAutoShoot = layout.add("Enable Auto Shoot Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     }
 
     /**
@@ -113,8 +113,8 @@ public class ShooterAutoShootTest extends Test {
              * their currently calculated values from
              * the auto shoot math.
              */
-            this.flywheelRPM.setDouble(Robot.shooter.getFlywheelRPM());
-            this.shootHoodAngle.setDouble(Robot.shooter.getShootHoodAngle());
+            this.flywheelRPM.forceSetDouble(Robot.shooter.getFlywheelRPM());
+            this.shootHoodAngle.forceSetDouble(Robot.shooter.getShootHoodAngle());
 
             // Sets the currently specified trajectory constant.
             Robot.shooter.setTrajectoryConstant(this.trajectoryConstant.getDouble(2.0));

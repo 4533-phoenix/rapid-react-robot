@@ -305,6 +305,12 @@ public class DriveSystem extends SubsystemBase {
 			controller.setD(POSITION_D, Constants.POSITION_SLOT_ID);
 			controller.setIZone(POSITION_I_ZONE, Constants.POSITION_SLOT_ID);
 			controller.setFF(POSITION_FEED_FORWARD, Constants.POSITION_SLOT_ID);
+
+			controller.setP(POSITION_P);
+			controller.setI(POSITION_I);
+			controller.setD(POSITION_D);
+			controller.setIZone(POSITION_I_ZONE);
+			controller.setFF(POSITION_FEED_FORWARD);
 		}
 		else if (mode == Mode.TELEOP) {
 			controller.setP(VELOCITY_P, Constants.VELOCITY_SLOT_ID);
@@ -312,6 +318,12 @@ public class DriveSystem extends SubsystemBase {
 			controller.setD(VELOCITY_D, Constants.VELOCITY_SLOT_ID);
 			controller.setIZone(VELOCITY_I_ZONE, Constants.VELOCITY_SLOT_ID);
 			controller.setFF(VELOCITY_FEED_FORWARD, Constants.VELOCITY_SLOT_ID);
+
+			controller.setP(VELOCITY_P);
+			controller.setI(VELOCITY_I);
+			controller.setD(VELOCITY_D);
+			controller.setIZone(VELOCITY_I_ZONE);
+			controller.setFF(VELOCITY_FEED_FORWARD);
 		}
 	}
 
@@ -333,6 +345,17 @@ public class DriveSystem extends SubsystemBase {
 		controller.setD(d, slotID);
 		controller.setIZone(iz, slotID);
 		controller.setFF(ff, slotID);
+
+		controller.setP(p);
+		controller.setI(i);
+		controller.setD(d);
+		controller.setIZone(iz);
+		controller.setFF(ff);
+	}
+
+	public void pidDrive(double setpoint, ControlType type, int slotID) {
+		this.leftPIDCont.setReference(setpoint, type, slotID);
+		this.rightPIDCont.setReference(setpoint, type, slotID);
 	}
 
 	/**
@@ -802,9 +825,6 @@ public class DriveSystem extends SubsystemBase {
 	public void periodic() {
 		double leftDist = leftEncoder.getPosition() * WHEEL_CIRCUMFERENCE_M;
 		double rightDist = -(rightEncoder.getPosition() * WHEEL_CIRCUMFERENCE_M);
-
-		// System.out.println("Left Dist: " + leftDist);
-		// System.out.println("Right Dist: " + rightDist);
 
 		Rotation2d navXAngle = Rotation2d.fromDegrees(-navX.getAngle());
 

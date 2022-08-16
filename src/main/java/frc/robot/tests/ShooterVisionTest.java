@@ -46,7 +46,7 @@ public class ShooterVisionTest extends Test {
         this.tab = Shuffleboard.getTab("Test");
         this.layout = tab.getLayout("Shooter Vision Testing", BuiltInLayouts.kList).withPosition(6, 0).withSize(2, 2);
 
-        this.enableVision = layout.add("Test/Enable Vision Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+        this.enableVision = layout.add("Enable Vision Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     }
     
     /**
@@ -61,8 +61,13 @@ public class ShooterVisionTest extends Test {
     public void run() {
         // Checks if vision testing is enabled.
         if (this.enableVision.getBoolean(false)) {
+            // Sets the auto face hub command.
             this.command = ShooterCommands.oldAutoFlywheelPos();
 
+            /*
+             * Schedules the auto face hub command if 
+             * the command is not already scheduled.
+             */
             if (!CommandScheduler.getInstance().isScheduled((this.command))) {
                 CommandScheduler.getInstance().schedule(this.command);
             }

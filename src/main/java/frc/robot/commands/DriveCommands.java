@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
+import com.revrobotics.CANSparkMax.ControlType;
+
 import frc.robot.Robot;
 
 public class DriveCommands {
@@ -42,6 +45,13 @@ public class DriveCommands {
     public static Command quarterFalse() {
         return new InstantCommand(
             () -> Robot.drive.quarterFalse(),
+            Robot.drive
+        );
+    }
+
+    public static Command pidDriveCommand(double setpoint, ControlType type, int slotID) {
+        return new InstantCommand (
+            () -> Robot.drive.pidDrive(setpoint, type, slotID),
             Robot.drive
         );
     }

@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.*;
 
 import frc.robot.tests.Test;
 import frc.robot.subsystems.ShooterSystem;
-import frc.robot.commands.AutoCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.Robot;
 import frc.robot.Constants;
 
@@ -49,6 +49,12 @@ public class ShooterHoodTest extends Test {
      * testing is enabled.
      */
     private NetworkTableEntry enableHood;
+
+    /**
+     * Stores the set hood command
+     * ({@link ShooterCommands#setHoodAngleCommand(double)}).
+     */
+    private Command command;
     
     /**
      * The constructor for our shooter hood test.
@@ -99,21 +105,25 @@ public class ShooterHoodTest extends Test {
              * Use Robot.shooter.getServoOffset(), as servo 
              * offset might be different in Shuffleboard.
              */
-            Robot.shooter.setHoodAngle(setHoodAngle.getDouble(Robot.shooter.getServoOffset()));
+            this.command = ShooterCommands.setHoodAngleCommand(setHoodAngle.getDouble(Robot.shooter.getServoOffset()));
+
+            /*
+             * Schedules the set hood angle command if the 
+             * command is not already scheduled.
+             */
+            if (!CommandScheduler.getInstance().isScheduled(this.command)) {
+                CommandScheduler.getInstance().schedule(this.command);
+            }
 
             /* 
              * Sets the actual hood angle in the Shuffleboard 
              * to the actual hood angle commanded.
              */
-            this.actualHoodAngle.setDouble(Robot.shooter.getHoodAngle());
+            this.actualHoodAngle.forceSetDouble(Robot.shooter.getHoodAngle());
         }
         // If not enabled, cancel the current test.
         else {
-            /* 
-             * Use Robot.shooter.getServoOffset(), as servo offset 
-             * might not be set from Shuffleboard if disabled.
-             */
-            Robot.shooter.setHoodAngle(Robot.shooter.getServoOffset());
+            CommandScheduler.getInstance().cancel(this.command);
         }
     }
 }

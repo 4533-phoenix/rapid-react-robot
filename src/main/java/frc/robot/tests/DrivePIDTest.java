@@ -5,11 +5,13 @@ import java.util.Map;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj2.command.*;
 
 import frc.robot.tests.Test;
 import frc.robot.subsystems.DriveSystem;
 import frc.robot.Robot;
 import frc.robot.Constants;
+import frc.robot.commands.DriveCommands;
 
 /**
  * The class for testing drive PID in Test mode.
@@ -82,6 +84,12 @@ public class DrivePIDTest extends Test {
     private DriveSystem.Mode currMode;
 
     /**
+     * Stores the PID drive command
+     * ({@link DriveCommands#pidDriveCommand(double, ControlType, int)}).
+     */
+    private Command command;
+
+    /**
      * The constructor for our drive PID test.
      * 
      * @param mode The initial drive mode that will be PID tested.
@@ -126,10 +134,10 @@ public class DrivePIDTest extends Test {
         Robot.drive.setPIDF(Robot.drive.getLeftPIDCont(), mode);
         Robot.drive.setPIDF(Robot.drive.getRightPIDCont(), mode);
 
-        this.pValue.setDouble(Robot.drive.getLeftPIDCont().getP());
-        this.iValue.setDouble(Robot.drive.getLeftPIDCont().getI());
-        this.dValue.setDouble(Robot.drive.getLeftPIDCont().getD());
-        this.fValue.setDouble(Robot.drive.getLeftPIDCont().getFF());
+        this.pValue.forceSetDouble(Robot.drive.getLeftPIDCont().getP());
+        this.iValue.forceSetDouble(Robot.drive.getLeftPIDCont().getI());
+        this.dValue.forceSetDouble(Robot.drive.getLeftPIDCont().getD());
+        this.fValue.forceSetDouble(Robot.drive.getLeftPIDCont().getFF());
     }
 
     /**
@@ -185,27 +193,37 @@ public class DrivePIDTest extends Test {
             // Starts PID testing for the selected drive mode.
             if (currMode == DriveSystem.Mode.AUTONOMOUS) {
                 // Update current robot position (rotations).
-                this.actualValue.setDouble(Robot.drive.getPosition());
+                this.actualValue.forceSetDouble(Robot.drive.getPosition());
 
+                // Sets the current PIDF values.
                 setPIDFVals(pValue.getDouble(0.0), iValue.getDouble(0.0), dValue.getDouble(0.0), 0.0, fValue.getDouble(0.0), Constants.POSITION_SLOT_ID);
 
-                // Divide by wheel circumference (in.) to go from inches to rotations
-                Robot.drive.getLeftPIDCont().setReference(setpoint.getDouble(0.0) / DriveSystem.WHEEL_CIRCUMFERENCE, ControlType.kPosition, Constants.POSITION_SLOT_ID);
-                Robot.drive.getRightPIDCont().setReference(setpoint.getDouble(0.0) / DriveSystem.WHEEL_CIRCUMFERENCE, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+                /* 
+                 * Sets the PID drive command.
+                 * 
+                 * Divide by wheel circumference (in.) to go from inches to rotations
+                 */
+                this.command = DriveCommands.pidDriveCommand(this.setpoint.getDouble(0.0) / DriveSystem.WHEEL_CIRCUMFERENCE, ControlType.kPosition, Constants.POSITION_SLOT_ID);
             }
             else if (currMode == DriveSystem.Mode.TELEOP) {
                 // Update current robot velocity (RPM).
-                this.actualValue.setDouble(Robot.drive.getVelocity());
+                this.actualValue.forceSetDouble(Robot.drive.getVelocity());
                 
+                // Sets the current PIDF values.
                 setPIDFVals(pValue.getDouble(0.0), iValue.getDouble(0.0), dValue.getDouble(0.0), 0.0, fValue.getDouble(0.0), Constants.VELOCITY_SLOT_ID);
 
-                Robot.drive.getLeftPIDCont().setReference(setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
-                Robot.drive.getRightPIDCont().setReference(setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+                // Sets the PID drive command.
+                this.command = DriveCommands.pidDriveCommand(this.setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
+            }
+
+            // Schedules the command if not already scheduled.
+            if (!CommandScheduler.getInstance().isScheduled(this.command)) {
+                CommandScheduler.getInstance().schedule(this.command);
             }
         }
         // If not enabled, cancel the current test.
         else {
-            Robot.drive.percent(0.0, 0.0);
+            CommandScheduler.getInstance().cancel(this.command);
         }
     }
 }

@@ -29,9 +29,14 @@ public class DriveOdometryTest extends Test {
     private ShuffleboardLayout layout;
 
     /**
-     * The robot position for odometry testing.
+     * The robot's x position for odometry testing.
      */
-    private NetworkTableEntry robotPosition;
+    private NetworkTableEntry robotX;
+
+    /**
+     * The robot's y position for odometry testing.
+     */
+    private NetworkTableEntry robotY;
 
     /**
      * The robot angle for odometry testing.
@@ -39,9 +44,14 @@ public class DriveOdometryTest extends Test {
     private NetworkTableEntry robotAngle;
 
     /**
-     * The target position for odometry testing.
+     * The target's x position for odometry testing.
      */
-    private NetworkTableEntry targetPosition;
+    private NetworkTableEntry targetX;
+
+    /**
+     * The target's y position for odometry testing.
+     */
+    private NetworkTableEntry targetY;
 
     /**
      * The value for whether or not odometry testing is enabled.
@@ -63,7 +73,9 @@ public class DriveOdometryTest extends Test {
 
         Pose2d robotPos = Robot.drive.getRobotPos();
 
-        this.robotPosition = layout.add("Robot Pos", new double[]{robotPos.getX(), robotPos.getY()}).getEntry();
+        this.robotX = layout.add("Robot X", robotPos.getX()).getEntry();
+        this.robotY = layout.add("Robot Y", robotPos.getY()).getEntry();
+
         this.robotAngle = layout.add("Robot Angle", Robot.drive.getRobotAngle()).getEntry();
 
         /*
@@ -72,7 +84,8 @@ public class DriveOdometryTest extends Test {
          * enabled, it doesn't immediately drive to another
          * location.
          */
-        this.targetPosition = layout.add("Target Pos", new double[]{robotPos.getX(), robotPos.getY()}).getEntry();
+        this.targetX = layout.add("Target X", robotPos.getX()).getEntry();
+        this.targetY = layout.add("Target Y", robotPos.getY()).getEntry();
 
         this.enableOdometry = layout.add("Enable Odometry Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     }
@@ -95,17 +108,18 @@ public class DriveOdometryTest extends Test {
             Pose2d robotPos = Robot.drive.getRobotPos();
 
             // Sets the current robot position in the Shuffleboard.
-            this.robotPosition.setDoubleArray(new double[]{robotPos.getX(), robotPos.getY()});
+            this.robotX.forceSetDouble(robotPos.getX());
+            this.robotY.forceSetDouble(robotPos.getY());
 
             // Sets the current robot angle in the Shuffleboard.
-            this.robotAngle.setDouble(Robot.drive.getRobotAngle());
+            this.robotAngle.forceSetDouble(Robot.drive.getRobotAngle());
 
             // Gets the current target coords from the Shuffleboard.
-            double targetX = targetPosition.getDoubleArray(new double[]{0.0, 0.0})[0];
-            double targetY = targetPosition.getDoubleArray(new double[]{0.0, 0.0})[1];
+            double xPos = this.targetX.getDouble(robotPos.getX());
+            double yPos = this.targetY.getDouble(robotPos.getY());
 
             // Gets the command to run for the test.
-            this.command = AutoCommands.driveToPosAutoCommand(targetX, targetY);
+            this.command = AutoCommands.driveToPosAutoCommand(xPos, yPos);
 
             // Schedules the command if not already scheduled.
             if (!CommandScheduler.getInstance().isScheduled(this.command)) {
