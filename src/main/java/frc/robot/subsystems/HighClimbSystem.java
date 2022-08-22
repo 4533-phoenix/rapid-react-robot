@@ -32,36 +32,42 @@ import frc.robot.commands.Odometry;
  * The class for the high climb system.
  */
 public class HighClimbSystem extends SubsystemBase {
-  private WPI_TalonSRX highClimbMotor;
+  private WPI_TalonSRX highClimbLeader;
+  private WPI_TalonSRX highClimbFollower;
 
-  public static final double HIGH_CLIMB_MOTOR_PERCENT = 0.25;
+  public static final double HIGH_CLIMB_MOTOR_PERCENT = 0.75;
 
   /**
    * Constructor for the high climb system.
    */
   public HighClimbSystem() {
-    this.highClimbMotor = new WPI_TalonSRX(Constants.HIGH_CLIMB_MOTOR);
+    this.highClimbLeader = new WPI_TalonSRX(Constants.HIGH_CLIMB_MOTOR);
+    this.highClimbFollower = new WPI_TalonSRX(Constants.HIGH_CLIMB_FOLLOWER);
+
+    this.highClimbLeader.setInverted(true);
+
+    this.highClimbFollower.follow(highClimbLeader);
   }
 
   /**
    * Sets the high climb motor to lift up the high climb hook.
    */
   public void highClimberUp() {
-    highClimbMotor.set(ControlMode.PercentOutput, HIGH_CLIMB_MOTOR_PERCENT);
+    highClimbLeader.set(ControlMode.PercentOutput, HIGH_CLIMB_MOTOR_PERCENT);
   }
 
   /**
    * Sets the high climb motor to lower down the high climb hook.
    */
   public void highClimberDown() {
-    highClimbMotor.set(ControlMode.PercentOutput, -HIGH_CLIMB_MOTOR_PERCENT);
+    highClimbLeader.set(ControlMode.PercentOutput, -HIGH_CLIMB_MOTOR_PERCENT);
   }
   
   /**
    * Stops the high climb motor from running.
    */
   public void highClimberStop() {
-    highClimbMotor.set(ControlMode.PercentOutput, 0.0);
+    highClimbLeader.set(ControlMode.PercentOutput, 0.0);
   }
 
   /**

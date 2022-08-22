@@ -69,7 +69,7 @@ public class RobotContainer {
     highClimbUp.whenPressed(HighClimbCommands.highClimberUp());
     highClimbUp.whenReleased(HighClimbCommands.highClimberStop());
 
-    JoystickButton intakeLiftUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_RB);
+    JoystickButton intakeLiftUpButton = new JoystickButton(controllerTwo, Constants.BUTTON_BACK);
     intakeLiftUpButton.whenPressed(IntakeCommands.intakeLiftUpCommand());
     intakeLiftUpButton.whenReleased(IntakeCommands.intakeLiftStopCommand());
 
@@ -77,7 +77,7 @@ public class RobotContainer {
     intakeLiftDownButton.whenPressed(IntakeCommands.intakeLiftDownCommand());
     intakeLiftDownButton.whenReleased(IntakeCommands.intakeLiftStopCommand());
 
-    JoystickButton highClimbDown = new JoystickButton(controllerTwo, Constants.BUTTON_BACK);
+    JoystickButton highClimbDown = new JoystickButton(controllerTwo, Constants.BUTTON_RB);
     highClimbDown.whenPressed(HighClimbCommands.highClimberDown());
     highClimbDown.whenReleased(HighClimbCommands.highClimberStop());
 
