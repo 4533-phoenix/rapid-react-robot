@@ -37,27 +37,19 @@ import frc.robot.tests.ShooterHoodTest;
 import frc.robot.tests.ShooterVisionTest;
 import frc.robot.tests.ShooterAutoShootTest;
 
+/**
+ * The class for the robot.
+ * <p>
+ * This class includes all of the subsystems, 
+ * the autonomous command to be used, the 
+ * robot container, PIDF setting for teleop
+ * and autonomous, and test running for
+ * test mode.
+ */
 public class Robot extends TimedRobot {
-  	private Logger stateLogger = LogManager.getLogger("robot_state");
-	private Logger robotLogger = LogManager.getLogger("robot");
-
-	private ObjectMapper mapper = new ObjectMapper();
-
-	private Command autoCommand = null;
+  	private Command autoCommand = null;
 
 	private RobotContainer container = null;
-
-	/**
-   * Tracks the current state of the robot
-   */
-  	private RobotState robotState = null;
-
-	/**
-	 * Thread pool for handling interval based tasks that are outside of the
-	 * typical robot lifecyle. In other words, things that should not be on the
-	 * robot's main loop/thread.
-	 */
-	private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
 
 	/**
 	 * The robot's drive train subsystem.
@@ -74,7 +66,7 @@ public class Robot extends TimedRobot {
 	 */
 	public final static MidClimbSystem midClimber = new MidClimbSystem();
 
-  /**
+  	/**
 	 * The robot's high/transversal rung climber subsystem.
 	 */
 	public final static HighClimbSystem highClimber = new HighClimbSystem();
@@ -91,14 +83,17 @@ public class Robot extends TimedRobot {
 	private static ArrayList<Test> tests = new ArrayList<Test>();
 
 	/**
-	 * This function is run when the robot is first started up and should be
-	 * used for any initialization code.
+	 * This method is run when the robot is first 
+	 * started up and should be used for any 
+	 * initialization code.
 	 */
-
 	@Override
 	public void robotInit() {
-		// Instantiate our RobotContainer.  This will perform all our button
-		// bindings, and put our autonomous chooser on the dashboard.
+		/* 
+		 * Instantiate our RobotContainer. This will perform 
+		 * all our button bindings, and put our autonomous 
+		 * chooser on the dashboard.
+		 */
 		this.container = new RobotContainer();
 
 		drive.resetAngle();
@@ -111,56 +106,82 @@ public class Robot extends TimedRobot {
 	}
 
 	/**
-	 * This function is called once each time the robot enters Disabled mode.
+	 * This method is called once when disabled mode
+	 * is activated.
 	 */
 	@Override
 	public void disabledInit() {
 	}
 
+	/**
+	 * This method is called periodically when disabled
+	 * mode is activated.
+	 */
 	@Override
 	public void disabledPeriodic() {
 	}
 
 	/**
-	 * This autonomous runs the autonomous command selected by your
-	 * {@link RobotContainer} class.
+	 * This method is called once when autonomous 
+	 * mode is activated.
 	 */
 	@Override
 	public void autonomousInit() {
+		/*
+		 * Sets the autonomous PIDF values for the
+		 * drive system.
+		 */
 		drive.setPIDF(drive.getLeftPIDCont(), DriveSystem.Mode.AUTONOMOUS);
 		drive.setPIDF(drive.getRightPIDCont(), DriveSystem.Mode.AUTONOMOUS);
 
+		/*
+		 * Gets the autonomous command selected in
+		 * the robot container.
+		 */
 		this.autoCommand = this.container.getAutonomousCommand("shootAndDriveOffTarmac");
 
-		// schedule the autonomous command (example)
+		// Schedules the autonomous command.
 		if (this.autoCommand != null) {
 			this.autoCommand.schedule();
 		}
 	}
 
 	/**
-	 * This function is called periodically during autonomous.
+	 * This method is called periodically when autonomous
+	 * mode is activated.
 	 */
 	@Override
 	public void autonomousPeriodic() {
 	}
 
+	/**
+	 * This method is called once when teleop mode
+	 * is activated.
+	 */
 	@Override
 	public void teleopInit() {
+		/*
+		 * Sets the teleop PIDF values for the
+		 * drive system.
+		 */
 		drive.setPIDF(drive.getLeftPIDCont(), DriveSystem.Mode.TELEOP);
 		drive.setPIDF(drive.getRightPIDCont(), DriveSystem.Mode.TELEOP);
 
-		// This makes sure that the autonomous stops running when
-		// teleop starts running. If you want the autonomous to
-		// continue until interrupted by another command, remove
-		// this line or comment it out.
+		/* 
+		 * This makes sure that the autonomous command 
+		 * stops running when teleop mode is 
+		 * activated. If you want the autonomous 
+		 * command to continue running until it ends, 
+		 * remove these lines or comment them out.
+		 */
 		if (this.autoCommand != null) {
 			this.autoCommand.cancel();
 		}
 	}
 
 	/**
-	 * This function is called periodically during operator control.
+	 * This method is called periodically when teleop 
+	 * mode is activated.
 	 */
 	@Override
 	public void teleopPeriodic() {
@@ -171,6 +192,10 @@ public class Robot extends TimedRobot {
 		// Cancels all running commands at the start of test mode.
 		// CommandScheduler.getInstance().cancelAll();
 
+		/*
+		 * Adds the tests that will be run
+		 * during test mode.
+		 */
 		tests.add(new DrivePIDTest(DriveSystem.Mode.AUTONOMOUS));
 		tests.add(new DriveOdometryTest());
 		tests.add(new ShooterHoodTest());
@@ -183,6 +208,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+		// Runs the currently activated tests.
 		for (Test t : tests) {
 			t.run();
 		}

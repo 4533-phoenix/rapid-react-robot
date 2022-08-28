@@ -36,14 +36,17 @@ import java.lang.Math.*;
  * The class for the drive system.
  */
 public class DriveSystem extends SubsystemBase {
-	// Drive train motor controllers
+	// Drive train motor controllers.
 	private CANSparkMax rightMaster;
 	private CANSparkMax rightSlave;
 	private CANSparkMax leftMaster;
 	private CANSparkMax leftSlave;
 
+	// Drive train motor encoders.
 	private RelativeEncoder rightEncoder;
 	private RelativeEncoder leftEncoder;
+
+	// Drive train motor PID controllers.
 	private SparkMaxPIDController leftPIDCont;
 	private SparkMaxPIDController rightPIDCont;
 
@@ -353,6 +356,16 @@ public class DriveSystem extends SubsystemBase {
 		controller.setFF(ff);
 	}
 
+	/**
+	 * Sets the robot to reach the passed in setpoint corresponding
+	 * with the passed in type to read values from (velocity or 
+	 * position) with the PID values from the slot specified
+	 * by the passed in slot ID.
+	 * 
+	 * @param setpoint The setpoint to set the PID control loop to.
+	 * @param type The type of value for the PID control loop to read (velocity or position).
+	 * @param slotID The slot ID for the desired PID slot values.
+	 */
 	public void pidDrive(double setpoint, ControlType type, int slotID) {
 		this.leftPIDCont.setReference(setpoint, type, slotID);
 		this.rightPIDCont.setReference(setpoint, type, slotID);
