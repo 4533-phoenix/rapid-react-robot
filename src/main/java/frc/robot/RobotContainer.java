@@ -15,6 +15,12 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.*;
 
+/**
+ * The class for the robot container.
+ * <p>
+ * Deals with button inputs, default commands,
+ * and autonomous commands.
+ */
 public class RobotContainer {
   // Initialize the driver controls
 	private Joystick controllerOne = new Joystick(Constants.DRIVER_CONTROLLER);

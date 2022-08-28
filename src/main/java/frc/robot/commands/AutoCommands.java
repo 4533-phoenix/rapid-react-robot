@@ -7,15 +7,31 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+
+import com.revrobotics.CANSparkMax.ControlType;
+
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.DriveSystem;
 
+/**
+ * The class for the autonomous commands.
+ */
 public class AutoCommands {
-
     public AutoCommands() {
     }
 
     // Test Commands:
+
+    /**
+     * @deprecated With odometry test class, there is not
+     * much need for this method.
+     * <p>
+     * Returns the test command for testing odometry.
+     * 
+     * @return The test command as a 
+     * {@link SequentialCommandGroup} object.
+     */
     public static Command testDriveToPos() {
         return new SequentialCommandGroup(
             driveToPosAutoCommand(0.5, 1),
@@ -30,6 +46,16 @@ public class AutoCommands {
     }
 
     // Normal Commands:
+
+    /**
+     * @deprecated With the use of {@link #shootAndDriveOffTarmac()}, there
+     * is not much need for this method.
+     * <p>
+     * Returns the command to just drive off of the tarmac.
+     * 
+     * @return The command as a 
+     * {@link SequentialCommandGroup} object.
+     */
     public static Command basicDriveOffTarmac() {
         return new SequentialCommandGroup(
             voltageDriveCommand(-5, -5),
@@ -38,11 +64,25 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * @deprecated With the use of odometry, there is not much need
+     * for the manual driving to different positions used in this
+     * method for autonomous.
+     * <p>
+     * Returns the command for a two ball that aims to shoot a ball, 
+     * drive off of the tarmac, intake a ball behind us, and shoot said ball.
+     * 
+     * @return The command as a 
+     * {@link SequentialCommandGroup} object.
+     */
     public static Command shootAndDriveOffTarmac() {
         return new SequentialCommandGroup(
             // ShooterCommands.autoFlywheelPos(),
             ShooterCommands.autoShoot(32.0, 1, false),
+
+            // Makes the robot go fast here to make the intake fall down.
             oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
+
             oldAngularTurnAutoCommand(0.20, 150, Direction.LEFT).withTimeout(2.5),
             oldGetBallAutoCommand(60, Direction.FORWARD).withTimeout(2.25),
             oldAngularTurnAutoCommand(0.2, 25, Direction.RIGHT).withTimeout(2.5),
@@ -51,6 +91,18 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * @deprecated With the use of odometry, there is not much need
+     * for the manual driving to different positions used in this 
+     * method for autonomous.
+     * <p>
+     * Returns the command for a three ball auto that aims to drive 
+     * off of the tarmac, intake a ball behind us, shoot two balls, 
+     * intake another ball, and then shoot said ball.
+     *  
+     * @return The command as a 
+     * {@link SequentialCommandGroup} object.
+     */
     public static Command threeBallTest() {
         return new SequentialCommandGroup(
             oldDriveDistanceAutoCommand(500, Direction.FORWARD).withTimeout(0.1),
@@ -66,17 +118,32 @@ public class AutoCommands {
         );
     }
 
-    // Normal Commands:    
+    /**
+     * Returns the command that drives the distance to the
+     * position calculated by the odometry code
+     * ({@link DriveSystem#driveToPosition(double, double)}).
+     * 
+     * @return The command as a 
+     * {@link FunctionalCommand} object.
+     */
     public static Command driveDistanceAutoCommand() {
         return new FunctionalCommand(
             () -> {},
             () -> Robot.drive.driveDistance(),
-            (interrupt) -> Robot.drive.percent(0.0, 0.0),
+            (interrupt) -> Robot.drive.pidDrive(0.0, ControlType.kPosition, Constants.POSITION_SLOT_ID),
             () -> Robot.drive.reachedPosition(),
             Robot.drive
         );
     }
 
+    /**
+     * Returns the command that turns to the angle towards
+     * the position calculated by the odometry code
+     * ({@link DriveSystem#driveToPosition(double, double)}).
+     * 
+     * @return The command as a 
+     * {@link FunctionalCommand} object.
+     */
     public static Command turnCommand() {
         return new FunctionalCommand(
             () -> {},
@@ -87,6 +154,18 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * Returns the command that runs the odometry code
+     * that will calculate the angle needed to turn to
+     * the target position and the distance needed to drive
+     * to the target position after turning the calculated
+     * angle.
+     * 
+     * @param xMeters The x-coordinate of the target position in meters.
+     * @param yMeters The y-coordinate of the target position in meters.
+     * @return The command as an
+     * {@link InstantCommand} object.
+     */
     public static Command driveToPosition(double xMeters, double yMeters) {
         return new InstantCommand(
             () -> Robot.drive.driveToPosition(xMeters, yMeters),
@@ -94,6 +173,15 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * Returns the command that will drive to a target position 
+     * based on what the odometry code calculates.
+     * 
+     * @param xMeters The x-coordinate of the target position in meters.
+     * @param yMeters The y-coordinate of the target position in meters.
+     * @return The command as a 
+     * {@link SequentialCommandGroup} object.
+     */
     public static Command driveToPosAutoCommand(double xMeters, double yMeters) {
         return new SequentialCommandGroup(
             driveToPosition(xMeters, yMeters),
@@ -102,6 +190,16 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * Returns the command that will drive to a target position
+     * with the robot's intake on to intake the ball at said
+     * target position.
+     * 
+     * @param xMeters The x-coordinate of the target position in meters.
+     * @param yMeters The y-coordinate of the target position in meters.
+     * @return The command as a
+     * {@link ParallelCommandGroup} object.
+     */
     public static Command getBallAutoCommand(double xMeters, double yMeters) {
         return new ParallelCommandGroup(
             driveToPosAutoCommand(xMeters, yMeters),
@@ -117,7 +215,22 @@ public class AutoCommands {
         );
     }
 
-    public static Command curveTurnAutoCommand(double left, double right, Direction direction) {
+    /**
+     * @deprecated With the use of odometry, there is not much need
+     * for the manual driving to different positions used in this
+     * method for autonomous.
+     * <p>
+     * Returns the command that will drive a curve based on the 
+     * passed in values for the left and right sides of the drive train
+     * and the passed in direction to drive in.
+     * 
+     * @param left The distance for the left side of the drive train to drive (inches).
+     * @param right The distance for the right side of the drive train to drive (inches).
+     * @param direction The direction for the robot to drive (forwards or backwards).
+     * @return The command as a 
+     * {@link FunctionalCommand} object.
+     */
+    public static Command oldCurveTurnAutoCommand(double left, double right, Direction direction) {
         return new FunctionalCommand(
             () -> {}, 
             () -> Robot.drive.driveCurve(left, right, direction), 
@@ -127,7 +240,22 @@ public class AutoCommands {
         );
     }
 
-    public static Command circleTurnAutoCommand(double angle, Direction direction, double radius) {
+    /**
+     * @deprecated With the use of odometry, there is not much need
+     * for the manual driving to different positions used in this 
+     * method for autonomous.
+     * <p>
+     * Returns the command that will drive the robot in a circle based
+     * on the angle (determines arc of the circle to drive), the direction, 
+     * and the radius of the circle.
+     * 
+     * @param angle The angle that determines the arc of the circle to drive.
+     * @param direction The direction to drive (left or right).
+     * @param radius The radius of the circle (inches).
+     * @return The command as a
+     * {@link FunctionalCommand} object.
+     */
+    public static Command oldCircleTurnAutoCommand(double angle, Direction direction, double radius) {
         return new FunctionalCommand(
             () -> {},
             () -> Robot.drive.driveCircle(angle, direction, radius), 
@@ -137,10 +265,12 @@ public class AutoCommands {
         );
     }
 
-    public static Command flywheelWait(int seconds) {
-        return new WaitCommand(seconds);
-    }
-
+    /**
+     * Returns the command that will activate the flywheel motors.
+     * 
+     * @return The command as an
+     * {@link InstantCommand} object.
+     */
     public static Command activateFlywheel() {
         return new InstantCommand(
             () -> Robot.shooter.flywheelOut(), 
@@ -148,6 +278,19 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * @deprecated With the use of odometry, there is not much need
+     * for the manual driving to different positions used in this
+     * method for autonomous.
+     * <p>
+     * Returns the command that will drive the robot the passed in
+     * distance in the passed in direction.
+     * 
+     * @param distance The distance for the robot to drive (inches).
+     * @param direction The direction for the robot to drive in (forwards or backwards).
+     * @return The command as a
+     * {@link FunctionalCommand} object.
+     */
 	public static Command oldDriveDistanceAutoCommand(double distance, Direction direction) {
 		return new FunctionalCommand(
 			() -> Robot.drive.resetPosition(),
@@ -158,6 +301,20 @@ public class AutoCommands {
 		);
 	}
 
+    /**
+     * @deprecated With the use of odometry, there is not much need
+     * for the manual turing to different angles used in this
+     * method for autonomous.
+     * <p>
+     * Returns the command that will turn the robot at the passed in
+     * speed to the passed in angle in the passed in direction.
+     * 
+     * @param speed The speed for the robot to turn at (percent of throttle).
+     * @param angle The angle for the robot to turn to (degrees).
+     * @param direction The direction for the robot to turn in (left or right).
+     * @return The command as a
+     * {@link FunctionalCommand} object.
+     */
 	public static Command oldAngularTurnAutoCommand(double speed, double angle, Direction direction) {
 		return new FunctionalCommand(
 			() -> {},
@@ -168,20 +325,15 @@ public class AutoCommands {
 		);
 	}
 
-    public static Command intakeInAutoCommand() {
-        return new InstantCommand(
-            () -> Robot.intake.intakeIn(),
-            Robot.intake
-        );
-    }
-
-    public static Command intakeStopAutoCommand() {
-        return new InstantCommand(
-            () -> Robot.intake.intakeStop(),
-            Robot.intake
-        );
-    }
-
+    /**
+     * Returns the command that drives the left and right sides 
+     * of the drive train at the passed in voltage levels.
+     * 
+     * @param leftVolt The voltage value for the left side of the drive train.
+     * @param rightVolt The voltage value for the right side of the drive train.
+     * @return The command as an
+     * {@link InstantCommand} object.
+     */
     public static Command voltageDriveCommand(double leftVolt, double rightVolt) {
         return new InstantCommand(
             () -> Robot.drive.voltage(leftVolt, rightVolt),
@@ -189,6 +341,14 @@ public class AutoCommands {
         );
     }
 
+    /**
+     * Returns the command that stops the robot via setting
+     * the PID setpoint for the drive train to 0 RPM via
+     * the {@link DriveSystem#tank(double, double)} method.
+     * 
+     * @return The command as an
+     * {@link InstantCommand} object.
+     */
     public static Command stopDriveCommand() {
         return new InstantCommand(
             () -> Robot.drive.tank(0, 0),
@@ -198,7 +358,7 @@ public class AutoCommands {
 
 
 
-//Mesurements in Inches and Degrees, all auto needs to be tested. DriveSystem.INCHES_PER_METER is inches to meters
+    // Autonomous methods with exact ball positions.
 
     // public static Command threeBallAutoBlue() {
     //     return new SequentialCommandGroup(
