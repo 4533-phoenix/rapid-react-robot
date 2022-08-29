@@ -24,6 +24,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.DigitalInput;
+
 import frc.robot.Constants;
 import frc.robot.commands.Direction;
 import frc.robot.commands.Odometry;
@@ -37,6 +39,11 @@ public class HighClimbSystem extends SubsystemBase {
 
   public static final double HIGH_CLIMB_MOTOR_PERCENT = 0.75;
 
+  private DigitalInput leftLimitSwitch;
+  private DigitalInput rightLimitSwitch;
+
+  private boolean limitSwitchPressed;
+
   /**
    * Constructor for the high climb system.
    */
@@ -47,20 +54,35 @@ public class HighClimbSystem extends SubsystemBase {
     this.highClimbLeader.setInverted(true);
 
     this.highClimbFollower.follow(highClimbLeader);
+
+    this.leftLimitSwitch = new DigitalInput(Constants.LEFT_LIMIT_SWITCH);
+    this.rightLimitSwitch = new DigitalInput(Constants.RIGHT_LIMIT_SWITCH);
+
+    this.limitSwitchPressed = false;
   }
 
   /**
    * Sets the high climb motor to lift up the high climb hook.
+   * <p>
+   * Will only do this if it is not activating the right limit switch
+   * ({@link #rightLimitSwitch}).
    */
   public void highClimberUp() {
-    highClimbLeader.set(ControlMode.PercentOutput, HIGH_CLIMB_MOTOR_PERCENT);
+    if (!this.rightLimitSwitch.get()) {
+      highClimbLeader.set(ControlMode.PercentOutput, HIGH_CLIMB_MOTOR_PERCENT);
+    }
   }
 
   /**
    * Sets the high climb motor to lower down the high climb hook.
+   * <p>
+   * Will only do this if it is not activating the left limit switch
+   * ({@link #leftLimitSwitch}).
    */
   public void highClimberDown() {
-    highClimbLeader.set(ControlMode.PercentOutput, -HIGH_CLIMB_MOTOR_PERCENT);
+    if (!this.leftLimitSwitch.get()) {
+      highClimbLeader.set(ControlMode.PercentOutput, -HIGH_CLIMB_MOTOR_PERCENT);
+    }
   }
   
   /**
@@ -75,6 +97,31 @@ public class HighClimbSystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
+    /*
+     * If either of the limit switches are being pressed
+     * and the boolean flag limitSwitchPressed is false,
+     * then stop the high climb arm motor and set the 
+     * boolean flag limitSwitchPressed to true to make
+     * sure that the high climb motor is only commanded
+     * to stop once.
+     */
+    if (!leftLimitSwitch.get() || !rightLimitSwitch.get() && !limitSwitchPressed) {
+      this.highClimberStop();
+
+      this.limitSwitchPressed = true;
+    }
+
+    /*
+     * If neither of the limit switches are being 
+     * pressed, then set the boolean flag
+     * limitSwitchedPressed to false to reset 
+     * the ability to set the high climb arm 
+     * motor to stop once either of the limit 
+     * switches is pressed.
+     */
+    if (leftLimitSwitch.get() && rightLimitSwitch.get()) {
+      this.limitSwitchPressed = false;
+    }
   }
 
   /**

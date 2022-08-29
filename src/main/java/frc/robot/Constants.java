@@ -25,7 +25,8 @@ public final class Constants {
 	 * Correspond to the DIO and PWM channels on the RoboRio.
 	 */
 	public static final int HOOD_SERVO_MOTOR = 9;
-	public static final int LIMIT_SWITCH = 0;
+	public static final int LEFT_LIMIT_SWITCH = 1;
+	public static final int RIGHT_LIMIT_SWITCH = 0;
 
 	// Drive controller IDs.
 	public static final int DRIVER_CONTROLLER = 0;

@@ -91,8 +91,6 @@ public class ShooterSystem extends SubsystemBase {
     private double targetArea;
     private double targetSkew;
 
-    private DigitalInput limitSwitch;
-
     // TODO: Decide soon when we're going to activate PhotonVision
     // PhotonCamera visionCam;
     // PhotonPipelineResult result;
@@ -131,8 +129,6 @@ public class ShooterSystem extends SubsystemBase {
         shooterNAVX = new AHRS(SPI.Port.kMXP);
 
         currHoodAngle = 0;
-
-        limitSwitch = new DigitalInput(Constants.LIMIT_SWITCH);
 
         limelight = NetworkTableInstance.getDefault().getTable("limelight");
 
@@ -490,10 +486,6 @@ public class ShooterSystem extends SubsystemBase {
         shootHoodPercent = FLYWHEEL_MOTOR_PERCENT;
 
         initialAngle = getHoodAngle();
-
-        if (!limitSwitch.get()) {
-            System.out.println("True");
-        }
 
         // result = visionCam.getLatestResult();
 
