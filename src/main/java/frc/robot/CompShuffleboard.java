@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.cameraserver.*;
+import edu.wpi.first.cscore.MjpegServer;
  
 
 public class CompShuffleboard {
@@ -15,6 +17,10 @@ public class CompShuffleboard {
     //Shuffleboard Elements
     private ComplexWidget field;
     private NetworkTableEntry gyroEntry;
+
+
+    //Cameras
+    private CameraServer cameraTest;
 
     //Shuffleboard Elements being constructed.
     public CompShuffleboard() {
@@ -26,5 +32,8 @@ public class CompShuffleboard {
     public void periodic() {
         double gyro = Robot.drive.getRobotAngle();
         gyroEntry.setDouble(gyro);
+
+        //Cameras for Shuffleboard
+        public static MjpegServer addServer​(cameraTest,1181);
     }
 }
