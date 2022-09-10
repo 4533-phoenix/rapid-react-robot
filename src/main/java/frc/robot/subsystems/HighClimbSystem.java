@@ -68,7 +68,7 @@ public class HighClimbSystem extends SubsystemBase {
    * ({@link #rightLimitSwitch}).
    */
   public void highClimberUp() {
-    if (!this.rightLimitSwitch.get()) {
+    if (this.rightLimitSwitch.get()) {
       highClimbLeader.set(ControlMode.PercentOutput, HIGH_CLIMB_MOTOR_PERCENT);
     }
   }
@@ -80,7 +80,7 @@ public class HighClimbSystem extends SubsystemBase {
    * ({@link #leftLimitSwitch}).
    */
   public void highClimberDown() {
-    if (!this.leftLimitSwitch.get()) {
+    if (this.leftLimitSwitch.get()) {
       highClimbLeader.set(ControlMode.PercentOutput, -HIGH_CLIMB_MOTOR_PERCENT);
     }
   }

@@ -79,6 +79,8 @@ public class ShooterAutoShootTest extends Test {
         this.trajectoryConstant = layout.add("Trajectory Constant", Robot.shooter.getTrajectoryConstant()).getEntry();
 
         this.enableAutoShoot = layout.add("Enable Auto Shoot Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+
+        this.command = ShooterCommands.autoShoot(Robot.shooter.getServoOffset() - Robot.shooter.getHoodAngle(), 0, false);
     }
 
     /**
@@ -97,7 +99,7 @@ public class ShooterAutoShootTest extends Test {
         // Checks if auto shoot testing is enabled.
         if (this.enableAutoShoot.getBoolean(false)) {
             /* 
-             * Gets the specified drive percent and halves it.
+             * Gets the specified drive percent and halves it
              * for slower driving.
              */
             double percent = 0.5 * this.drivePercent.getDouble(0.0);
@@ -119,21 +121,21 @@ public class ShooterAutoShootTest extends Test {
             // Sets the currently specified trajectory constant.
             Robot.shooter.setTrajectoryConstant(this.trajectoryConstant.getDouble(2.0));
 
-            /* 
-             * Sets the auto shoot command.
-             * 
-             * Use Robot.shooter.getShootHoodAngle(), as 
-             * the shoot hood angle might not be set in
-             * the Shuffleboard.
-             */
-            this.command = ShooterCommands.autoShoot(Robot.shooter.getShootHoodAngle(), 2, false);
-
             /*
              * Schedules the auto shoot command if the auto shoot
              * command is not already scheduled.
              */
-            if (!CommandScheduler.getInstance().isScheduled(this.command)) {
-                CommandScheduler.getInstance().schedule(this.command);
+            if (!this.command.isScheduled()) {
+                /* 
+                 * Sets the auto shoot command.
+                 * 
+                 * Use Robot.shooter.getShootHoodAngle(), as 
+                 * the shoot hood angle might not be set in
+                 * the Shuffleboard.
+                 */
+                this.command = ShooterCommands.autoShoot(Robot.shooter.getShootHoodAngle(), 2, false);
+
+                this.command.schedule(false);
             }
 
             /*
@@ -141,12 +143,12 @@ public class ShooterAutoShootTest extends Test {
              * is canceled.
              */
             if (percent != 0.0) {
-                CommandScheduler.getInstance().cancel(this.command);
+                this.command.cancel();
             }
         }
         // If not enabled, cancel the current test.
         else {
-            CommandScheduler.getInstance().cancel(this.command);
+            this.command.cancel();
         }
     }
 }

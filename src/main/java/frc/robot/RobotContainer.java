@@ -47,7 +47,8 @@ public class RobotContainer {
     private Map<String, Command> commands = Map.ofEntries(
       Map.entry("basicDriveOffTarmac", AutoCommands.basicDriveOffTarmac()),
       Map.entry("shootAndDriveOffTarmac", AutoCommands.shootAndDriveOffTarmac()),
-      Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos())
+      Map.entry("testDrivePositionOne", AutoCommands.testDriveToPos()),
+      Map.entry("odometryTest", AutoCommands.driveToPosAutoCommand(0.5, 0.5))
       // Map.entry("threeBallAutoBlue", AutoCommands.threeBallAutoBlue()),
       // Map.entry("threeBallAutoRed", AutoCommands.threeBallAutoRed()),
       // Map.entry("twoBallAutoBottomBlue", AutoCommands.twoBallAutoBottomBlue()),

@@ -72,7 +72,7 @@ public class ShooterSystem extends SubsystemBase {
     private static double cameraTargetAngle = 0.0;
     private static double horizontalDistance = 0.0;
     private static final double GRAVITY_ACCELERATION = -32.1741; // feet/s^2
-    private static final double INITIAL_Y_VELOCITY = ((GOAL_HEIGHT - CAMERA_HEIGHT) - (0.5 * GRAVITY_ACCELERATION * (TIME_TO_SHOOT * TIME_TO_SHOOT))) / TIME_TO_SHOOT; // feet/s
+    private static final double INITIAL_Y_VELOCITY = ((GOAL_HEIGHT - CAMERA_HEIGHT) - (0.5 * GRAVITY_ACCELERATION * ((TIME_TO_SHOOT / 2) * (TIME_TO_SHOOT / 2)))) / (TIME_TO_SHOOT / 2); // feet/s
     private static double initialXVelocity = 0.0;
     private static double initialVelocity = 0.0;
     private static double rotationalVelocity = 0.0;

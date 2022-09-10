@@ -407,8 +407,12 @@ public class DriveSystem extends SubsystemBase {
 		double robotX = robotPos.getX();
 		double robotY = robotPos.getY();
 
+		System.out.println("X: " + robotX + "\n" + "Y: " + robotY);
+
 		double targetX = targetPosition.getX();
 		double targetY = targetPosition.getY();
+
+		System.out.println("Target Distance: " + target);
 
 		return
 		(robotX >= (targetX - 0.25) && robotX <= (targetX + 0.25)) 
@@ -515,6 +519,8 @@ public class DriveSystem extends SubsystemBase {
 	 */
 	public void driveDistance() {
 		double targetDist = target;
+
+		System.out.println("Target Distance: " + targetDist);
 		
 		if (driveDirection == Direction.FORWARD) {
 			targetDist = (targetDist * INCHES_PER_METER) / WHEEL_CIRCUMFERENCE;
@@ -525,7 +531,7 @@ public class DriveSystem extends SubsystemBase {
 		}
 
 		this.leftPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
-		this.rightPIDCont.setReference(targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+		this.rightPIDCont.setReference(-targetDist, ControlType.kPosition, Constants.POSITION_SLOT_ID);
 	}
 
 	/**
@@ -770,26 +776,26 @@ public class DriveSystem extends SubsystemBase {
 	 * calculated via {@link #driveToPosition(double, double)} at the 
 	 * passed in speed.
 	 * 
-	 * @param speed Percentage of voltage to set the robot to using {@link #voltage(double, double)}.
+	 * @param speed Percentage of voltage to set the robot to using {@link #percent(double, double)}.
 	 */
 	public void turn(double speed) {
 		switch (turnDirection) {
 		case LEFT:
-			this.voltage(-speed, -speed);
+			this.percent(-speed, -speed);
 			break;
 		case RIGHT:
  
-		this.voltage(speed, speed);
+		this.percent(speed, speed);
 			break;
 		default:
-			this.voltage(0, 0);
+			this.percent(0, 0);
 		}
 	}
 
 	/**
 	 * Turns the robot in the passed in direction at the passed in speed.
 	 * 
-	 * @param speed Percentage of voltage to set the robot to using {@link #voltage(double, double)}.
+	 * @param speed Percentage of voltage to set the robot to using {@link #percent(double, double)}.
 	 * @param direction The direction to turn in.
 	 */
 	public void oldTurn(double speed, Direction direction) {

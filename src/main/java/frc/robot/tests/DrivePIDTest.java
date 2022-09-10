@@ -121,6 +121,8 @@ public class DrivePIDTest extends Test {
         this.currMode = mode;
 
         this.setPIDFMode(mode);
+
+        this.command = DriveCommands.pidDriveCommand(0.0, ControlType.kPosition, Constants.POSITION_SLOT_ID);
     }
 
     /**
@@ -198,12 +200,18 @@ public class DrivePIDTest extends Test {
                 // Sets the current PIDF values.
                 setPIDFVals(pValue.getDouble(0.0), iValue.getDouble(0.0), dValue.getDouble(0.0), 0.0, fValue.getDouble(0.0), Constants.POSITION_SLOT_ID);
 
-                /* 
-                 * Sets the PID drive command.
-                 * 
-                 * Divide by wheel circumference (in.) to go from inches to rotations
-                 */
-                this.command = DriveCommands.pidDriveCommand(this.setpoint.getDouble(0.0) / DriveSystem.WHEEL_CIRCUMFERENCE, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+                // Schedules the command if not already scheduled.
+                if (!this.command.isScheduled()) {
+                    /*
+                     * Sets the PID drive command.
+                     * 
+                     * Divide by wheel circumference (in.) to go from 
+                     * inches to rotations 
+                     */
+                    this.command = DriveCommands.pidDriveCommand(this.setpoint.getDouble(0.0) / DriveSystem.WHEEL_CIRCUMFERENCE, ControlType.kPosition, Constants.POSITION_SLOT_ID);
+
+                    this.command.schedule(false);
+                }               
             }
             else if (currMode == DriveSystem.Mode.TELEOP) {
                 // Update current robot velocity (RPM).
@@ -212,18 +220,18 @@ public class DrivePIDTest extends Test {
                 // Sets the current PIDF values.
                 setPIDFVals(pValue.getDouble(0.0), iValue.getDouble(0.0), dValue.getDouble(0.0), 0.0, fValue.getDouble(0.0), Constants.VELOCITY_SLOT_ID);
 
-                // Sets the PID drive command.
-                this.command = DriveCommands.pidDriveCommand(this.setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
-            }
+                // Schedules the command if not already scheduled.
+                if (!this.command.isScheduled()) {
+                    // Sets the PID drive command.
+                    this.command = DriveCommands.pidDriveCommand(this.setpoint.getDouble(0.0), ControlType.kVelocity, Constants.VELOCITY_SLOT_ID);
 
-            // Schedules the command if not already scheduled.
-            if (!CommandScheduler.getInstance().isScheduled(this.command)) {
-                CommandScheduler.getInstance().schedule(this.command);
+                    this.command.schedule(false);
+                } 
             }
         }
         // If not enabled, cancel the current test.
         else {
-            CommandScheduler.getInstance().cancel(this.command);
+            this.command.cancel();
         }
     }
 }

@@ -78,6 +78,8 @@ public class ShooterHoodTest extends Test {
         this.currServoOffset = layout.add("Current Servo Offset", Robot.shooter.getServoOffset()).getEntry();
 
         this.enableHood = layout.add("Enable Hood Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+
+        this.command = ShooterCommands.setHoodAngleCommand(Robot.shooter.getServoOffset() - Robot.shooter.getHoodAngle());
     }
     
     /**
@@ -98,21 +100,15 @@ public class ShooterHoodTest extends Test {
              */
             Robot.shooter.setServoOffset(this.currServoOffset.getDouble(90.0));
 
-            /* 
-             * Sets the hood angle to the commanded hood 
-             * angle in the Shuffleboard.
-             * 
-             * Use Robot.shooter.getServoOffset(), as servo 
-             * offset might be different in Shuffleboard.
-             */
-            this.command = ShooterCommands.setHoodAngleCommand(setHoodAngle.getDouble(Robot.shooter.getServoOffset()));
-
             /*
              * Schedules the set hood angle command if the 
              * command is not already scheduled.
              */
-            if (!CommandScheduler.getInstance().isScheduled(this.command)) {
-                CommandScheduler.getInstance().schedule(this.command);
+            if (!this.command.isScheduled()) {
+                // Sets the hood angle command.
+                this.command = ShooterCommands.setHoodAngleCommand(setHoodAngle.getDouble(0.0));
+                
+                this.command.schedule(false);
             }
 
             /* 
@@ -123,7 +119,7 @@ public class ShooterHoodTest extends Test {
         }
         // If not enabled, cancel the current test.
         else {
-            CommandScheduler.getInstance().cancel(this.command);
+            this.command.cancel();
         }
     }
 }

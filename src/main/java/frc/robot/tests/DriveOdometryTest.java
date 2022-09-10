@@ -59,8 +59,8 @@ public class DriveOdometryTest extends Test {
     private NetworkTableEntry enableOdometry;
 
     /**
-     * Stores the drive to position command 
-     * ({@link AutoCommands#driveToPosAutoCommand(double, double)}).
+     * Stores the drive to position command
+     * ({@link AutoCommands#driveToPosAutoCommand(double, double)})
      */
     private Command command;
 
@@ -88,6 +88,8 @@ public class DriveOdometryTest extends Test {
         this.targetY = layout.add("Target Y", robotPos.getY()).getEntry();
 
         this.enableOdometry = layout.add("Enable Odometry Test", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+
+        this.command = AutoCommands.driveToPosAutoCommand(robotPos.getX(), robotPos.getY());
     }
     
     /**
@@ -118,17 +120,17 @@ public class DriveOdometryTest extends Test {
             double xPos = this.targetX.getDouble(robotPos.getX());
             double yPos = this.targetY.getDouble(robotPos.getY());
 
-            // Gets the command to run for the test.
-            this.command = AutoCommands.driveToPosAutoCommand(xPos, yPos);
-
             // Schedules the command if not already scheduled.
-            if (!CommandScheduler.getInstance().isScheduled(this.command)) {
-                CommandScheduler.getInstance().schedule(this.command);
+            if (!this.command.isScheduled()) {
+                // Sets the odometry command.
+                this.command = AutoCommands.driveToPosAutoCommand(xPos, yPos);
+
+                this.command.schedule(false);
             }
         }
         // If not enabled, cancel the current test.
         else {
-            CommandScheduler.getInstance().cancel(this.command);
+            this.command.cancel();
         }
     }
 }
